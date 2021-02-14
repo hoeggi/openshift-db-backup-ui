@@ -9,7 +9,7 @@ plugins {
     id( "org.jetbrains.kotlin.kapt") version "1.4.30"
 }
 
-group = "com.theapache64"
+group = "io.github.hoeggi"
 version = "1.0.0-alpha01"
 
 repositories {
@@ -42,10 +42,10 @@ tasks.withType<KotlinCompile>() {
 
 compose.desktop {
     application {
-        mainClass = "com.theapache64.ntcdesktop.MainKt"
+        mainClass = "io.github.hoeggi.openshiftdb.ntcdesktop.MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Name That Color Desktop"
+            targetFormats(TargetFormat.Deb)
+            packageName = "openshift-db-gui"
         }
     }
 }
