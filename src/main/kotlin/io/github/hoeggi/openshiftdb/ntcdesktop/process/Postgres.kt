@@ -50,7 +50,7 @@ class Postgres {
             object Started : Download()
             class InProgres(val lines: List<String>) : Download()
             class Success(val path: String) : Download()
-            class Error(val exitCode: Int, val  ex: Exception?) : Download()
+            class Error(val exitCode: Int, val ex: Exception?) : Download()
         }
     }
 
@@ -62,6 +62,9 @@ class Postgres {
     private fun Process.await() = also {
         it.onExit().thenAcceptAsync {
             println("postges onExit: ${it.exitValue()} - ${Thread.currentThread().name}")
+//            if (it.exitValue() != 0) {
+//                println(it.errorStream.source().buffer().readUtf8())
+//            }
         }
         it.waitFor()
     }
@@ -90,6 +93,14 @@ class Postgres {
 
     suspend fun listLines(password: String): List<String> {
         return list(password).split("\n").filter { it.isNotEmpty() }
+    }
+
+    suspend fun defaultDB(password: String) = withContext(Dispatchers.IO) {
+        ProcessBuilder(defaultDb)
+            .withPassword(password)
+            .start()
+            .await()
+            .text()
     }
 
     suspend fun list(password: String) = withContext(Dispatchers.IO) {
@@ -145,6 +156,13 @@ class Postgres {
             "-h", "localhost", "-p", "5432", "-U", "postgres",
             "-q", "-A", "-t",
             "-c", "select version();"
+        )
+
+        val defaultDb = listOf(
+            "psql",
+            "-h", "localhost", "-p", "5432", "-U", "postgres",
+            "-q", "-A", "-t",
+            "-c", "select current_database();"
         )
 
         fun dump(databse: String) = listOf(

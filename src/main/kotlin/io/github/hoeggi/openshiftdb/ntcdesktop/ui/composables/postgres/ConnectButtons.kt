@@ -21,6 +21,7 @@ fun ConnectButtons(){
             onClick = {
                 viewModel.postgresVersion()
                 viewModel.listLines()
+//                viewModel.selectDefaultDatabase()
             }
         ) {
             Text(

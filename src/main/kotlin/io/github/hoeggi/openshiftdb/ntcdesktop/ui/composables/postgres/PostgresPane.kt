@@ -1,18 +1,11 @@
 package io.github.hoeggi.openshiftdb.ntcdesktop.ui.composables
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.ntcdesktop.PostgresViewModel
 import io.github.hoeggi.openshiftdb.ntcdesktop.Scope
 import io.github.hoeggi.openshiftdb.ntcdesktop.ui.composables.postgres.ConsoleOutput
-import java.io.Console
+import io.github.hoeggi.openshiftdb.ntcdesktop.ui.composables.postgres.DatabaseChooser
 
 //var finished by mutableStateOf("")
 

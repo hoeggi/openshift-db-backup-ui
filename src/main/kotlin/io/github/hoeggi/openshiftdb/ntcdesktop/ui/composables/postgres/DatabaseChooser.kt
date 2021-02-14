@@ -1,4 +1,4 @@
-package io.github.hoeggi.openshiftdb.ntcdesktop.ui.composables
+package io.github.hoeggi.openshiftdb.ntcdesktop.ui.composables.postgres
 
 import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.clickable

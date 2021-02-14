@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun OcPane() {
+fun OcPane(modifier: Modifier = Modifier.fillMaxWidth(0.5f)) {
 
     val viewModel = OcViewModel.current
 
@@ -25,7 +25,7 @@ fun OcPane() {
     val portForward: OC.PortForward? by viewModel.portForward.collectAsState(Scope.current.coroutineContext)
 
     Column(
-        modifier = Modifier.fillMaxWidth(0.5f)
+        modifier = modifier
     ) {
         OcVersion(version)
         CurrentProject(currentProject)

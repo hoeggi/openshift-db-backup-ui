@@ -26,12 +26,9 @@ class PostgresViewModel(
     private val _postgresVersion = MutableStateFlow("")
     private val _pgdupmVersion = MutableStateFlow("")
     private val _dumpPath = MutableStateFlow("")
-//    private val _dump: MutableStateFlow<Postgres.PostgresResult.Dump?> = MutableStateFlow(null)
 
     private val _downloadState: MutableStateFlow<Postgres.PostgresResult.Download> =
         MutableStateFlow(Postgres.PostgresResult.Download.Unspecified)
-
-    //5xhdr;T,D+Fs6NE})mJ:{Fsw
 
     init {
         psqlVersion()
@@ -88,6 +85,7 @@ class PostgresViewModel(
     val databasesLines = _databasesLines.asStateFlow()
     fun listLines() = coroutineScope.launch {
         _databasesLines.value = postgres.listLines(password.value)
+        selectDefaultDatabase()
     }
 
     val databases = _databases.asStateFlow()
@@ -103,5 +101,13 @@ class PostgresViewModel(
     fun detectPassword() = coroutineScope.launch {
         val secrets = oc.secrets()
         _password.value = findPassword(secrets.json) ?: ""
+    }
+
+    private fun selectDefaultDatabase() = coroutineScope.launch {
+        val default = postgres.defaultDB(password.value).replace("\n", "")
+        val defaultDb = databasesLines.value.indexOfFirst {
+            it == default
+        }
+        _selectedDatabase.value = defaultDb
     }
 }
