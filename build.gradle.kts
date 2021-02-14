@@ -1,7 +1,6 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 plugins {
     kotlin("jvm") version "1.4.30"
@@ -35,14 +34,14 @@ tasks.test {
     useJUnit()
 }
 
-tasks.withType<KotlinCompile>() {
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi"
 }
 
 compose.desktop {
     application {
-        mainClass = "io.github.hoeggi.openshiftdb.ntcdesktop.MainKt"
+        mainClass = "io.github.hoeggi.openshiftdb.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Deb)
             packageName = "openshift-db-gui"
