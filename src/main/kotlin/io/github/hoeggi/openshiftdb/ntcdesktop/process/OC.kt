@@ -15,6 +15,13 @@ class OC {
         class Projects(val projects: List<String>, result: ProcessResult) : OcResult(result)
         class Services(val services: List<Service>, result: ProcessResult) : OcResult(result)
         class Secret(val json: String, result: ProcessResult) : OcResult(result)
+        class Server(val json: String, result: ProcessResult) : OcResult(result)
+
+        sealed class LoginState(result: ProcessResult = ProcessResult.Ok) : OcResult(result) {
+            object Unchecked : LoginState()
+            object LoggedIn : LoginState()
+            class NotLogedIn(result: ProcessResult) : LoginState(result)
+        }
     }
 
     class PortForwardTarget(val projectName: String, val serviceName: String, val port: String)
@@ -37,6 +44,11 @@ class OC {
         object Projects : Commands("projects", "-q")
         object Services : Commands("get", "svc", "-ojson")
         object Secrets : Commands("get", "secrets", "-ojson")
+
+        class Login(token: String, server: String) : Commands("login", "--token=$token", "--server=$server")
+        object ListServer : Commands("config", "view", "--minify", "-ojson")
+        object CheckLogin : Commands("whoami")
+
         sealed class Project(name: String = "") : Commands("project", "-q", "$name") {
             object Show : Project()
             class Switch(name: String) : Project(name)
@@ -44,6 +56,33 @@ class OC {
 
         class PortForward(projectName: String, serviceName: String, port: String) :
             Commands("-n", "$projectName", "port-forward", "svc/$serviceName", "$port:$port")
+    }
+
+    suspend fun checkLogin() = withContext(Dispatchers.IO) {
+        val process = process(Commands.CheckLogin)
+        when (process.exitValue()) {
+            0 -> OcResult.LoginState.LoggedIn
+            else -> OcResult.LoginState.NotLogedIn(process.result())
+        }
+    }
+
+    suspend fun login(token: String, server: String) = withContext(Dispatchers.IO) {
+        val process = process(Commands.Login(token, server))
+        when (process.exitValue()) {
+            0 -> OcResult.LoginState.LoggedIn
+            else -> OcResult.LoginState.NotLogedIn(process.result())
+        }
+    }
+
+    suspend fun listServer() = withContext(Dispatchers.IO) {
+        val process = process(Commands.ListServer)
+
+        val text = process.inputStream.source().buffer().readUtf8()
+        val error = process.errorStream.source().buffer().readUtf8()
+        println(error)
+        process.let {
+            OcResult.Server(text, it.result())
+        }
     }
 
     suspend fun portForward(projectName: String, serviceName: String, port: String): PortForward =

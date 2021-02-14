@@ -1,6 +1,6 @@
 package io.github.hoeggi.openshiftdb.ntcdesktop.ui.viewmodel
 
-import io.github.hoeggi.openshiftdb.ntcdesktop.process.OC
+import io.github.hoeggi.openshiftdb.ntcdesktop.process.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,14 +20,31 @@ class OcViewModel(private val oc: OC, private val coroutineScope: CoroutineScope
     private val _portForward: MutableStateFlow<OC.PortForward?> =
         MutableStateFlow(null)
 
+    private val _loginState: MutableStateFlow<OC.OcResult.LoginState> =
+        MutableStateFlow(OC.OcResult.LoginState.Unchecked)
+    private val _server: MutableStateFlow<List<Server>> =
+        MutableStateFlow(listOf())
 
-    init {
+    fun update() {
         version()
         projects()
         currentProject()
         services()
     }
 
+    val loginState: StateFlow<OC.OcResult.LoginState> = _loginState.asStateFlow()
+    fun checkLoginState() = coroutineScope.launch {
+        _loginState.value = oc.checkLogin()
+    }
+
+    fun login(token: String, server: String) = coroutineScope.launch {
+        _loginState.value = oc.login(token, server)
+    }
+
+    val server: StateFlow<List<Server>> = _server.asStateFlow()
+    fun listServer() = coroutineScope.launch {
+        _server.value = parseServer(oc.listServer().json)
+    }
 
     val projects: StateFlow<OC.OcResult> = _projects.asStateFlow()
     fun projects() = coroutineScope.launch {

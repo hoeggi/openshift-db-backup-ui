@@ -1,6 +1,7 @@
 package io.github.hoeggi.openshiftdb.ntcdesktop.process
 
-sealed class ProcessResult(val code: Int) {
+sealed class ProcessResult(val code: Int = -1) {
+    object Unset : ProcessResult()
     object Ok : ProcessResult(0)
     class Error(result: Int) : ProcessResult(result)
 }

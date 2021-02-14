@@ -70,6 +70,26 @@ fun findPassword(json: String?): String? = try {
     null
 }
 
+@JsonClass(generateAdapter = true)
+data class Clusters(val clusters: List<Cluster>)
+
+@JsonClass(generateAdapter = true)
+data class Cluster(val cluster: Server)
+
+@JsonClass(generateAdapter = true)
+data class Server(val server: String)
+
+fun parseServer(json: String?) = try {
+    if (json.isNullOrBlank()) listOf()
+    else Moshi.Builder()
+        .build()
+        .adapter(Clusters::class.java)
+        .fromJson(json)?.clusters?.map { it.cluster } ?: listOf()
+} catch (ex: Exception) {
+    ex.printStackTrace()
+    listOf()
+}
+
 private fun matchesUsername(key: String, value: String) =
     (key.equals("username", true)
             || key.equals("user", true))
