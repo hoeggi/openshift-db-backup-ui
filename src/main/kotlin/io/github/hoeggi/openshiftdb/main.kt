@@ -23,6 +23,7 @@ import io.github.hoeggi.openshiftdb.ui.theme.ColorMuskTheme
 import io.github.hoeggi.openshiftdb.ui.viewmodel.OcViewModel
 import io.github.hoeggi.openshiftdb.ui.viewmodel.PostgresViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.util.concurrent.Executors
@@ -66,7 +67,6 @@ fun main() {
         val postgresViewModel = PostgresViewModel(postgres, oc, scope)
 
         val loginState: OC.OcResult.LoginState by ocViewModel.loginState.collectAsState(
-            OC.OcResult.LoginState.NotLogedIn(ProcessResult.Unset),
             scope.coroutineContext
         )
 
@@ -144,7 +144,6 @@ var selected by mutableStateOf(-1)
 private fun LoginScreen(ocViewModel: OcViewModel) {
 
     val server by ocViewModel.server.collectAsState(
-        listOf(),
         Scope.current.coroutineContext
     )
     ocViewModel.listServer()

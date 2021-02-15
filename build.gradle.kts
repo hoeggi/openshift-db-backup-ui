@@ -45,6 +45,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Deb)
             packageName = "openshift-db-gui"
+            modules("java.logging")
         }
     }
 }
