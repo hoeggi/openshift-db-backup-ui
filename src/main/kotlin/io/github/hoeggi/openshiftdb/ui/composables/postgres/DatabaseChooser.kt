@@ -42,7 +42,7 @@ fun DatabaseChooser() {
                     Text(
                         modifier = Modifier.fillMaxWidth(0.75f),
                         text = databases[idx],
-                        style = MaterialTheme.typography.overline
+                        style = MaterialTheme.typography.caption
                     )
                     RadioButton(
                         selected = idx == selectedDatabase,
@@ -53,6 +53,7 @@ fun DatabaseChooser() {
                 }
             }
         }
+
         if (selectedDatabase != -1) {
             Row(
                 modifier = Modifier.padding(10.dp),
@@ -74,7 +75,8 @@ fun DatabaseChooser() {
                     }
                 )
                 Text(
-                    text = dumpPath
+                    text = dumpPath,
+                    modifier = Modifier.padding(horizontal = 5.dp)
                 )
             }
         }

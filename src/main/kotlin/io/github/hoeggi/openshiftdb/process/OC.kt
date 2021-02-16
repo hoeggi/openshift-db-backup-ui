@@ -28,8 +28,8 @@ class OC {
     class PortForward(private val process: Process, val target: PortForwardTarget) {
         val isAlive
             get() = process.isAlive
-        val stream = process.inputStream.bufferedReader()
-        val errorStream = process.errorStream.bufferedReader()
+        val stream = process.inputStream.source().buffer()
+        val errorStream = process.errorStream.source().buffer()
         fun stop() {
             if (process.supportsNormalTermination()) process.destroy()
             else process.destroyForcibly()
@@ -46,7 +46,7 @@ class OC {
         object Secrets : Commands("get", "secrets", "-ojson")
 
         class Login(token: String, server: String) : Commands("login", "--token=$token", "--server=$server")
-        object ListServer : Commands("config", "view", "--minify", "-ojson")
+        object ListServer : Commands("config", "view", "-ojson")
         object CheckLogin : Commands("whoami")
 
         sealed class Project(name: String = "") : Commands("project", "-q", name) {

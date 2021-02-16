@@ -2,9 +2,29 @@ import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+//buildscript {
+//    repositories {
+//        // TODO: remove after new build is published
+//        mavenLocal().mavenContent {
+//            includeModule("org.jetbrains.compose", "compose-gradle-plugin")
+//        }
+//        google()
+//        jcenter()
+//        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+//    }
+//
+//    dependencies {
+//        // __LATEST_COMPOSE_RELEASE_VERSION__
+//        classpath("org.jetbrains.compose:compose-gradle-plugin:0.3.1-SNAPSHOT")
+//        // __KOTLIN_COMPOSE_VERSION__
+//        classpath(kotlin("gradle-plugin", version = "1.4.30"))
+//    }
+//}
+
+
 plugins {
     kotlin("jvm") version "1.4.30"
-    id("org.jetbrains.compose") version "0.3.0-build152"
+    id("org.jetbrains.compose") version "0.3.0-build154"
     id( "org.jetbrains.kotlin.kapt") version "1.4.30"
 }
 

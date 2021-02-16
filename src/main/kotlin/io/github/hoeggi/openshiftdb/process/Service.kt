@@ -14,7 +14,7 @@ data class ServiceItem(val metadata: Metadata, val spec: ServiceSpec)
 data class Metadata(val name: String)
 
 @JsonClass(generateAdapter = true)
-data class ServiceSpec(val ports: List<Port>)
+data class ServiceSpec(val ports: List<Port>?)
 
 @JsonClass(generateAdapter = true)
 data class Port(val port: String)
@@ -28,10 +28,10 @@ fun parseServices(json: String?) = try {
         .adapter(ServiceResult::class.java)
         .fromJson(json)
         .let {
-            it?.items?.map {
+            it?.items?.filter { it.spec.ports != null }?.map {
                 Service(
                     name = it.metadata.name,
-                    ports = it.spec.ports.map { it.port }
+                    ports = it.spec.ports!!.map { it.port }
                 )
             } ?: listOf()
         }
