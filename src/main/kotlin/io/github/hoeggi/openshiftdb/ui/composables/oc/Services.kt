@@ -27,7 +27,7 @@ fun Service(
     ) {
         Text(
             text = "Available services:",
-            style = MaterialTheme.typography.caption
+            style = MaterialTheme.typography.body1
         )
         Spacer(
             modifier = Modifier.height(10.dp)
@@ -58,7 +58,7 @@ fun Service(
         Text(
             text = service.name,
             modifier = Modifier.fillMaxSize().padding(2.dp),
-            style = MaterialTheme.typography.overline
+            style = MaterialTheme.typography.caption
         )
         service.ports.forEach {
             Text(text = "* $it",
@@ -67,9 +67,9 @@ fun Service(
                     .clickable {
                         onServiceClicked(service, it, scope)
                     },
-                style = MaterialTheme.typography.overline
+                style = MaterialTheme.typography.caption
             )
         }
-        Divider(color = Color.White, thickness = 1.dp)
+        Divider(modifier = Modifier.padding(vertical = 1.dp))
     }
 }

@@ -9,7 +9,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.process.OC
@@ -26,16 +25,18 @@ fun AllProjects(
     ) {
         Text(
             text = "All projects:",
-            style = MaterialTheme.typography.caption
+            style = MaterialTheme.typography.body1
         )
         Spacer(
             modifier = Modifier.height(10.dp)
         )
         LazyColumn {
-            items(when(projects){
-                is OC.OcResult.Projects -> projects.projects
-                else -> listOf()
-            }) { item ->
+            items(
+                when (projects) {
+                    is OC.OcResult.Projects -> projects.projects.filterNot { it.startsWith("openshift") }
+                    else -> listOf()
+                }
+            ) { item ->
                 Project(
                     name = item,
                     onProjectClicked = onProjectClicked
@@ -51,14 +52,14 @@ fun Project(
     onProjectClicked: (String, CoroutineScope) -> Unit
 ) {
     val scope = Scope.current
-    Column (
+    Column(
         modifier = Modifier
             .clickable {
                 onProjectClicked(name, scope)
             }
             .fillMaxWidth(),
     ) {
-        Text(text = name, modifier = Modifier.fillMaxSize().padding(2.dp), style = MaterialTheme.typography.overline)
-        Divider(color = Color.White, thickness = 1.dp)
+        Text(text = name, modifier = Modifier.fillMaxSize().padding(2.dp), style = MaterialTheme.typography.caption)
+        Divider()
     }
 }

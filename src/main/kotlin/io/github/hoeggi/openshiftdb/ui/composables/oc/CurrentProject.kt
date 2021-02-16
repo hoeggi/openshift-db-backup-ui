@@ -20,7 +20,7 @@ fun CurrentProject(project: OC.OcResult) {
     ) {
         Text(
             text = "Current project:",
-            style = MaterialTheme.typography.caption
+            style = MaterialTheme.typography.body1
         )
         Spacer(
             modifier = Modifier.height(10.dp)
@@ -30,7 +30,7 @@ fun CurrentProject(project: OC.OcResult) {
                 is OC.OcResult.Project -> project.text
                 else -> "Unset"
             },
-            style = MaterialTheme.typography.overline
+            style = MaterialTheme.typography.caption
         )
     }
 }

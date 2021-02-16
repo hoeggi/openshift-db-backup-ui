@@ -1,15 +1,27 @@
 package io.github.hoeggi.openshiftdb.ui.composables.oc
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.process.OC
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+
+private var expanded by mutableStateOf(false)
 
 @Composable
 fun OcVersion(version: OC.OcResult) {
@@ -18,20 +30,31 @@ fun OcVersion(version: OC.OcResult) {
         modifier = Modifier
             .padding(10.dp)
     ) {
-        Text(
-            text = "oc version:",
-            style = MaterialTheme.typography.caption
-        )
-        Spacer(
-            modifier = Modifier.height(10.dp)
-        )
-        Text(
-            text = when (version) {
-                is OC.OcResult.Version -> version.text
-                else -> "Unset"
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable {
+                expanded = !expanded
             },
-            style = MaterialTheme.typography.overline
-        )
+        ) {
+            Text(
+                text = "oc version",
+                style = MaterialTheme.typography.body1,
+            )
+            Icon(if (expanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown, "")
+        }
+
+        if (expanded) {
+            Spacer(
+                modifier = Modifier.height(5.dp)
+            )
+            Text(
+                text = when (version) {
+                    is OC.OcResult.Version -> version.text
+                    else -> "Unset"
+                },
+                style = MaterialTheme.typography.caption
+            )
+        }
     }
 
 }

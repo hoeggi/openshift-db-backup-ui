@@ -1,5 +1,6 @@
 package io.github.hoeggi.openshiftdb.ui.viewmodel
 
+import androidx.compose.ui.text.input.TextFieldValue
 import com.google.common.collect.EvictingQueue
 import io.github.hoeggi.openshiftdb.process.DatabaseDownloader
 import io.github.hoeggi.openshiftdb.process.OC
@@ -21,7 +22,7 @@ class PostgresViewModel(
     private val _databases = MutableStateFlow("")
     private val _databasesLines = MutableStateFlow(listOf<String>())
     private val _psqlVersion = MutableStateFlow("")
-    private val _password = MutableStateFlow("")
+    private val _password = MutableStateFlow(TextFieldValue(""))
     private val _selectedDatabase = MutableStateFlow(-1)
     private val _postgresVersion = MutableStateFlow("")
     private val _pgdupmVersion = MutableStateFlow("")
@@ -40,7 +41,7 @@ class PostgresViewModel(
         if (database.isEmpty()) return@launch
         _downloadState.value = Postgres.PostgresResult.Download.Started
         postgresDownloader.download(
-            dump = postgres.dumpDatabase(database, dumpPath.value, password.value),
+            dump = postgres.dumpDatabase(database, dumpPath.value, password.value.text),
             onNewLine = {
                 downloadQueue.add(it)
                 _downloadState.value = Postgres.PostgresResult.Download.InProgres(downloadQueue.toList())
@@ -68,7 +69,7 @@ class PostgresViewModel(
 
     val postgresVersion = _postgresVersion.asStateFlow()
     fun postgresVersion() = coroutineScope.launch {
-        _postgresVersion.value = postgres.postgresVersion(password.value)
+        _postgresVersion.value = postgres.postgresVersion(password.value.text)
     }
 
     val selectedDatabase = _selectedDatabase.asStateFlow()
@@ -78,19 +79,19 @@ class PostgresViewModel(
     }
 
     val password = _password.asStateFlow()
-    fun updatePassword(password: String) {
+    fun updatePassword(password: TextFieldValue) {
         _password.value = password
     }
 
     val databasesLines = _databasesLines.asStateFlow()
     fun listLines() = coroutineScope.launch {
-        _databasesLines.value = postgres.listLines(password.value)
+        _databasesLines.value = postgres.listLines(password.value.text)
         selectDefaultDatabase()
     }
 
     val databases = _databases.asStateFlow()
     fun listPretty() = coroutineScope.launch {
-        _databases.value = postgres.listPretty(password.value)
+        _databases.value = postgres.listPretty(password.value.text)
     }
 
     val psqlVersion = _psqlVersion.asStateFlow()
@@ -100,11 +101,11 @@ class PostgresViewModel(
 
     fun detectPassword() = coroutineScope.launch {
         val secrets = oc.secrets()
-        _password.value = findPassword(secrets.json) ?: ""
+        _password.value = TextFieldValue(findPassword(secrets.json) ?: "")
     }
 
     private fun selectDefaultDatabase() = coroutineScope.launch {
-        val default = postgres.defaultDB(password.value).replace("\n", "")
+        val default = postgres.defaultDB(password.value.text).replace("\n", "")
         val defaultDb = databasesLines.value.indexOfFirst {
             it == default
         }

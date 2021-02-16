@@ -3,29 +3,28 @@ package io.github.hoeggi.openshiftdb
 import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.plus
-import androidx.compose.ui.input.key.shortcuts
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.process.OC
 import io.github.hoeggi.openshiftdb.process.Postgres
-import io.github.hoeggi.openshiftdb.process.ProcessResult
+import io.github.hoeggi.openshiftdb.ui.composables.EditTextField
 import io.github.hoeggi.openshiftdb.ui.composables.oc.OcPane
 import io.github.hoeggi.openshiftdb.ui.composables.postgres.PostgresPane
 import io.github.hoeggi.openshiftdb.ui.theme.ColorMuskTheme
 import io.github.hoeggi.openshiftdb.ui.viewmodel.OcViewModel
 import io.github.hoeggi.openshiftdb.ui.viewmodel.PostgresViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
 import java.util.concurrent.Executors
 import javax.swing.UIManager
 
@@ -41,9 +40,16 @@ private val downloadDispatcher = Executors.newFixedThreadPool(4).asCoroutineDisp
 val Dispatchers.DUMP: CoroutineDispatcher
     get() = downloadDispatcher
 
-val Scope = compositionLocalOf<CoroutineScope>()
-val PostgresViewModel = compositionLocalOf<PostgresViewModel>()
-val OcViewModel = compositionLocalOf<OcViewModel>()
+val Scope = staticCompositionLocalOf<CoroutineScope> {
+    error("unexpected call to Scope")
+}
+val PostgresViewModel = staticCompositionLocalOf<PostgresViewModel> {
+    error("unexpected call to PostgresViewModel")
+}
+val OcViewModel = staticCompositionLocalOf<OcViewModel> {
+    error("unexpected call to OcViewModel")
+}
+
 fun main() {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
     Window(
@@ -71,7 +77,6 @@ fun main() {
         )
 
         var dark by mutableStateOf(true)
-        var tabbed by mutableStateOf(false)
 
         CompositionLocalProvider(
             Scope provides scope,
@@ -92,19 +97,11 @@ fun main() {
                             dark = !dark
                         }
                     )
-//                    Text(text = "Tabbed UI")
-//                    Switch(
-//                        checked = tabbed,
-//                        onCheckedChange = {
-//                            tabbed = !tabbed
-//                        }
-//                    )
                 }
                 when (loginState) {
                     is OC.OcResult.LoginState.LoggedIn -> MainScreen(
                         ocViewModel = ocViewModel,
                         postgresViewModel = postgresViewModel,
-                        tabbedUI = tabbed
                     )
                     is OC.OcResult.LoginState.NotLogedIn -> LoginScreen(
                         ocViewModel = ocViewModel
@@ -137,7 +134,7 @@ private fun Loading(ocViewModel: OcViewModel) {
     }
 }
 
-var token by mutableStateOf("")
+var token by mutableStateOf(TextFieldValue(""))
 var selected by mutableStateOf(-1)
 
 @Composable
@@ -161,26 +158,16 @@ private fun LoginScreen(ocViewModel: OcViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedTextField(
-                    modifier = Modifier//.fillMaxWidth(0.75f)
-                        .shortcuts {
-                            on(Key.CtrlLeft + Key.V) {
-                                val text = Toolkit.getDefaultToolkit()
-                                    .systemClipboard.getData(DataFlavor.stringFlavor)?.toString()
-                                if (text.isNullOrEmpty().not()) token = text!!
-                            }
-                        },
+                EditTextField(
                     value = token,
-                    onValueChange = {
-                        token = it
-                    },
-                    label = { Text("Token") },
-                )
+                ) {
+                    token = it
+                }
                 Button(
                     onClick = {
-                        ocViewModel.login(token, server[selected].server)
+                        ocViewModel.login(token.text, server[selected].server)
                     },
-                    enabled = token.isNotEmpty() && selected != -1,
+                    enabled = token.text.isNotEmpty() && selected != -1,
                     modifier = Modifier.padding(4.dp),
                 ) {
                     Text(text = "Login")
@@ -188,7 +175,7 @@ private fun LoginScreen(ocViewModel: OcViewModel) {
             }
             LazyColumn(
                 contentPadding = PaddingValues(4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.Start
             ) {
                 items(server.size) {
                     Row(
@@ -219,7 +206,6 @@ private fun LoginScreen(ocViewModel: OcViewModel) {
 private fun MainScreen(
     ocViewModel: OcViewModel,
     postgresViewModel: PostgresViewModel,
-    tabbedUI: Boolean
 ) {
     ocViewModel.update()
     Box(
@@ -227,42 +213,12 @@ private fun MainScreen(
             .fillMaxSize()
             .padding(15.dp),
     ) {
-
-        if (tabbedUI) {
-            var selected by mutableStateOf(0)
-            TabRow(
-                selectedTabIndex = selected
-            ) {
-                Tab(
-                    selected = selected == 0,
-                    onClick = {
-                        selected = 0
-                    }
-                ) {
-                    CompositionLocalProvider(OcViewModel provides ocViewModel) {
-                        OcPane(modifier = Modifier.fillMaxWidth())
-                    }
-                }
-                Tab(
-                    selected = selected == 1,
-                    onClick = {
-                        selected = 1
-                    }
-                ) {
-                    CompositionLocalProvider(PostgresViewModel provides postgresViewModel) {
-                        PostgresPane()
-                    }
-                }
+        Row {
+            CompositionLocalProvider(OcViewModel provides ocViewModel) {
+                OcPane()
             }
-
-        } else {
-            Row {
-                CompositionLocalProvider(OcViewModel provides ocViewModel) {
-                    OcPane()
-                }
-                CompositionLocalProvider(PostgresViewModel provides postgresViewModel) {
-                    PostgresPane()
-                }
+            CompositionLocalProvider(PostgresViewModel provides postgresViewModel) {
+                PostgresPane()
             }
         }
     }

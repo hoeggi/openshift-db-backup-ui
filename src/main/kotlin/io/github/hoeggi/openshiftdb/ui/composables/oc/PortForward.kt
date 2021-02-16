@@ -31,11 +31,13 @@ fun PortForward(
     val scope = Scope.current
     scope.launch {
 
-        async(Dispatchers.BACKGROUND) {
+        val input = async(Dispatchers.BACKGROUND) {
             var streamOpen = true
             while (target.isAlive && streamOpen) {
                 try {
-                    val line = target.stream.readLine()
+                    println("reading line - ${target.isAlive} - $streamOpen")
+                    val line = target.stream.readUtf8Line()
+                    println("read line - ${target.isAlive} - $streamOpen")
                     withContext(Dispatchers.Main) {
                         lines = if (line != null) lines.toMutableList().apply {
                             add(line)
@@ -48,11 +50,13 @@ fun PortForward(
             }
         }
 
-        async(Dispatchers.BACKGROUND) {
+        val error = async(Dispatchers.BACKGROUND) {
             var streamOpen = true
             while (target.isAlive && streamOpen) {
                 try {
-                    val line = target.errorStream.readLine()
+                    println("reading error - ${target.isAlive} - $streamOpen")
+                    val line = target.errorStream.readUtf8Line()
+                    println("read error - ${target.isAlive} - $streamOpen")
                     withContext(Dispatchers.Main) {
                         lines = if (line != null) lines.toMutableList().apply {
                             add(line)
@@ -62,6 +66,15 @@ fun PortForward(
                     ex.printStackTrace()
                     streamOpen = false
                 }
+            }
+        }
+        println("before await")
+        input.await()
+        error.await()
+        println("after await")
+        ProcessHandle.allProcesses().forEach {
+            it.info().commandLine().ifPresent {
+                if(it.contains("oc") && it.contains("port-forward")) println("$it")
             }
         }
     }
