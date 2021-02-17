@@ -17,7 +17,7 @@ fun ConnectButtons(){
         modifier = Modifier
             .padding(10.dp)
     ) {
-        OutlinedButton(
+        Button(
             modifier = Modifier.weight(1f).padding(end = 10.dp),
             onClick = {
                 viewModel.postgresVersion()
@@ -29,7 +29,7 @@ fun ConnectButtons(){
                 text = "Connect"
             )
         }
-        OutlinedButton(
+        Button(
             modifier = Modifier.weight(1f).padding(start = 10.dp),
             onClick = {
                 viewModel.listPretty()

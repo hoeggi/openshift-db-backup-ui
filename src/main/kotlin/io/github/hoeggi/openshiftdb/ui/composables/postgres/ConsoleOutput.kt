@@ -29,6 +29,7 @@ fun ConsoleOutput() {
             Scope.current.coroutineContext
         )
 
+//    if(downloadState != Postgres.PostgresResult.Download.)
     Text(
         text = text,
         style = MaterialTheme.typography.caption.copy(
@@ -39,11 +40,10 @@ fun ConsoleOutput() {
 
     when (downloadState) {
         is Postgres.PostgresResult.Download.InProgres -> {
-            Column(
-                modifier = Modifier
-                    .padding(10.dp)
-            ) {
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(10.dp)
+                ) {
                     val lines = (downloadState as Postgres.PostgresResult.Download.InProgres).lines
                     items(lines) { item ->
                         Text(
@@ -52,7 +52,7 @@ fun ConsoleOutput() {
                         )
                     }
                 }
-            }
+//            }
         }
     }
 }

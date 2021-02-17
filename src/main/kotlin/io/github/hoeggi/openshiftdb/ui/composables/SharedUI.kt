@@ -1,8 +1,18 @@
 package io.github.hoeggi.openshiftdb.ui.composables
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.plus
@@ -14,8 +24,49 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.event.KeyEvent
 
 @Composable
+fun ExpandableText(
+    initialState: Boolean = false,
+    header: @Composable ((Boolean) -> Unit),
+    content: @Composable (() -> Unit),
+) {
+    val expanded = remember { mutableStateOf(initialState) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable {
+            expanded.value = !expanded.value
+        },
+    ) {
+        header(expanded.value)
+    }
+    if (expanded.value) {
+        content()
+    }
+}
+
+@Composable
+fun ExpandableText(
+    text: String,
+    initialState: Boolean = false,
+    content: @Composable (() -> Unit)
+) {
+    ExpandableText(
+        initialState = initialState,
+        header = { expanded ->
+            Icon(if (expanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown, "")
+            Text(
+                text = text,
+                style = MaterialTheme.typography.body1,
+            )
+        },
+        content = content,
+    )
+}
+
+@Composable
 fun EditTextField(
     value: TextFieldValue,
+    label: String,
     modifier: Modifier = Modifier,
     onValueChange: (TextFieldValue) -> Unit,
 ) {
@@ -53,7 +104,7 @@ fun EditTextField(
         },
         value = value,
         onValueChange = onValueChange,
-        label = { Text("Password") },
+        label = { Text(label) },
     )
 }
 

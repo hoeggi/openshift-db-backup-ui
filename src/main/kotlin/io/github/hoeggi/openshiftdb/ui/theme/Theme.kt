@@ -14,10 +14,10 @@ fun ColorMuskTheme(
     DesktopMaterialTheme(
         colors = if (isDark) darkColors(
             primary = Color(0xFF3C5EE6),
-//            primaryVariant = Color(0xFF3C5EE6),
             secondary = Color(0xFF1b3394),
             background = Color(0xFF242424),
-            surface = Color(0xFF242424)
+            surface = Color(0xFF242424),
+            onBackground = Color(0xFFEEEEEE),
         ) else lightColors()
     ) {
         Surface {

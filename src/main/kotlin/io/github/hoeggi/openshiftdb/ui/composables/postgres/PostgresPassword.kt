@@ -3,9 +3,7 @@ package io.github.hoeggi.openshiftdb.ui.composables.postgres
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,10 +27,11 @@ fun PostgresPassword() {
         EditTextField(
             value = password,
             modifier = Modifier.fillMaxWidth(0.75f),
+            label = "Password"
         ) {
             viewModel.updatePassword(it)
         }
-        OutlinedButton(
+        Button(
             modifier = Modifier.padding(horizontal = 10.dp),
             onClick = {
                 viewModel.detectPassword()

@@ -20,8 +20,9 @@ import io.github.hoeggi.openshiftdb.process.OC
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import io.github.hoeggi.openshiftdb.ui.composables.ExpandableText
 
-private var expanded by mutableStateOf(false)
+//private var expanded by mutableStateOf(false)
 
 @Composable
 fun OcVersion(version: OC.OcResult) {
@@ -30,20 +31,9 @@ fun OcVersion(version: OC.OcResult) {
         modifier = Modifier
             .padding(10.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable {
-                expanded = !expanded
-            },
+        ExpandableText(
+            text = "oc version",
         ) {
-            Text(
-                text = "oc version",
-                style = MaterialTheme.typography.body1,
-            )
-            Icon(if (expanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown, "")
-        }
-
-        if (expanded) {
             Spacer(
                 modifier = Modifier.height(5.dp)
             )
