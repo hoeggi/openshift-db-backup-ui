@@ -28,7 +28,6 @@ class Postgres {
                 get() = process.exitValue()
 
             override fun close() {
-                RuntimeException("closed").printStackTrace()
                 try {
                     stream.close()
                     errorStream.close()

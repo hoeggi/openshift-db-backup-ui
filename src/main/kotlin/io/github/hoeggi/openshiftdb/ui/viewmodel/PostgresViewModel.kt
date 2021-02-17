@@ -27,6 +27,7 @@ class PostgresViewModel(
     private val _postgresVersion = MutableStateFlow("")
     private val _pgdupmVersion = MutableStateFlow("")
     private val _dumpPath = MutableStateFlow("")
+    private val _userName = MutableStateFlow(TextFieldValue("postgres"))
 
     private val _downloadState: MutableStateFlow<Postgres.PostgresResult.Download> =
         MutableStateFlow(Postgres.PostgresResult.Download.Unspecified)
@@ -55,6 +56,11 @@ class PostgresViewModel(
                 _downloadState.value = Postgres.PostgresResult.Download.Success(it)
             }
         )
+    }
+
+    val userName = _userName.asStateFlow()
+    fun updateUserName(userName: TextFieldValue) = coroutineScope.launch {
+        _userName.value = userName
     }
 
     val dumpPath = _dumpPath.asStateFlow()
@@ -101,7 +107,7 @@ class PostgresViewModel(
 
     fun detectPassword() = coroutineScope.launch {
         val secrets = oc.secrets()
-        _password.value = TextFieldValue(findPassword(secrets.json) ?: "")
+        _password.value = TextFieldValue(findPassword(secrets.json, userName.value.text) ?: "")
     }
 
     private fun selectDefaultDatabase() = coroutineScope.launch {

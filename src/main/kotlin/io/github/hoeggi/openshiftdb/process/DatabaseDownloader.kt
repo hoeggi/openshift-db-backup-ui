@@ -18,9 +18,7 @@ class DatabaseDownloader {
                 val output = dump.output
                 try {
                     while (true) {
-                        println("---reading line---")
                         val line = dump.stream.readUtf8Line() ?: break
-                        println("---read line: $line---")
                         output.writeUtf8(line)
                         output.writeUtf8("\n")
 
@@ -34,9 +32,7 @@ class DatabaseDownloader {
             val error = async(Dispatchers.DUMP) {
                 try {
                     while (true) {
-                        println("---reading errorline---")
                         val line = dump.errorStream.readUtf8Line() ?: break
-                        println("---read errorline: $line---")
                         onNewLine(line)
                     }
                 } catch (ex: IOException) {
@@ -47,14 +43,9 @@ class DatabaseDownloader {
 
             input.await()
             error.await()
-//            runBlocking {
-//                dump.await()
-//            }
             onSuccess(dump.outputPath)
         } catch (ex: Exception) {
-            println("----------------------------------------------")
             ex.printStackTrace()
-            println("----------------------------------------------")
             onError(dump.exitCode, ex)
         } finally {
             dump.close()

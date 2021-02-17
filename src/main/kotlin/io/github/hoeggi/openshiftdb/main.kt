@@ -10,6 +10,9 @@ import androidx.compose.material.*
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ModeNight
+import androidx.compose.material.icons.outlined.ModeNight
+import androidx.compose.material.icons.outlined.PlusOne
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,30 +88,27 @@ fun main() {
             ColorMuskTheme(
                 isDark = dark
             ) {
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(10.dp)
-                ) {
-                    Text(text = "Dark Theme: ")
-                    Switch(
-                        checked = dark,
-                        onCheckedChange = {
+                Box {
+                    when (loginState) {
+                        is OC.OcResult.LoginState.LoggedIn -> MainScreen(
+                            ocViewModel = ocViewModel,
+                            postgresViewModel = postgresViewModel,
+                        )
+                        is OC.OcResult.LoginState.NotLogedIn -> LoginScreen(
+                            ocViewModel = ocViewModel
+                        )
+                        is OC.OcResult.LoginState.Unchecked -> Loading(
+                            ocViewModel = ocViewModel
+                        )
+                    }
+                    FloatingActionButton(
+                        onClick = {
                             dark = !dark
-                        }
-                    )
-                }
-                when (loginState) {
-                    is OC.OcResult.LoginState.LoggedIn -> MainScreen(
-                        ocViewModel = ocViewModel,
-                        postgresViewModel = postgresViewModel,
-                    )
-                    is OC.OcResult.LoginState.NotLogedIn -> LoginScreen(
-                        ocViewModel = ocViewModel
-                    )
-                    is OC.OcResult.LoginState.Unchecked -> Loading(
-                        ocViewModel = ocViewModel
-                    )
+                        },
+                        modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 15.dp, end = 15.dp),
+                    ) {
+                        Icon(if (dark) Icons.Outlined.ModeNight else Icons.Filled.ModeNight, "")
+                    }
                 }
             }
         }
@@ -160,6 +160,7 @@ private fun LoginScreen(ocViewModel: OcViewModel) {
             ) {
                 EditTextField(
                     value = token,
+                    label = "Token",
                 ) {
                     token = it
                 }

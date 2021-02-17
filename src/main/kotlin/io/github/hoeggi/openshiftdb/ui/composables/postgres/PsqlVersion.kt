@@ -1,21 +1,22 @@
 package io.github.hoeggi.openshiftdb.ui.composables.postgres
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
-import androidx.compose.material.icons.outlined.KeyboardArrowUp
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.Scope
-
-private var expanded by mutableStateOf(false)
+import io.github.hoeggi.openshiftdb.ui.composables.EditTextField
+import io.github.hoeggi.openshiftdb.ui.composables.ExpandableText
 
 @Composable
 fun PsqlVersion() {
@@ -24,27 +25,15 @@ fun PsqlVersion() {
     val psqlVersion by viewModel.psqlVersion.collectAsState(Scope.current.coroutineContext)
     val pgdupmVersion by viewModel.pgdupmVersion.collectAsState(Scope.current.coroutineContext)
     val postgresVersion by viewModel.postgresVersion.collectAsState(Scope.current.coroutineContext)
+    val userName by viewModel.userName.collectAsState(Scope.current.coroutineContext)
 
     Column(
         modifier = Modifier
             .padding(10.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable {
-                expanded = !expanded
-            },
+        ExpandableText(
+            text = "postgres version data"
         ) {
-            Text(
-                text = "postgres version data",
-                style = MaterialTheme.typography.body1,
-            )
-            Icon(if (expanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown, "")
-        }
-        Spacer(
-            modifier = Modifier.height(10.dp)
-        )
-        if (expanded) {
             Text(
                 text = "psql version:",
                 style = MaterialTheme.typography.body1
@@ -84,18 +73,37 @@ fun PsqlVersion() {
                 )
             }
         }
-
-
-        Row(
-            verticalAlignment = Alignment.Bottom
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
+        ExpandableText(
+            initialState = false,
+            header = {
+                Row(
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Text(
+                        text = "Username: ",
+                        style = MaterialTheme.typography.body1
+                    )
+                    Text(
+                        text = userName.text,
+                        style = MaterialTheme.typography.caption,
+                    )
+                    Icon(
+                        Icons.Default.Edit,
+                        "",
+                        modifier = Modifier.padding(horizontal = 4.dp).size(16.dp)
+                    )
+                }
+            }
         ) {
-            Text(
-                text = "Username: ",
-                style = MaterialTheme.typography.body1
-            )
-            Text(
-                text = "postgres",
-                style = MaterialTheme.typography.caption
+            EditTextField(
+                value = userName,
+                label = "Username",
+                onValueChange = {
+                    viewModel.updateUserName(it)
+                }
             )
         }
         Row(

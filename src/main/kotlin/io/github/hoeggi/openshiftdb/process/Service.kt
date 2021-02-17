@@ -46,7 +46,7 @@ data class SecretResult(val items: List<SecretItem>)
 @JsonClass(generateAdapter = true)
 data class SecretItem(val data: Map<String, String>)
 
-fun findPassword(json: String?): String? = try {
+fun findPassword(json: String?, userName: String): String? = try {
     if (json.isNullOrBlank()) {
         null
     } else {
@@ -58,7 +58,10 @@ fun findPassword(json: String?): String? = try {
             ?.asSequence()
             ?.map {
                 val map = it.data.filter { (k, v) ->
-                    matchesUsername(k, v) || k.equals("password", true)
+                    val pw = k.equals("password", true)
+                    val user = matchesUsername(k, v, userName)
+                    println("user: $user - pw: $pw")
+                    matchesUsername(k, v, userName) || k.equals("password", true)
                 }.map { (k, v) ->
                     k to v.decodeBase64()?.utf8()
                 }.toMap()
@@ -90,7 +93,8 @@ fun parseServer(json: String?) = try {
     listOf()
 }
 
-private fun matchesUsername(key: String, value: String) =
+private fun matchesUsername(key: String, value: String, userName: String) =
     (key.equals("username", true)
-            || key.equals("user", true))
-            && value.equals("postgres", true)
+            || key.equals("user", true)
+            || key.equals("database-user", true))
+            && value.decodeBase64()?.utf8().equals(userName, true)
