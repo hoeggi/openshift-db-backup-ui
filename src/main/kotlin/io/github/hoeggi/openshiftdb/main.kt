@@ -2,26 +2,19 @@ package io.github.hoeggi.openshiftdb
 
 import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
-import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ModeNight
-import androidx.compose.material.icons.outlined.ModeNight
-import androidx.compose.material.icons.outlined.PlusOne
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.process.OC
 import io.github.hoeggi.openshiftdb.process.Postgres
-import io.github.hoeggi.openshiftdb.ui.composables.EditTextField
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.BottomNav
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.Fab
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.Screen
 import io.github.hoeggi.openshiftdb.ui.composables.oc.OcPane
 import io.github.hoeggi.openshiftdb.ui.composables.postgres.PostgresPane
 import io.github.hoeggi.openshiftdb.ui.theme.ColorMuskTheme
@@ -53,19 +46,31 @@ val OcViewModel = staticCompositionLocalOf<OcViewModel> {
     error("unexpected call to OcViewModel")
 }
 
+val GlobalState = staticCompositionLocalOf<GlobalState> {
+    error("unexpected call to OcViewModel")
+}
+
 fun main() {
+    val globalState = GlobalState()
+    val logger = Logger(globalState)
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+    Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(globalState))
+
     Window(
         title = APP_NAME,
         undecorated = false,
         size = IntSize(1024, 1024),
         events = WindowEvents(
+//            onOpen = {
+//                Initialiser.start(globalState)
+//            },
             onClose = {
                 ProcessHandle.current()
                     .children()
                     .forEach {
                         it.destroy()
                     }
+                logger.stop()
             }
         )
     ) {
@@ -79,41 +84,46 @@ fun main() {
             scope.coroutineContext
         )
 
-        var dark by mutableStateOf(true)
-
         CompositionLocalProvider(
             Scope provides scope,
+            GlobalState provides globalState,
         ) {
-
-            ColorMuskTheme(
-                isDark = dark
-            ) {
-                Box {
-                    when (loginState) {
-                        is OC.OcResult.LoginState.LoggedIn -> MainScreen(
-                            ocViewModel = ocViewModel,
-                            postgresViewModel = postgresViewModel,
-                        )
-                        is OC.OcResult.LoginState.NotLogedIn -> LoginScreen(
-                            ocViewModel = ocViewModel
-                        )
-                        is OC.OcResult.LoginState.Unchecked -> Loading(
-                            ocViewModel = ocViewModel
-                        )
-                    }
-                    FloatingActionButton(
-                        onClick = {
-                            dark = !dark
-                        },
-                        modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 15.dp, end = 15.dp),
-                    ) {
-                        Icon(if (dark) Icons.Outlined.ModeNight else Icons.Filled.ModeNight, "")
-                    }
+            ColorMuskTheme {
+                when (loginState) {
+                    is OC.OcResult.LoginState.LoggedIn -> MainScreen(
+                        ocViewModel = ocViewModel,
+                        postgresViewModel = postgresViewModel,
+                    )
+                    is OC.OcResult.LoginState.NotLogedIn -> LoginScreen(
+                        ocViewModel = ocViewModel
+                    )
+                    is OC.OcResult.LoginState.Unchecked -> Loading(
+                        ocViewModel = ocViewModel
+                    )
                 }
+                Fab(
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                        .padding(bottom = 15.dp, end = 15.dp),
+                )
             }
         }
-
+//
+//        Executors.newSingleThreadExecutor().execute {
+//            while (true) {
+//                Thread.sleep(1000)
+//                println("test1")
+//                Thread.sleep(1000)
+//                println("test2")
+//                Thread.sleep(1000)
+//                println("test3")
+//                Thread.sleep(1000)
+//                println("test4")
+//                Thread.sleep(1000)
+//                exception()
+//            }
+//        }
     }
+
 }
 
 @Composable
@@ -134,94 +144,47 @@ private fun Loading(ocViewModel: OcViewModel) {
     }
 }
 
-var token by mutableStateOf(TextFieldValue(""))
-var selected by mutableStateOf(-1)
-
-@Composable
-private fun LoginScreen(ocViewModel: OcViewModel) {
-
-    val server by ocViewModel.server.collectAsState(
-        Scope.current.coroutineContext
-    )
-    ocViewModel.listServer()
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(15.dp),
-    ) {
-        Column(
-            modifier = Modifier.wrapContentSize(
-                align = Alignment.Center
-            )
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                EditTextField(
-                    value = token,
-                    label = "Token",
-                ) {
-                    token = it
-                }
-                Button(
-                    onClick = {
-                        ocViewModel.login(token.text, server[selected].server)
-                    },
-                    enabled = token.text.isNotEmpty() && selected != -1,
-                    modifier = Modifier.padding(4.dp),
-                ) {
-                    Text(text = "Login")
-                }
-            }
-            LazyColumn(
-                contentPadding = PaddingValues(4.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                items(server.size) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        RadioButton(
-                            modifier = Modifier.padding(4.dp),
-                            selected = it == selected,
-                            onClick = {
-                                selected = it
-                            },
-                        )
-                        Text(
-                            modifier = Modifier.clickable {
-                                selected = it
-                            },
-                            text = server[it].server,
-                            style = MaterialTheme.typography.body2,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
 @Composable
 private fun MainScreen(
     ocViewModel: OcViewModel,
     postgresViewModel: PostgresViewModel,
 ) {
     ocViewModel.update()
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(15.dp),
-    ) {
-        Row {
-            CompositionLocalProvider(OcViewModel provides ocViewModel) {
-                OcPane()
-            }
-            CompositionLocalProvider(PostgresViewModel provides postgresViewModel) {
-                PostgresPane()
+    Box {
+        Control(ocViewModel, postgresViewModel)
+        BottomNav(
+            Modifier.align(Alignment.BottomCenter).height(48.dp)
+        )
+    }
+}
+
+@Composable
+private fun Control(
+    ocViewModel: OcViewModel,
+    postgresViewModel: PostgresViewModel,
+) {
+    val navigationState = GlobalState.current
+    val screen by navigationState.screen.collectAsState(Scope.current.coroutineContext)
+
+    when (screen) {
+        is Screen.Detail -> {
+            Log(modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 48.dp),)
+        }
+        is Screen.Main -> {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 48.dp),
+            ) {
+                CompositionLocalProvider(OcViewModel provides ocViewModel) {
+                    OcPane()
+                }
+                CompositionLocalProvider(PostgresViewModel provides postgresViewModel) {
+                    PostgresPane()
+                }
             }
         }
     }
 }
-

@@ -1,6 +1,5 @@
 package io.github.hoeggi.openshiftdb.ui.composables.postgres
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +14,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.Scope
+import io.github.hoeggi.openshiftdb.collectAsStateFLowState
 import io.github.hoeggi.openshiftdb.process.Postgres
 import kotlinx.coroutines.flow.filterIsInstance
 
@@ -22,9 +22,8 @@ import kotlinx.coroutines.flow.filterIsInstance
 fun ConsoleOutput() {
     val viewModel = PostgresViewModel.current
     val text by viewModel.databases.collectAsState("", Scope.current.coroutineContext)
-    val downloadState: Postgres.PostgresResult.Download by viewModel.downloadState
-        .filterIsInstance<Postgres.PostgresResult.Download.InProgres>()
-        .collectAsState(
+    val downloadProgress: Postgres.PostgresResult.Download by viewModel.downloadProgress
+        .collectAsStateFLowState(
             Postgres.PostgresResult.Download.Unspecified,
             Scope.current.coroutineContext
         )
@@ -37,21 +36,21 @@ fun ConsoleOutput() {
         ),
         modifier = Modifier.fillMaxWidth(1f).padding(10.dp)
     )
-
-    when (downloadState) {
+    println(downloadProgress)
+    when (downloadProgress) {
         is Postgres.PostgresResult.Download.InProgres -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(10.dp)
-                ) {
-                    val lines = (downloadState as Postgres.PostgresResult.Download.InProgres).lines
-                    items(lines) { item ->
-                        Text(
-                            text = item,
-                            style = MaterialTheme.typography.overline
-                        )
-                    }
+            LazyColumn(
+                modifier = Modifier
+                    .padding(10.dp)
+            ) {
+                val lines = (downloadProgress as Postgres.PostgresResult.Download.InProgres).lines
+                items(lines) { item ->
+                    Text(
+                        text = item,
+                        style = MaterialTheme.typography.overline
+                    )
                 }
+            }
 //            }
         }
     }

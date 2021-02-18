@@ -48,7 +48,6 @@ class Postgres {
     }
 
     private fun ProcessBuilder.withPassword(password: String) = also {
-        println("PGPASSWORD='$password'")
         it.environment()["PGPASSWORD"] = password
     }
 

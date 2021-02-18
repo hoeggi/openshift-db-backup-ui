@@ -60,7 +60,6 @@ fun findPassword(json: String?, userName: String): String? = try {
                 val map = it.data.filter { (k, v) ->
                     val pw = k.equals("password", true)
                     val user = matchesUsername(k, v, userName)
-                    println("user: $user - pw: $pw")
                     matchesUsername(k, v, userName) || k.equals("password", true)
                 }.map { (k, v) ->
                     k to v.decodeBase64()?.utf8()

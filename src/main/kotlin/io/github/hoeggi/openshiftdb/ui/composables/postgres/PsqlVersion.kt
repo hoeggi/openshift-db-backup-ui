@@ -34,42 +34,27 @@ fun PsqlVersion() {
         ExpandableText(
             text = "postgres version data"
         ) {
-            Text(
-                text = "psql version:",
-                style = MaterialTheme.typography.body1
-            )
             Spacer(
                 modifier = Modifier.height(5.dp)
             )
             Text(
-                text = psqlVersion,
+                text = psqlVersion.trim(),
                 style = MaterialTheme.typography.caption
             )
-            Text(
-                text = "pgdump version:",
-                style = MaterialTheme.typography.body1
-            )
             Spacer(
-                modifier = Modifier.height(5.dp)
+                modifier = Modifier.height(4.dp)
             )
             Text(
-                text = pgdupmVersion,
+                text = pgdupmVersion.trim(),
                 style = MaterialTheme.typography.caption
             )
             if (postgresVersion.isNotEmpty()) {
-                Text(
-                    text = "postgres version:",
-                    style = MaterialTheme.typography.body1
-                )
                 Spacer(
-                    modifier = Modifier.height(5.dp)
+                    modifier = Modifier.height(4.dp)
                 )
                 Text(
-                    text = postgresVersion,
+                    text = postgresVersion.trim(),
                     style = MaterialTheme.typography.caption
-                )
-                Spacer(
-                    modifier = Modifier.height(10.dp)
                 )
             }
         }
