@@ -9,6 +9,7 @@ import io.github.hoeggi.openshiftdb.process.findPassword
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PostgresViewModel(
     private val postgres: Postgres,
@@ -38,6 +39,10 @@ class PostgresViewModel(
     }
 
     val downloadState = _downloadState.asStateFlow()
+    val downloadProgress = _downloadState.filterIsInstance<Postgres.PostgresResult.Download.InProgres>().onEach {
+        println(it)
+    }
+
     fun dumpDatabase(database: String) = coroutineScope.launch {
         if (database.isEmpty()) return@launch
         _downloadState.value = Postgres.PostgresResult.Download.Started
@@ -80,7 +85,6 @@ class PostgresViewModel(
 
     val selectedDatabase = _selectedDatabase.asStateFlow()
     fun updateSelectedDatabase(index: Int) = coroutineScope.launch {
-        println(index)
         _selectedDatabase.value = index
     }
 

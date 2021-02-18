@@ -1,28 +1,58 @@
+@file:Suppress("FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName",
+    "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName",
+    "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName",
+    "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName",
+    "FunctionName"
+)
+
 package io.github.hoeggi.openshiftdb.ui.theme
 
 import androidx.compose.desktop.DesktopMaterialTheme
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.material.Surface
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import io.github.hoeggi.openshiftdb.ErrorView
+import io.github.hoeggi.openshiftdb.GlobalState
+import io.github.hoeggi.openshiftdb.Scope
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.Theme
+
 
 @Composable
 fun ColorMuskTheme(
-    isDark: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable BoxScope.() -> Unit,
 ) {
-    DesktopMaterialTheme(
-        colors = if (isDark) darkColors(
+    val viewModel = GlobalState.current
+    val dark by viewModel.theme.collectAsState(Scope.current.coroutineContext)
+    val error by viewModel.errors.collectAsState(Scope.current.coroutineContext)
+
+
+    val colors = when (dark) {
+        Theme.Dark -> darkColors(
             primary = Color(0xFF3C5EE6),
             secondary = Color(0xFF1b3394),
             background = Color(0xFF242424),
             surface = Color(0xFF242424),
             onBackground = Color(0xFFEEEEEE),
-        ) else lightColors()
+        )
+        Theme.Light -> lightColors()
+    }
+    DesktopMaterialTheme(
+        colors = colors
     ) {
         Surface {
-            Column {
+            Box {
                 content()
+                if (error.fired) {
+                    ErrorView(error.t, error.th, Modifier.align(Alignment.Center))
+                }
             }
         }
     }

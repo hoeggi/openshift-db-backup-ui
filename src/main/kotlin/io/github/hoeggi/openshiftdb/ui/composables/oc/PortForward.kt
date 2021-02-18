@@ -35,9 +35,7 @@ fun PortForward(
             var streamOpen = true
             while (target.isAlive && streamOpen) {
                 try {
-                    println("reading line - ${target.isAlive} - $streamOpen")
                     val line = target.stream.readUtf8Line()
-                    println("read line - ${target.isAlive} - $streamOpen")
                     withContext(Dispatchers.Main) {
                         lines = if (line != null) lines.toMutableList().apply {
                             add(line)
@@ -54,9 +52,7 @@ fun PortForward(
             var streamOpen = true
             while (target.isAlive && streamOpen) {
                 try {
-                    println("reading error - ${target.isAlive} - $streamOpen")
                     val line = target.errorStream.readUtf8Line()
-                    println("read error - ${target.isAlive} - $streamOpen")
                     withContext(Dispatchers.Main) {
                         lines = if (line != null) lines.toMutableList().apply {
                             add(line)
@@ -68,13 +64,11 @@ fun PortForward(
                 }
             }
         }
-        println("before await")
         input.await()
         error.await()
-        println("after await")
         ProcessHandle.allProcesses().forEach {
             it.info().commandLine().ifPresent {
-                if(it.contains("oc") && it.contains("port-forward")) println("$it")
+                if(it.contains("oc") && it.contains("port-forward")) println(it)
             }
         }
     }

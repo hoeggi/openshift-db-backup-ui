@@ -1,3 +1,9 @@
+@file:Suppress("FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName",
+    "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName",
+    "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName",
+    "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName", "FunctionName"
+)
+
 package io.github.hoeggi.openshiftdb.ui.composables.oc
 
 import androidx.compose.foundation.clickable
