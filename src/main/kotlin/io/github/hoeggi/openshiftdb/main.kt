@@ -20,6 +20,9 @@ import io.github.hoeggi.openshiftdb.ui.composables.postgres.PostgresPane
 import io.github.hoeggi.openshiftdb.ui.theme.ColorMuskTheme
 import io.github.hoeggi.openshiftdb.ui.viewmodel.OcViewModel
 import io.github.hoeggi.openshiftdb.ui.viewmodel.PostgresViewModel
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.*
 import java.util.concurrent.Executors
 import javax.swing.UIManager
@@ -56,14 +59,14 @@ fun main() {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
     Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(globalState))
 
+
+
+
     Window(
         title = APP_NAME,
         undecorated = false,
         size = IntSize(1024, 1024),
         events = WindowEvents(
-//            onOpen = {
-//                Initialiser.start(globalState)
-//            },
             onClose = {
                 ProcessHandle.current()
                     .children()
@@ -74,8 +77,10 @@ fun main() {
             }
         )
     ) {
+
         val scope = rememberCoroutineScope() + Dispatchers.BACKGROUND + Dispatchers.DUMP
         val oc = OC()
+
         val postgres = Postgres()
         val ocViewModel = OcViewModel(oc, scope)
         val postgresViewModel = PostgresViewModel(postgres, oc, scope)
@@ -107,21 +112,6 @@ fun main() {
                 )
             }
         }
-//
-//        Executors.newSingleThreadExecutor().execute {
-//            while (true) {
-//                Thread.sleep(1000)
-//                println("test1")
-//                Thread.sleep(1000)
-//                println("test2")
-//                Thread.sleep(1000)
-//                println("test3")
-//                Thread.sleep(1000)
-//                println("test4")
-//                Thread.sleep(1000)
-//                exception()
-//            }
-//        }
     }
 
 }

@@ -47,6 +47,14 @@ class GlobalState {
         }
     }
 
+    private val _settings: MutableStateFlow<Boolean> =
+        MutableStateFlow(false)
+    val settings = _settings.asStateFlow()
+
+    fun toggleSettings() {
+        _settings.value = !_settings.value
+    }
+
     fun dark() = theme(Theme.Dark)
     fun light() = theme(Theme.Light)
     fun theme(theme: Theme) {

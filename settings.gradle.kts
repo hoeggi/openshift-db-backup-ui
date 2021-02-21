@@ -7,5 +7,12 @@ pluginManagement {
     }
 
 }
-rootProject.name = "name-that-color-desktop"
+rootProject.name = "openshift-db-gui"
 
+include(
+    ":common",
+    ":oc",
+    ":server",
+    ":postgres",
+    ":api"
+)
