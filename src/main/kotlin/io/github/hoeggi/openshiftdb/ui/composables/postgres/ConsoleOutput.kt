@@ -14,19 +14,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.Scope
-import io.github.hoeggi.openshiftdb.collectAsStateFLowState
 import io.github.hoeggi.openshiftdb.process.Postgres
-import kotlinx.coroutines.flow.filterIsInstance
 
 @Composable
 fun ConsoleOutput() {
     val viewModel = PostgresViewModel.current
     val text by viewModel.databases.collectAsState("", Scope.current.coroutineContext)
     val downloadProgress: Postgres.PostgresResult.Download by viewModel.downloadProgress
-        .collectAsStateFLowState(
-            Postgres.PostgresResult.Download.Unspecified,
-            Scope.current.coroutineContext
-        )
+        .collectAsState(Scope.current.coroutineContext)
 
 //    if(downloadState != Postgres.PostgresResult.Download.)
     Text(
@@ -36,7 +31,7 @@ fun ConsoleOutput() {
         ),
         modifier = Modifier.fillMaxWidth(1f).padding(10.dp)
     )
-    println(downloadProgress)
+
     when (downloadProgress) {
         is Postgres.PostgresResult.Download.InProgres -> {
             LazyColumn(

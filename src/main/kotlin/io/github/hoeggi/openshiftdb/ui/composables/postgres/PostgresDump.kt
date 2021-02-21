@@ -27,16 +27,9 @@ fun PostgresDump() {
 
     val selectedDatabase by viewModel.selectedDatabase.collectAsState(-1, Scope.current.coroutineContext)
     val resultState by viewModel.downloadState.collectAsState(
-        Postgres.PostgresResult.Download.Unspecified,
         Scope.current.coroutineContext
     )
     val databases by viewModel.databasesLines.collectAsState(listOf(), Scope.current.coroutineContext)
-//    val downloadState: Postgres.PostgresResult.Download by viewModel.downloadState
-//        .filterIsInstance<Postgres.PostgresResult.Download.InProgres>()
-//        .collectAsState(
-//            Postgres.PostgresResult.Download.Unspecified,
-//            Scope.current.coroutineContext
-//        )
 
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -81,25 +74,5 @@ fun PostgresDump() {
             }
         }
     }
-
-//    when (downloadState) {
-//        is Postgres.PostgresResult.Download.InProgres -> {
-//            Column(
-//                modifier = Modifier
-//                    .padding(10.dp)
-//            ) {
-//                LazyColumn {
-//                    val lines = (downloadState as Postgres.PostgresResult.Download.InProgres).lines
-//                    items(lines) { item ->
-//                        Text(
-//                            text = item,
-//                            style = MaterialTheme.typography.overline
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
-
 }
 

@@ -1,26 +1,27 @@
 package io.github.hoeggi.openshiftdb.process
 
-import io.github.hoeggi.openshiftdb.DUMP
 import io.ktor.application.*
 import io.ktor.auth.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
-import okio.source
 import java.io.Closeable
 import java.io.File
 import java.io.IOException
 import java.time.LocalDateTime
-import kotlin.jvm.Throws
+import java.util.concurrent.Executors
+
+internal val DISPATCHER = Executors.newFixedThreadPool(
+    Runtime.getRuntime().availableProcessors()
+).asCoroutineDispatcher()
 
 class Postgres {
 
     sealed class PostgresResult {
         class Dump(private val process: Process, path: File) : PostgresResult(), Closeable {
-
-            val stream = process.inputStream.source().buffer()
-            val errorStream = process.errorStream.source().buffer()
+            val buffer = process.buffer()
+            val bufferError = process.bufferError()
 
             val outputPath: String = path.absolutePath
             val output = path.sink().buffer()
@@ -31,8 +32,8 @@ class Postgres {
 
             override fun close() {
                 try {
-                    stream.close()
-                    errorStream.close()
+                    process.inputStream.close()
+                    process.errorStream.close()
                     output.close()
                 } catch (ex: IOException) {
                     ex.printStackTrace()
@@ -63,7 +64,7 @@ class Postgres {
         it.waitFor()
     }
 
-    suspend fun dumpDatabase(databse: String, path: String, password: String) = withContext(Dispatchers.DUMP) {
+    suspend fun dumpDatabase(databse: String, path: String, password: String) = withContext(DISPATCHER) {
         PostgresResult.Dump(
             ProcessBuilder(dump(databse))
                 .withPassword(password)
@@ -77,7 +78,7 @@ class Postgres {
         )
     }
 
-    suspend fun listPretty(password: String) = withContext(Dispatchers.IO) {
+    suspend fun listPretty(password: String) = withContext(DISPATCHER) {
         ProcessBuilder(listPretty)
             .withPassword(password)
             .start()
@@ -89,7 +90,7 @@ class Postgres {
         return list(password).split("\n").filter { it.isNotEmpty() }
     }
 
-    suspend fun defaultDB(password: String) = withContext(Dispatchers.IO) {
+    suspend fun defaultDB(password: String) = withContext(DISPATCHER) {
         ProcessBuilder(defaultDb)
             .withPassword(password)
             .start()
@@ -97,7 +98,7 @@ class Postgres {
             .text()
     }
 
-    suspend fun list(password: String) = withContext(Dispatchers.IO) {
+    suspend fun list(password: String) = withContext(DISPATCHER) {
         ProcessBuilder(list)
             .withPassword(password)
             .start()
@@ -105,7 +106,7 @@ class Postgres {
             .text()
     }
 
-    suspend fun psqlVersion() = withContext(Dispatchers.IO) {
+    suspend fun psqlVersion() = withContext(DISPATCHER) {
         ProcessBuilder(
             "psql", "-V"
         ).start().also {
@@ -113,7 +114,7 @@ class Postgres {
         }.text()
     }
 
-    suspend fun pqDumpVersion() = withContext(Dispatchers.IO) {
+    suspend fun pqDumpVersion() = withContext(DISPATCHER) {
         ProcessBuilder(
             "pg_dump", "--version"
         ).start().also {
@@ -121,7 +122,7 @@ class Postgres {
         }.text()
     }
 
-    suspend fun postgresVersion(password: String) = withContext(Dispatchers.IO) {
+    suspend fun postgresVersion(password: String) = withContext(DISPATCHER) {
         ProcessBuilder(version)
             .withPassword(password)
             .start()

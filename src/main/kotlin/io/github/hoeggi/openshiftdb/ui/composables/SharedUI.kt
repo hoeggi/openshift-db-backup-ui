@@ -21,6 +21,8 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
+import java.awt.datatransfer.StringSelection
+import java.awt.datatransfer.Transferable
 import java.awt.event.KeyEvent
 
 @Composable
@@ -75,7 +77,37 @@ fun EditTextField(
             on(Key.CtrlLeft + Key.V) {
                 val text = Toolkit.getDefaultToolkit()
                     .systemClipboard.getData(DataFlavor.stringFlavor)?.toString()
-                if (text.isNullOrEmpty().not()) onValueChange(TextFieldValue(text!!))
+                if (text.isNullOrEmpty().not()) {
+                    if (value.selection.collapsed) {
+                        val prefix = value.text.substring(0, value.selection.start)
+                        val postfix = value.text.substring(value.selection.start)
+                        onValueChange(
+                            value.copy(
+                                text = "$prefix$text$postfix",
+                                selection = TextRange(value.selection.start + text!!.length)
+                            )
+                        )
+                    } else {
+                        val selected = value.selection
+                        val prefix = value.text.substring(0, selected.start.coerceAtMost(selected.end))
+                        val postfix = value.text.substring(selected.start.coerceAtLeast(selected.end))
+                        onValueChange(
+                            value.copy(
+                                text = "$prefix$text$postfix",
+                                selection = TextRange(selected.start.coerceAtMost(selected.end) + text!!.length)
+                            )
+                        )
+                    }
+                }
+            }
+            on(Key.CtrlLeft + Key.C) {
+                val selected = value.selection
+                val text = value.text.substring(
+                    selected.start.coerceAtMost(selected.end),
+                    selected.start.coerceAtLeast(selected.end)
+                )
+                if (text.isNullOrEmpty().not()) Toolkit.getDefaultToolkit()
+                    .systemClipboard.setContents(StringSelection(text), null)
             }
             on(Key.Delete) {
                 val start = value.selection.start

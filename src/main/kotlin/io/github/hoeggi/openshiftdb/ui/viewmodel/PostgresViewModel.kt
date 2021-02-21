@@ -29,7 +29,8 @@ class PostgresViewModel(
     private val _pgdupmVersion = MutableStateFlow("")
     private val _dumpPath = MutableStateFlow("")
     private val _userName = MutableStateFlow(TextFieldValue("postgres"))
-
+    private val _downloadProgress: MutableStateFlow<Postgres.PostgresResult.Download> =
+        MutableStateFlow(Postgres.PostgresResult.Download.Unspecified)
     private val _downloadState: MutableStateFlow<Postgres.PostgresResult.Download> =
         MutableStateFlow(Postgres.PostgresResult.Download.Unspecified)
 
@@ -39,10 +40,7 @@ class PostgresViewModel(
     }
 
     val downloadState = _downloadState.asStateFlow()
-    val downloadProgress = _downloadState.filterIsInstance<Postgres.PostgresResult.Download.InProgres>().onEach {
-        println(it)
-    }
-
+    val downloadProgress = _downloadProgress.asStateFlow()
     fun dumpDatabase(database: String) = coroutineScope.launch {
         if (database.isEmpty()) return@launch
         _downloadState.value = Postgres.PostgresResult.Download.Started
@@ -50,7 +48,9 @@ class PostgresViewModel(
             dump = postgres.dumpDatabase(database, dumpPath.value, password.value.text),
             onNewLine = {
                 downloadQueue.add(it)
-                _downloadState.value = Postgres.PostgresResult.Download.InProgres(downloadQueue.toList())
+                val progress = Postgres.PostgresResult.Download.InProgres(downloadQueue.toList())
+                _downloadState.value = progress
+                _downloadProgress.value = progress
             },
             onError = { code, ex ->
                 downloadQueue.clear()
