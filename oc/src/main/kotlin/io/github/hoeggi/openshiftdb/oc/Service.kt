@@ -1,4 +1,4 @@
-package io.github.hoeggi.openshiftdb.process
+package io.github.hoeggi.openshiftdb.oc
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString

@@ -14,7 +14,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
-    api(project(":common"))
+    implementation(project(":process"))
     implementation(Dependencies.Kotlin.coroutines)
     implementation(Dependencies.ktor.auth)
     implementation(Dependencies.Kotlin.serialization)

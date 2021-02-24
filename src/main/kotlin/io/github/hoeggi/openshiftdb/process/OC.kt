@@ -90,15 +90,16 @@ class OC {
     suspend fun portForward(projectName: String, serviceName: String, port: String): PortForward =
         withContext(Dispatchers.BACKGROUND + CoroutineName("portForward")) {
             println("opening port forward")
-            val process = ProcessBuilder(Commands.PortForward(projectName, serviceName, port).commands).start().also {
-                it.onExit().thenApply {
-
-                    println("oc port forward (pid: ${it.pid()}: onExit: ${it.exitValue()} - ${Thread.currentThread().name}")
-                    if (it.exitValue() != 0) {
-                        System.err.println(it.errorStream.bufferedReader().readText())
-                    }
-                }
-            }
+            val process = ProcessBuilder(Commands.PortForward(projectName, serviceName, port).commands).start()
+//                .also {
+//                it.onExit().thenApply {
+//
+//                    println("oc port forward (pid: ${it.pid()}: onExit: ${it.exitValue()} - ${Thread.currentThread().name}")
+//                    if (it.exitValue() != 0) {
+//                        System.err.println(it.errorStream.bufferedReader().readText())
+//                    }
+//                }
+//            }
             println("opened port forward: ${process.pid()}")
             PortForward(process, PortForwardTarget(projectName, serviceName, port))
         }

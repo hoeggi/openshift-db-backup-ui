@@ -1,7 +1,11 @@
-package io.github.hoeggi.openshiftdb.process
+package io.github.hoeggi.openshiftdb.commons
 
 import okio.buffer
 import okio.source
+
+interface Command {
+    val commands: List<String>
+}
 
 sealed class ProcessResult(val code: Int = -1) {
     object Unset : ProcessResult()
@@ -9,15 +13,17 @@ sealed class ProcessResult(val code: Int = -1) {
     class Error(result: Int) : ProcessResult(result)
 }
 
-interface Command {
-    val commands: List<String>
-}
-
 fun Process.buffer() = inputStream.source().buffer()
 fun Process.readStdout() = inputStream.source().buffer().readUtf8()
 
 fun Process.bufferError() = errorStream.source().buffer()
 fun Process.readError() = errorStream.source().buffer().readUtf8()
+
+fun Process.messageAndResult() = if (exitValue() == 0) {
+    inputStream.bufferedReader().readText() to exitValue()
+} else {
+    errorStream.bufferedReader().readText()to exitValue()
+}
 
 fun Process.text() = if (exitValue() == 0) {
     inputStream.bufferedReader().readText()
