@@ -1,51 +1,56 @@
-package io.github.hoeggi.openshiftdb.process
+package io.github.hoeggi.openshiftdb.oc
 
 import kotlinx.coroutines.*
-import java.util.concurrent.Executors
+import org.slf4j.LoggerFactory
 
 
 class PortForward(
     private val onNewLine: suspend (String) -> Unit,
-    private val onNewErrorLine: suspend (String) -> Unit
+    private val onNewErrorLine: suspend (String) -> Unit,
+    private val onClosed: suspend (String) -> Unit,
 ) {
-    private val oc = OC()
+    private val oc = OC
     private var portForward: OC.PortForward? = null
-
-//    private val dispatcher = Dispatchers.IO//Executors.newFixedThreadPool(3).asCoroutineDispatcher()
 
     fun stop() {
         portForward?.stop()
+        logger.info("port-forward: $portForward stopped")
     }
 
     suspend fun open(target: OC.PortForwardTarget) = withContext(Dispatchers.IO + CoroutineName("$target")) {
         if (portForward != null) throw IllegalStateException("port-forward is already running")
         try {
             portForward = oc.portForward(target.projectName, target.serviceName, target.port)
+            logger.info("port-forward: $portForward openend")
             val stream = async(
                 Dispatchers.IO + CoroutineName("port-forward-stream")
             ) {
                 while (isActive) {
                     val readUtf8Line = portForward?.buffer?.readUtf8Line() ?: break
+                    logger.debug("read line from stream $readUtf8Line")
                     onNewLine(readUtf8Line)
                 }
             }
-
             val error = async(
                 Dispatchers.IO + CoroutineName("port-forward-errorstream")
             ) {
-//                val buffer = portForward?.bufferError()
                 while (isActive) {
                     val readUtf8Line = portForward?.bufferError?.readUtf8Line() ?: break
+                    logger.debug("read line from errorstream $readUtf8Line")
                     onNewErrorLine(readUtf8Line)
                 }
             }
-            stream.await()
-            error.await()
+            awaitAll(stream, error)
         } catch (e: Throwable) {
             e.printStackTrace()
         } finally {
+            logger.debug("finally close")
             portForward?.stop()
+            onClosed(portForward?.exitMessage ?: "closed for unknown reason")
         }
     }
 
+    companion object {
+        val logger = LoggerFactory.getLogger(PortForward::class.java)
+    }
 }

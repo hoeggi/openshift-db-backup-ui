@@ -6,6 +6,8 @@ private object Versions {
     val kotlinx_serialization = "1.1.0"
     val metrics_jmx = "4.1.17"
     val micrometer_registry_prometheus = "1.6.4"
+    val okhttp = "4.9.0"
+    val slf4j = "1.7.30"
 }
 
 object Dependencies {
@@ -29,6 +31,8 @@ object Dependencies {
         val metrics_micrometer = "io.ktor:ktor-metrics-micrometer:${Versions.ktor}"
     }
 
+    val slf4j_api = "org.slf4j:slf4j-api:${Versions.slf4j}"
+    val okhttp = "com.squareup.okhttp3:okhttp:${Versions.okhttp}"
     val okio = "com.squareup.okio:okio:${Versions.okio}"
     val metrics_jmx = "io.dropwizard.metrics:metrics-jmx:${Versions.metrics_jmx}"
     val micrometer_registry_prometheus =

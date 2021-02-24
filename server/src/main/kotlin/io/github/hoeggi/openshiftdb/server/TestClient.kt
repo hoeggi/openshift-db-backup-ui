@@ -1,11 +1,3 @@
-import io.github.hoeggi.openshiftdb.api.ProjectApi
-import io.ktor.client.*
-import io.ktor.client.features.websocket.*
-import io.ktor.http.*
-import io.ktor.http.cio.websocket.*
-import kotlinx.coroutines.*
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
@@ -160,7 +152,7 @@ class TestClient {
                 )
                 .post(
 //                    Json.encodeToString(ProjectApi("playground-daniel"))
-                        "".toRequestBody("application/json".toMediaType())
+                    "".toRequestBody("application/json".toMediaType())
                 )
                 .build()
         )
@@ -214,10 +206,5 @@ class TestClient {
         Thread.sleep(3000)
         socket.close(1000, "we are done")
         println("closed")
-//        runBlocking {
-//            webSocket(5432, 2000, "socket we are done", "socket test message")
-//            Thread.sleep(1000)
-//            webSocket(5432, 2000, "socket we are done", "socket test message")
-//        }
     }
 }

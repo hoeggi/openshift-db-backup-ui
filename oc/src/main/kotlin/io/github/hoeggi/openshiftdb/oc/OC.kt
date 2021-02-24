@@ -1,10 +1,17 @@
-package io.github.hoeggi.openshiftdb.process
+package io.github.hoeggi.openshiftdb.oc
 
+import io.github.hoeggi.openshiftdb.commons.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.slf4j.LoggerFactory
 
-class OC {
-    sealed class OcResult(val result: ProcessResult) {
+object OC {
+    val logger = LoggerFactory.getLogger(OC::class.java)
+
+    sealed class OcResult(private val _result: ProcessResult) {
+        val result: Int
+            get() = _result.code
+
         object Unset : OcResult(ProcessResult.Ok)
         class Version(val version: OcVersion?, result: ProcessResult) : OcResult(result)
         class Project(val text: String, result: ProcessResult) : OcResult(result)
@@ -14,7 +21,7 @@ class OC {
         class Server(val server: List<Cluster>, result: ProcessResult) : OcResult(result)
 
         sealed class LoginState(result: ProcessResult = ProcessResult.Ok) : OcResult(result) {
-            object Unchecked : LoginState()
+            //            object Unchecked : LoginState()
             object LoggedIn : LoginState()
             class NotLogedIn(result: ProcessResult) : LoginState(result)
         }
@@ -24,6 +31,11 @@ class OC {
     class PortForward(private val process: Process, val target: PortForwardTarget) {
         val isAlive
             get() = process.isAlive
+
+        val exitMessage: String
+            get() = process.run {
+                "port forward closed, pid: ${pid()} reason: ${exitValue()}"
+            }
 
         val buffer = process.buffer()
         val bufferError = process.bufferError()
@@ -76,20 +88,20 @@ class OC {
 
         val text = process.readStdout()
         val error = process.readError()
-        println(error)
+        logger.debug(error)
         process.let {
             OcResult.Server(parseServer(text), it.result())
         }
     }
 
     fun portForward(projectName: String, serviceName: String, port: String): PortForward {
-        println("opening port forward")
+        logger.debug("opening port forward")
         val process = ProcessBuilder(Commands.PortForward(projectName, serviceName, port).commands).start().also {
             it.onExit().thenApply {
-                println("oc port forward (pid: ${it.pid()}: onExit: ${it.exitValue()} - ${Thread.currentThread().name}")
+                logger.debug("oc port forward (pid: ${it.pid()}: onExit: ${it.exitValue()} - ${Thread.currentThread().name}")
             }
         }
-        println("opened port forward: ${process.pid()}")
+        logger.debug("opened port forward: ${process.pid()}")
         return PortForward(process, PortForwardTarget(projectName, serviceName, port))
     }
 
@@ -114,7 +126,8 @@ class OC {
         }
     }
 
-    suspend fun project(): OcResult.Project = withContext(Dispatchers.IO) {Dispatchers.IO
+    suspend fun project(): OcResult.Project = withContext(Dispatchers.IO) {
+        Dispatchers.IO
         val process = process(Commands.Project.Show)
         process.let {
             OcResult.Project(it.text().trimEnd('\n'), it.result())
@@ -133,7 +146,7 @@ class OC {
 
         val text = process.readStdout()
         val error = process.readError()
-        println(error)
+        logger.debug(error)
         process.let {
             OcResult.Secret(findPassword(text, username), it.result())
         }

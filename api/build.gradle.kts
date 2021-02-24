@@ -16,8 +16,23 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     implementation(Dependencies.ktor.serialization)
     implementation(Dependencies.Kotlin.coroutines)
+    implementation(Dependencies.okhttp)
 }
 
 tasks.test {
     useJUnit()
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.freeCompilerArgs += "-Xallow-result-return-type"
+}
+
+val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
 }

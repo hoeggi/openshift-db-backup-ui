@@ -14,10 +14,11 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
-    api(project(":common"))
+    implementation(project(":process"))
     implementation(Dependencies.Kotlin.coroutines)
     implementation(Dependencies.Kotlin.serialization)
     implementation(Dependencies.okio)
+    compileOnly(Dependencies.slf4j_api)
 }
 
 tasks.test {

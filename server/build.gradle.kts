@@ -16,6 +16,7 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     implementation(project(":oc"))
     implementation(project(":api"))
+    implementation(project(":postgres"))
 
     implementation(Dependencies.metrics_jmx)
     implementation(Dependencies.micrometer_registry_prometheus)
@@ -30,6 +31,8 @@ dependencies {
     implementation(Dependencies.ktor.metrics)
     implementation(Dependencies.ktor.metrics_micrometer)
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
+    implementation("ch.qos.logback:logback-classic:1.2.3")
+
 }
 
 tasks.test {
