@@ -8,15 +8,20 @@ sealed class DatabaseDownloadMessage {
     abstract val message: String
 
     companion object {
-        fun start(): DatabaseDownloadMessage = StartMessage("start")
+        fun unspecified(): DatabaseDownloadMessage = Unspecified()
+        fun start(): DatabaseDownloadMessage = StartMessage()
         fun finish(message: String): DatabaseDownloadMessage = FinishMessage(message)
         fun error(message: String): DatabaseDownloadMessage = ErrorMessage(message)
         fun inprogress(message: String): DatabaseDownloadMessage = InProgressMessage(message)
     }
 
     @Serializable
+    @SerialName("unspecified")
+    class Unspecified(override val message: String = "") : DatabaseDownloadMessage()
+
+    @Serializable
     @SerialName("start")
-    data class StartMessage(override val message: String) : DatabaseDownloadMessage()
+    data class StartMessage(override val message: String = "start") : DatabaseDownloadMessage()
 
     @Serializable
     @SerialName("error")
@@ -32,35 +37,36 @@ sealed class DatabaseDownloadMessage {
 }
 
 
-
 @Serializable
 data class ToolsVersionApi(
-    val psql: String,
-    val pgDump: String
+    val psql: String = "",
+    val pgDump: String = "",
 )
 
 @Serializable
 data class DefaultDatabaseApi(
-    val database: String,
+    val database: String = "",
 )
 
 @Serializable
 data class DatabaseVersionApi(
-    val database: String,
+    val database: String = "",
 )
 
 @Serializable
 sealed class DatabasesApi {
 
+    object Default : DatabasesApi()
+
     @Serializable
     @SerialName("tabel")
-    data class Tabel(val databases: String) : DatabasesApi()
+    data class Tabel(val databases: String = "") : DatabasesApi()
 
     @Serializable
     @SerialName("text")
-    data class Text(val databases: String) : DatabasesApi()
+    data class Text(val databases: String = "") : DatabasesApi()
 
     @Serializable
     @SerialName("list")
-    data class List(val databases: Array<String>) : DatabasesApi()
+    data class List(val databases: Array<String> = arrayOf()) : DatabasesApi()
 }

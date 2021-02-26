@@ -1,7 +1,6 @@
 package io.github.hoeggi.openshiftdb.api
 
 import io.github.hoeggi.openshiftdb.api.response.ApiResponse
-import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -13,10 +12,15 @@ import okhttp3.RequestBody.Companion.toRequestBody
 typealias ApiClient = Pair<OkHttpClient, BasePath>
 typealias BasePath = String
 
-interface CancelableFlow<T> {
-    val flow: Flow<T>
-    fun cancel(): Boolean
-}
+
+fun Api(port: Int, baseUrl: BasePath = "http://localhost"): Api = ApiImp(
+    OcApi.api(port, baseUrl),
+    PostgresApi.api(port, baseUrl)
+)
+
+interface Api : OcApi, PostgresApi
+private class ApiImp(val oc: OcApi, val postgres: PostgresApi) : Api, OcApi by oc, PostgresApi by postgres
+
 
 operator fun OkHttpClient.plus(baseUrl: BasePath): ApiClient = this to baseUrl
 

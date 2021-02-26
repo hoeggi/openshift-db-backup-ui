@@ -9,7 +9,9 @@ import io.github.hoeggi.openshiftdb.process.findPassword
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+
+
+typealias Password = Any
 
 class PostgresViewModel(
     private val postgres: Postgres,

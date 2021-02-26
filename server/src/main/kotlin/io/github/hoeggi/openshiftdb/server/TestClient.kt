@@ -1,8 +1,16 @@
+import io.github.hoeggi.openshiftdb.api.Api
+import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
+import io.github.hoeggi.openshiftdb.api.response.PortForwardMessage
+import io.github.hoeggi.openshiftdb.server.logging
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okio.ByteString
+import java.util.concurrent.Executors
+import kotlin.coroutines.coroutineContext
 
 //package io.github.hoeggi.openshiftdb.server
 //
@@ -10,85 +18,112 @@ import okio.ByteString
 //import okhttp3.HttpUrl.Companion.toHttpUrl
 //import okio.ByteString
 //
-class TestClient {
-//    private val webService = OkHttpClient.Builder()
-//        .addNetworkInterceptor(Interceptor { chain: Interceptor.Chain ->
-//            chain.proceed(
-//                chain.request()
-//                    .newBuilder()
-//                    .header("Connection", "Upgrade")
-//                    .header("Upgrade", "websocket")
-//                    .build()
-//            )
-//        }).build()
-//    val webService = HttpClient(CIO) {
-//        install(WebSockets) {
-//            useDefaultTransformers
-//        }
-//        engine {
-//            preconfigured = client
-//            webSocketFactory = client
-//            addNetworkInterceptor(Interceptor { chain: Interceptor.Chain ->
-//                chain.proceed(
-//                    chain.request()
-//                        .newBuilder()
-//                        .header("Connection", "Upgrade")
-//                        .header("Upgrade", "websocket")
-//                        .build()
-//                )
-//            })
-//        }
-//        engine {
-//
-//        }
-//    }
 
-//    private suspend fun webSocket(targetPort: Int, delay: Long, close: String, vararg messages: String) {
-//        webService.ws(
-//            request = {
-//                method = HttpMethod.Get
-//                url.apply {
-//                    parameters.apply {
-//                        append("project", "playground-hoeggi")
-//                        append("svc", "postgres12")
-//                        append("port", "$targetPort")
-//                    }
-//                    port = 32000
-//                    host = "localhost"
-//                    encodedPath = "v1/oc/port-forward"
-//                    protocol = URLProtocol.HTTP
-//                }
-//                headers.apply {
-//                    append("Connection", "Upgrade")
-//                    append("Upgrade", "websocket")
-//                }
-//            }, block = session(delay, close, *messages)
-//        )
+
+//suspend inline fun <reified T> StateFlow<Any>.cast(defaultValue: T): StateFlow<T> {
+//    val stream = MutableStateFlow(defaultValue).stateIn()
+//    collect {
+//        println("collected: $it")
+//        if (it is T) stream.value = it else stream.value = defaultValue
 //    }
+//    return stream
+////    println("cast: ${this.value}")
+////    return if (this.value is T) {
+////        this as StateFlow<T>
+////    } else {
+////        MutableStateFlow(defaultValue).asStateFlow()
+////    }
+//}
 //
-//    private suspend fun session(
-//        delay: Long,
-//        close: String,
-//        vararg messages: String
-//    ): suspend DefaultClientWebSocketSession.() -> Unit =
-//        {
-//            withContext(Dispatchers.Default) {
-//                while (isActive) {
-//                    when (val frame = incoming.receiveOrNull()) {
-//                        is Frame.Text -> println(frame.readText())
-//                        is Frame.Binary -> println(frame.readBytes())
+//class CastFlow<T>(defaultValue: T, upstream: StateFlow<Any>) : StateFlow<T> by upstream {
+//
+//}
+
+class TestClient {
+    fun test(port: Int) {
+
+//        GlobalScope.launch {
+//            val list = listOf("one", "two", "three")
+//            val test: MutableStateFlow<Any> = MutableStateFlow(Unit)
+//
+//            val async = async {
+//                test.filterIsInstance<String>().stateIn(this)
+//                    .collect {
+//                        println("$it")
 //                    }
+//            }
+//
+//            val async1 = async {
+//                for (step in list) {
+//                    delay(1000)
+//                    println("emitting: $step")
+//                    test.value = step
 //                }
 //            }
-//            withContext(Dispatchers.Default) {
-//                for (message in messages) {
-//                    delay(delay)
-//                    send(Frame.Text(message))
+//            awaitAll(async, async1)
+//        }
+
+
+//        val build = "http://example.com/v1".toHttpUrl().newBuilder()
+//            .addEncodedPathSegments("test/test")
+//            .addPathSegments("test2/test2").build()
+//        val toString = build.toString()
+//        Executors.newSingleThreadExecutor().execute {
+//            GlobalScope.launch(newFixedThreadPoolContext(4, "test")) {
+//                logging.debug("waiting for server")
+//                delay(3000)
+//                logging.debug("making api request")
+//                val api = Api(port)
+//
+//                val async = async(Dispatchers.IO + CoroutineName("pf")) {
+//                    val response: Flow<PortForwardMessage> = api.portForward("playground-hoeggi", "postgres12", "5432")
+//                    response.collect {
+//                        ensureActive()
+//                        logging.debug("message from port-forward: $it")
+//                    }
 //                }
-//                delay(delay)
-//                close(CloseReason(CloseReason.Codes.NORMAL, close))
+//                val pw = async(Dispatchers.IO + CoroutineName("pw")) {
+//                    api.password("postgres")
+//                }.await()
+//                logging.debug("$pw")
+//                delay(3000)
+//                val version = api.version()
+//                logging.debug("$version")
+//                val defaultDatabases = api.defaultDatabases("postgres", pw.getOrNull() ?: "")
+//                logging.debug("$defaultDatabases")
+////            val databasestable = api.databases("postgres", pw.getOrNull() ?: "", PostgresApi.DatabaseViewFormat.Table)
+////            logging.debug("$databasestable")
+////            delay(1000)
+////            val databasessingle = api.databases("postgres", pw.getOrNull() ?: "", PostgresApi.DatabaseViewFormat.Text)
+////            logging.debug("$databasessingle")
+////            delay(1000)
+////            val databases = api.databases("postgres", pw.getOrNull() ?: "")
+////            logging.debug("$databases")
+////            delay(1000)
+////            val databaseslist = api.databases("postgres", pw.getOrNull() ?: "", PostgresApi.DatabaseViewFormat.List)
+////            logging.debug("$databaseslist")
+////            delay(1000)
+////
+//                val dump = async(Dispatchers.IO + CoroutineName("pf")) {
+//                    val dumpDatabases = api.dumpDatabases(
+//                        "postgres",
+//                        pw.getOrNull() ?: "",
+//                        "postgres",
+//                        "/home/hoeggi/repos/name-that-color-desktop/server"
+//                    )
+//                    dumpDatabases.collect {
+//                        ensureActive()
+//                        logging.debug("---------$it---------")
+//                        if (it is DatabaseDownloadMessage.FinishMessage || it is DatabaseDownloadMessage.ErrorMessage) {
+//                            cancel()
+//                        }
+//                    }
+//                }.await()
+//
+//                async.cancel()
 //            }
 //        }
+    }
 
     val client = OkHttpClient.Builder()
         .build()

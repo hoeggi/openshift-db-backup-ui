@@ -36,15 +36,15 @@ interface OcApi {
     ): Flow<PortForwardMessage>
 
     companion object {
-        fun api(port: Int = 32000, baseUrl: BasePath = "http://localhost:$port/v1/oc/"): OcApi =
-            OcApiImpl(baseUrl)
+        fun api(port: Int, baseUrl: BasePath): OcApi =
+            OcApiImpl("$baseUrl:$port/v1/oc/")
     }
 }
 
-private class OcApiImpl(baseUrl: BasePath) : OcApi {
+private class OcApiImpl(url: BasePath) : OcApi {
 
     private val client = OkHttpClient.Builder()
-        .build() + baseUrl
+        .build() + url
     private val webSocketClient = OkHttpClient.Builder()
         .addNetworkInterceptor {
             it.proceed(
@@ -54,7 +54,7 @@ private class OcApiImpl(baseUrl: BasePath) : OcApi {
                     .build()
             )
         }
-        .build() + baseUrl
+        .build() + url
 
     override suspend fun version(): Result<VersionApi> = client.get("version")
 

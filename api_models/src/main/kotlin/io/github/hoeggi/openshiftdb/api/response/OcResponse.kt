@@ -33,28 +33,28 @@ sealed class PortForwardMessage {
 
 @Serializable
 data class VersionApi(
-    val oc: String,
-    val kubernets: String,
-    val openshift: String
+    val oc: String = "",
+    val kubernets: String  = "",
+    val openshift: String = ""
 )
 
 @Serializable
 data class ClusterApi(
-    val name: String,
-    val server: String,
+    val name: String = "",
+    val server: String = "",
 )
 
 @Serializable
 data class ServicesApi(
-    val name: String,
-    val ports: List<ServicesPortApi>,
+    val name: String = "",
+    val ports: List<ServicesPortApi> = listOf(),
 )
 
 @Serializable
 data class ServicesPortApi(
-    val port: String,
-    val targetPort: String,
-    val protocol: String,
+    val port: String = "",
+    val targetPort: String = "",
+    val protocol: String = "",
 ) {
     @Transient
     val display = "$port:$targetPort/$protocol"
@@ -62,5 +62,5 @@ data class ServicesPortApi(
 
 @Serializable
 data class ProjectApi(
-    val name: String,
+    val name: String = "",
 )

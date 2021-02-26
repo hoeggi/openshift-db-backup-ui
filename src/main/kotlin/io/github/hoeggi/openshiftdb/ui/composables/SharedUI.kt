@@ -1,6 +1,7 @@
 package io.github.hoeggi.openshiftdb.ui.composables
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -22,8 +23,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
-import java.awt.datatransfer.Transferable
 import java.awt.event.KeyEvent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @Composable
 fun ExpandableText(
@@ -72,70 +74,88 @@ fun EditTextField(
     modifier: Modifier = Modifier,
     onValueChange: (TextFieldValue) -> Unit,
 ) {
+    var value by remember { mutableStateOf(value) }
+    val _onValueChange: (TextFieldValue) -> Unit = {
+        value = it
+        onValueChange(it)
+    }
     OutlinedTextField(
-        modifier = modifier.shortcuts {
-            on(Key.CtrlLeft + Key.V) {
-                val text = Toolkit.getDefaultToolkit()
-                    .systemClipboard.getData(DataFlavor.stringFlavor)?.toString()
-                if (text.isNullOrEmpty().not()) {
-                    if (value.selection.collapsed) {
-                        val prefix = value.text.substring(0, value.selection.start)
-                        val postfix = value.text.substring(value.selection.start)
-                        onValueChange(
-                            value.copy(
-                                text = "$prefix$text$postfix",
-                                selection = TextRange(value.selection.start + text!!.length)
+        modifier = modifier
+//  https://github.com/JetBrains/compose-jb/issues/220
+//            .combinedClickable(
+//                onDoubleClick = {
+//                    println("DOUBLE CLICK")
+//                    _onValueChange(
+//                        value.copy(selection = TextRange(0, value.text.length))
+//                    )
+//                },
+//                onClick = {
+//                    println("CLICK")
+//                }
+//            )
+            .shortcuts {
+                on(Key.CtrlLeft + Key.V) {
+                    val text = Toolkit.getDefaultToolkit()
+                        .systemClipboard.getData(DataFlavor.stringFlavor)?.toString()
+                    if (text.isNullOrEmpty().not()) {
+                        if (value.selection.collapsed) {
+                            val prefix = value.text.substring(0, value.selection.start)
+                            val postfix = value.text.substring(value.selection.start)
+                            _onValueChange(
+                                value.copy(
+                                    text = "$prefix$text$postfix",
+                                    selection = TextRange(value.selection.start + text!!.length)
+                                )
                             )
-                        )
-                    } else {
-                        val selected = value.selection
-                        val prefix = value.text.substring(0, selected.start.coerceAtMost(selected.end))
-                        val postfix = value.text.substring(selected.start.coerceAtLeast(selected.end))
-                        onValueChange(
+                        } else {
+                            val selected = value.selection
+                            val prefix = value.text.substring(0, selected.start.coerceAtMost(selected.end))
+                            val postfix = value.text.substring(selected.start.coerceAtLeast(selected.end))
+                            _onValueChange(
+                                value.copy(
+                                    text = "$prefix$text$postfix",
+                                    selection = TextRange(selected.start.coerceAtMost(selected.end) + text!!.length)
+                                )
+                            )
+                        }
+                    }
+                }
+                on(Key.CtrlLeft + Key.C) {
+                    val selected = value.selection
+                    val text = value.text.substring(
+                        selected.start.coerceAtMost(selected.end),
+                        selected.start.coerceAtLeast(selected.end)
+                    )
+                    if (text.isNullOrEmpty().not()) Toolkit.getDefaultToolkit()
+                        .systemClipboard.setContents(StringSelection(text), null)
+                }
+                on(Key.Delete) {
+                    val start = value.selection.start
+                    val end = value.selection.start
+                    val length = value.text.length
+                    if (start <= end && start < length && end < length) {
+                        _onValueChange(
                             value.copy(
-                                text = "$prefix$text$postfix",
-                                selection = TextRange(selected.start.coerceAtMost(selected.end) + text!!.length)
+                                text = value.text.removeRange(start..end)
                             )
                         )
                     }
                 }
-            }
-            on(Key.CtrlLeft + Key.C) {
-                val selected = value.selection
-                val text = value.text.substring(
-                    selected.start.coerceAtMost(selected.end),
-                    selected.start.coerceAtLeast(selected.end)
-                )
-                if (text.isNullOrEmpty().not()) Toolkit.getDefaultToolkit()
-                    .systemClipboard.setContents(StringSelection(text), null)
-            }
-            on(Key.Delete) {
-                val start = value.selection.start
-                val end = value.selection.start
-                val length = value.text.length
-                if (start <= end && start < length && end < length) {
-                    onValueChange(
-                        value.copy(
-                            text = value.text.removeRange(start..end)
-                        )
-                    )
+                on(Key.Home) {
+                    _onValueChange(value.moveCursor(0))
                 }
-            }
-            on(Key.Home) {
-                onValueChange(value.moveCursor(0))
-            }
-            on(Key(KeyEvent.VK_END)) {
-                onValueChange(value.moveCursor(value.text.length))
-            }
-            on(Key.ShiftLeft + Key(KeyEvent.VK_RIGHT)) {
-                onValueChange(value.selectNext())
-            }
-            on(Key.ShiftLeft + Key(KeyEvent.VK_LEFT)) {
-                onValueChange(value.selectPrev())
-            }
-        },
+                on(Key(KeyEvent.VK_END)) {
+                    _onValueChange(value.moveCursor(value.text.length))
+                }
+                on(Key.ShiftLeft + Key(KeyEvent.VK_RIGHT)) {
+                    _onValueChange(value.selectNext())
+                }
+                on(Key.ShiftLeft + Key(KeyEvent.VK_LEFT)) {
+                    _onValueChange(value.selectPrev())
+                }
+            },
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = _onValueChange,
         label = { Text(label) },
     )
 }
