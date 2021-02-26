@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.4.30"
-    id("org.jetbrains.compose") version "0.3.0-build154"
+    id("org.jetbrains.compose") version "0.4.0-build168"
     id("org.jetbrains.kotlin.kapt") version "1.4.30"
 }
 
@@ -62,7 +62,6 @@ tasks.test {
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi"
-//    kotlinOptions.freeCompilerArgs += "-Xallow-result-return-type"
 }
 
 compose.desktop {

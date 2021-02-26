@@ -8,6 +8,7 @@ private object Versions {
     val micrometer_registry_prometheus = "1.6.4"
     val okhttp = "4.9.0"
     val slf4j = "1.7.30"
+    val guava = "30.1-jre"
 }
 
 object Dependencies {
@@ -20,8 +21,7 @@ object Dependencies {
     object ktor {
         val core = "io.ktor:ktor:${Versions.ktor}"
         val server = "io.ktor:ktor-server-netty:${Versions.ktor}"
-        val client = "io.ktor:ktor-client-core:${Versions.ktor}"
-        val client_okhttp = "io.ktor:ktor-client-cio:${Versions.ktor}"
+//        val client = "io.ktor:ktor-client-core:${Versions.ktor}"
 
         val logging = "io.ktor:ktor-client-logging:${Versions.ktor}"
         val websockets = "io.ktor:ktor-websockets:${Versions.ktor}"
@@ -31,6 +31,7 @@ object Dependencies {
         val metrics_micrometer = "io.ktor:ktor-metrics-micrometer:${Versions.ktor}"
     }
 
+    val guava = "com.google.guava:guava:${Versions.guava}"
     val slf4j_api = "org.slf4j:slf4j-api:${Versions.slf4j}"
     val okhttp = "com.squareup.okhttp3:okhttp:${Versions.okhttp}"
     val okio = "com.squareup.okio:okio:${Versions.okio}"

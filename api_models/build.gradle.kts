@@ -15,9 +15,6 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
     implementation(Dependencies.ktor.serialization)
-    implementation(Dependencies.Kotlin.coroutines)
-    implementation(Dependencies.okhttp)
-    api(project(":api_models"))
 }
 
 tasks.test {

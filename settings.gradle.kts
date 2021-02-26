@@ -14,5 +14,7 @@ include(
     ":oc",
     ":server",
     ":postgres",
-    ":api"
+    ":api",
+    ":viewmodel",
+    ":api_models"
 )

@@ -41,7 +41,7 @@ fun LoginScreen(ocViewModel: OcViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 EditTextField(
-                    value = token,
+                    value = TextFieldValue(""),
                     label = "Token",
                 ) {
                     token = it

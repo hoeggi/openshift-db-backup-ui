@@ -50,7 +50,7 @@ val OcViewModel = staticCompositionLocalOf<OcViewModel> {
 }
 
 val GlobalState = staticCompositionLocalOf<GlobalState> {
-    error("unexpected call to OcViewModel")
+    error("unexpected call to GlobalState")
 }
 
 fun main() {
@@ -58,9 +58,6 @@ fun main() {
     val logger = Logger(globalState)
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
     Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(globalState))
-
-
-
 
     Window(
         title = APP_NAME,

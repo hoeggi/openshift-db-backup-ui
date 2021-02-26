@@ -9,15 +9,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.ui.composables.EditTextField
+import kotlinx.coroutines.flow.filterIsInstance
 
 @Composable
 fun PostgresPassword() {
     val viewModel = PostgresViewModel.current
-    val password by viewModel.password.collectAsState(Scope.current.coroutineContext)
+    val password: TextFieldValue by viewModel.password
+        .filterIsInstance<TextFieldValue>()
+        .collectAsState(TextFieldValue(""), Scope.current.coroutineContext)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

@@ -41,16 +41,16 @@ interface PostgresApi {
     ): Flow<DatabaseDownloadMessage>
 
     companion object {
-        fun api(port: Int = 32000, baseUrl: BasePath = "http://localhost:$port/v1/postgres/"): PostgresApi =
-            PostgresApiImpl(port, baseUrl)
+        fun api(port: Int, baseUrl: BasePath): PostgresApi =
+            PostgresApiImpl("$baseUrl:$port/v1/postgres/")
     }
 
 }
 
-private class PostgresApiImpl(port: Int, baseUrl: BasePath) : PostgresApi {
+private class PostgresApiImpl(url: BasePath) : PostgresApi {
 
     private val client = OkHttpClient.Builder()
-        .build() + baseUrl
+        .build() + url
 
     private val webSocketClient = OkHttpClient.Builder()
         .addNetworkInterceptor {
@@ -61,7 +61,7 @@ private class PostgresApiImpl(port: Int, baseUrl: BasePath) : PostgresApi {
                     .build()
             )
         }
-        .build() + baseUrl
+        .build() + url
 
     override suspend fun toolsVersion(): Result<ToolsVersionApi> = client.get("version/tools")
 
