@@ -45,7 +45,7 @@ internal data class Metadata(val name: String)
 internal data class ServiceSpec(val ports: List<Port>?)
 
 @Serializable
-data class Port(val port: String, val targetPort: String, val protocol: String)
+data class Port(val port: Int, val targetPort: Int, val protocol: String)
 
 data class Service(val name: String, val ports: List<Port>)
 

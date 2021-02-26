@@ -16,5 +16,6 @@ include(
     ":postgres",
     ":api",
     ":viewmodel",
-    ":api_models"
+    ":api_models",
+    ":ui"
 )

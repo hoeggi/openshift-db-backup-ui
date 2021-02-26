@@ -7,10 +7,14 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.slf4j.LoggerFactory
 
-typealias LoginState = Boolean
-data class PortForwardTarget(val project: String, val svc: String, val port: String)
+enum class LoginState {
+    UNCHECKED, LOGGEDIN, NOT_LOGGEDIN
+}
 
-class OcViewModel(port: Int, private val api: OcApi = Api(port)) {
+data class PortForwardTarget(val project: String, val svc: String, val port: Int)
+
+class OcViewModel(port: Int) {
+    private val api: OcApi = Api(port)
 
     private val logger = LoggerFactory.getLogger(OcViewModel::class.java)
 
@@ -22,11 +26,11 @@ class OcViewModel(port: Int, private val api: OcApi = Api(port)) {
         MutableStateFlow(VersionApi())
     private val _services: MutableStateFlow<List<ServicesApi>> =
         MutableStateFlow(listOf())
-    private val _portForward: MutableStateFlow<Map<PortForwardTarget, PortForwardMessage>> =
+    private val _portForward: MutableStateFlow<Map<PortForwardTarget, List<PortForwardMessage>>> =
         MutableStateFlow(mapOf())
 
     private val _loginState: MutableStateFlow<LoginState> =
-        MutableStateFlow(false)
+        MutableStateFlow(LoginState.UNCHECKED)
     private val _server: MutableStateFlow<List<ClusterApi>> =
         MutableStateFlow(listOf())
 
@@ -40,12 +44,12 @@ class OcViewModel(port: Int, private val api: OcApi = Api(port)) {
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
     suspend fun checkLoginState() {
         val checkLogin = api.checkLogin()
-        _loginState.value = checkLogin.isSuccess
+        _loginState.value = if (checkLogin.isSuccess) LoginState.LOGGEDIN else LoginState.NOT_LOGGEDIN
     }
 
     suspend fun login(token: String, server: String) {
         val login = api.login(token, server)
-        _loginState.value = login.isSuccess
+        _loginState.value = if (login.isSuccess) LoginState.LOGGEDIN else LoginState.NOT_LOGGEDIN
     }
 
     val server: StateFlow<List<ClusterApi>> = _server.asStateFlow()
@@ -82,9 +86,9 @@ class OcViewModel(port: Int, private val api: OcApi = Api(port)) {
     }
 
     private val openPortForwars = mutableMapOf<PortForwardTarget, Job>()
-    val portForward: StateFlow<Map<PortForwardTarget, PortForwardMessage>> = _portForward.asStateFlow()
-    suspend fun portForward(project: String, svc: String, port: String) {
-        portForward(PortForwardTarget(project, svc, port))
+    val portForward: StateFlow<Map<PortForwardTarget, List<PortForwardMessage>>> = _portForward.asStateFlow()
+    suspend fun portForward(svc: String, port: Int) {
+        portForward(PortForwardTarget(currentProject.value.name, svc, port))
     }
 
     suspend fun portForward(target: PortForwardTarget) {
@@ -95,7 +99,10 @@ class OcViewModel(port: Int, private val api: OcApi = Api(port)) {
                     ensureActive()
                     logger.debug("message from port-forward: $it")
                     _portForward.value = _portForward.value.toMutableMap().apply {
-                        put(target, it)
+                        putIfAbsent(target, listOf())!!.toMutableList().apply {
+                            add(it)
+                        }
+
                     }
                 }
             }
@@ -103,7 +110,7 @@ class OcViewModel(port: Int, private val api: OcApi = Api(port)) {
         }
     }
 
-    fun closePortForward(project: String, svc: String, port: String) {
+    fun closePortForward(project: String, svc: String, port: Int) {
         closePortForward(PortForwardTarget(project, svc, port))
     }
 

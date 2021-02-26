@@ -30,9 +30,7 @@ dependencies {
     implementation(Dependencies.ktor.serialization)
     implementation(Dependencies.ktor.metrics)
     implementation(Dependencies.ktor.metrics_micrometer)
-    implementation("com.squareup.okhttp3:okhttp:4.9.0")
-    implementation("ch.qos.logback:logback-classic:1.2.3")
-
+//    implementation("com.squareup.okhttp3:okhttp:4.9.0")
 }
 
 tasks.test {

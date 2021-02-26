@@ -6,7 +6,7 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
 
-suspend fun <T> PipelineContext<Unit, ApplicationCall>.authorized(
+suspend inline fun <reified T> PipelineContext<Unit, ApplicationCall>.authorized(
     result: T,
     code: Int
 ) {
