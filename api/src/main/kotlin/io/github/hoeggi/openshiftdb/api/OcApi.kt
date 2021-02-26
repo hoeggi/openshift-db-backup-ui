@@ -32,7 +32,7 @@ interface OcApi {
     suspend fun portForward(
         project: String,
         svc: String,
-        port: String
+        port: Int
     ): Flow<PortForwardMessage>
 
     companion object {
@@ -92,17 +92,17 @@ private class OcApiImpl(url: BasePath) : OcApi {
     private fun authorize(request: Request): Result<Unit> {
         val result = client.first.newCall(request).execute()
         return when (result.code) {
-            201 -> Result.success(Unit)
+            204 -> Result.success(Unit)
             else -> Result.failure(RuntimeException("Unauthorized"))
         }
     }
 
-    override suspend fun portForward(project: String, svc: String, port: String) = callbackFlow {
+    override suspend fun portForward(project: String, svc: String, port: Int) = callbackFlow {
         val request = webSocketClient.second.withPath("port-forward")
             .withQuery(
                 "project" to project,
                 "svc" to svc,
-                "port" to port
+                "port" to "$port"
             ).toGetRequest()
 
         val listener: WebSocketListener = createListener(this@callbackFlow)

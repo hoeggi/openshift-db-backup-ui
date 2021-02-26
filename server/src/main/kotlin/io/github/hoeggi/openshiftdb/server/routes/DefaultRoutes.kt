@@ -13,7 +13,7 @@ fun Route.default(appMicrometerRegistry: PrometheusMeterRegistry) {
     get("/echo/{message?}") {
         call.respondText("Echo, ${call.parameters["message"]}")
     }
-    get("/status}") {
+    get("/status") {
         call.respond(HttpStatusCode.OK)
     }
 }

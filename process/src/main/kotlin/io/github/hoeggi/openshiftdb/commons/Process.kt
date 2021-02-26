@@ -2,6 +2,10 @@ package io.github.hoeggi.openshiftdb.commons
 
 import okio.buffer
 import okio.source
+import org.slf4j.LoggerFactory
+
+
+private val logger = LoggerFactory.getLogger(ProcessResult::class.java)
 
 interface Command {
     val commands: List<String>
@@ -22,7 +26,7 @@ fun Process.readError() = errorStream.source().buffer().readUtf8()
 fun Process.messageAndResult() = if (exitValue() == 0) {
     inputStream.bufferedReader().readText() to exitValue()
 } else {
-    errorStream.bufferedReader().readText()to exitValue()
+    errorStream.bufferedReader().readText() to exitValue()
 }
 
 fun Process.text() = if (exitValue() == 0) {
@@ -44,6 +48,9 @@ fun Process.result() = if (exitValue() == 0) {
 }
 
 fun process(command: Command): Process = ProcessBuilder(command.commands).start().also {
+    it.onExit().thenAcceptAsync {
+        logger.debug("process onExit: ${it.exitValue()} - ${Thread.currentThread().name}")
+    }
     it.waitFor()
 }
 

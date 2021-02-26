@@ -15,7 +15,14 @@ private val logger = LoggerFactory.getLogger(LoginLogger::class.java)
 
 fun CheckLogin(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
-        send { OC.checkLogin() }
+        logger.debug("checking login state")
+        when (val result = OC.checkLogin()) {
+            OC.OcResult.LoginState.LoggedIn -> call.respond(HttpStatusCode.NoContent)
+            is OC.OcResult.LoginState.NotLogedIn -> {
+                logger.debug("unauthorizes, process exited with: ${result.result}")
+                call.respond(HttpStatusCode.Unauthorized)
+            }
+        }
     }
 
 fun Login(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
@@ -24,18 +31,13 @@ fun Login(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
         if (login == null) {
             call.respond(HttpStatusCode.Unauthorized)
         } else {
-            send { OC.login(login.token, login.server) }
-        }
-
-    }
-
-private fun send(block: suspend () -> OC.OcResult.LoginState): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
-    {
-        when (val result = block()) {
-            OC.OcResult.LoginState.LoggedIn -> call.respond(HttpStatusCode.NoContent)
-            is OC.OcResult.LoginState.NotLogedIn -> {
-                logger.debug("unauthorizes, process exited with: ${result.result}")
-                call.respond(HttpStatusCode.Unauthorized)
+            when (val result = OC.login(login.token, login.server)) {
+                OC.OcResult.LoginState.LoggedIn -> call.respond(HttpStatusCode.NoContent)
+                is OC.OcResult.LoginState.NotLogedIn -> {
+                    logger.debug("unauthorizes, process exited with: ${result.result}")
+                    call.respond(HttpStatusCode.Unauthorized)
+                }
             }
         }
+
     }

@@ -8,26 +8,13 @@ import io.github.hoeggi.openshiftdb.api.response.DatabasesApi
 import io.github.hoeggi.openshiftdb.api.response.ToolsVersionApi
 import kotlinx.coroutines.flow.*
 
-//interface UserName {
-//    val text: String
-//}
-//
-//interface Password {
-//    val text: String
-//}
-//
-//private class UserNameImpl(override val text: String = "") : UserName
-//private class PasswordImpl(override val text: String = "") : Password
-
-class PostgresViewModel constructor(
-    port: Int, private val api: Api = Api(port)
-) {
-
-    private val downloadQueue = EvictingQueue.create<DatabaseDownloadMessage>(150)
+class PostgresViewModel(port: Int) {
+    private val api: Api = Api(port)
+    private val downloadQueue = EvictingQueue.create<DatabaseDownloadMessage.InProgressMessage>(150)
 
     private val _dumpPath = MutableStateFlow("")
-    private val _password = MutableStateFlow("postgres")
-    private val _userName = MutableStateFlow("")
+    private val _password = MutableStateFlow("")
+    private val _userName = MutableStateFlow("postgres")
 
     private val _databases = MutableStateFlow("")
     private val _databasesLines = MutableStateFlow(listOf<String>())
@@ -37,7 +24,7 @@ class PostgresViewModel constructor(
     private val _version = MutableStateFlow(ToolsVersionApi())
 
 
-    private val _downloadProgress: MutableStateFlow<List<DatabaseDownloadMessage>> =
+    private val _downloadProgress: MutableStateFlow<List<DatabaseDownloadMessage.InProgressMessage>> =
         MutableStateFlow(listOf())
     private val _downloadState: MutableStateFlow<DatabaseDownloadMessage> =
         MutableStateFlow(DatabaseDownloadMessage.unspecified())
@@ -46,8 +33,8 @@ class PostgresViewModel constructor(
         version()
     }
 
-    val downloadState = _downloadState.asStateFlow()
-    val downloadProgress = _downloadProgress.asStateFlow()
+    val downloadState: StateFlow<DatabaseDownloadMessage> = _downloadState.asStateFlow()
+    val downloadProgress: StateFlow<List<DatabaseDownloadMessage.InProgressMessage>> = _downloadProgress.asStateFlow()
     suspend fun dumpDatabase(database: String) {
         if (database.isEmpty()) return
         val dumpDatabases = api.dumpDatabases(userName.value, password.value, database, dumpPath.value)
@@ -56,6 +43,7 @@ class PostgresViewModel constructor(
                 is DatabaseDownloadMessage.InProgressMessage -> {
                     downloadQueue.add(it)
                     _downloadProgress.value = downloadQueue.toList()
+                    _downloadState.value = it
                 }
                 else -> {
                     downloadQueue.clear()

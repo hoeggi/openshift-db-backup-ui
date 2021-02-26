@@ -88,7 +88,6 @@ object OC {
 
         val text = process.readStdout()
         val error = process.readError()
-        logger.debug(error)
         process.let {
             OcResult.Server(parseServer(text), it.result())
         }

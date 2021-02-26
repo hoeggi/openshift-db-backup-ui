@@ -14,6 +14,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
     implementation(Dependencies.okio)
+    compileOnly(Dependencies.slf4j_api)
 }
 
 tasks.test {
