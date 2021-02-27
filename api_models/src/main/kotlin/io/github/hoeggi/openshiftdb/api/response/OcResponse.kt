@@ -6,6 +6,9 @@ import kotlinx.serialization.Transient
 
 
 @Serializable
+data class SecretsApi(val name: String, val data: Map<String, String>)
+
+@Serializable
 data class LoginApi(val token: String, val server: String)
 
 @Serializable

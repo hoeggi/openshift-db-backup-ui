@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -22,17 +23,17 @@ fun PortForward() {
 
     val viewModel = OcViewModel.current
     val portForwards by viewModel.portForward.collectAsState(Scope.current.coroutineContext)
-
     LazyColumn {
         items(portForwards.entries.map {
             it.key to it.value
-        }) {
+        }) { it ->
             val target = it.first
+            val messages = it.second
             Column(
                 modifier = Modifier
                     .padding(10.dp)
                     .clickable {
-                        viewModel.closePortForward(it.first)
+                        viewModel.closePortForward(target)
                     }
             ) {
 
@@ -62,16 +63,15 @@ fun PortForward() {
                     text = "Stream: ",
                     style = MaterialTheme.typography.caption,
                 )
-                val lines = it.second
-                LazyColumn {
-                    items(lines) { item ->
-                        Text(
-                            text = item.message,
-                            style = MaterialTheme.typography.overline
-                        )
-                    }
+                messages.forEach {
+                    Text(
+                        text = it.message,
+                        style = MaterialTheme.typography.overline
+                    )
                 }
+                Divider()
             }
         }
     }
 }
+

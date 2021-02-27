@@ -39,7 +39,7 @@ internal data class ServiceResult(val items: List<ServiceItem>)
 internal data class ServiceItem(val metadata: Metadata, val spec: ServiceSpec)
 
 @Serializable
-internal data class Metadata(val name: String)
+data class Metadata(val name: String)
 
 @Serializable
 internal data class ServiceSpec(val ports: List<Port>?)
@@ -66,10 +66,10 @@ internal fun parseServices(json: String?) = try {
 }
 
 @Serializable
-internal data class SecretResult(val items: List<SecretItem>)
+data class SecretResult(val items: List<SecretItem>)
 
 @Serializable
-internal data class SecretItem(val data: Map<String, String>)
+data class SecretItem(val data: Map<String, String>, val metadata: Metadata)
 
 internal fun findPassword(json: String?, userName: String): String? = try {
     if (json.isNullOrBlank()) {
@@ -80,18 +80,43 @@ internal fun findPassword(json: String?, userName: String): String? = try {
             .asSequence()
             .map {
                 val map = it.data.filter { (k, v) ->
-                    val pw = k.equals("password", true)
-                    val user = matchesUsername(k, v, userName)
                     matchesUsername(k, v, userName) || k.equals("password", true)
                 }.map { (k, v) ->
                     k to v.decodeBase64()?.utf8()
                 }.toMap()
                 map["password"]
-            }?.filterNotNull()?.first()
+            }.filterNotNull().firstOrNull()
     }
 } catch (ex: java.lang.Exception) {
     ex.printStackTrace()
     null
+}
+
+internal fun parseSecrets(json: String?) = try {
+    if (json.isNullOrBlank()) {
+        listOf()
+    } else {
+        jsonParser.decodeFromString<SecretResult>(json)
+            .items.filter {
+                val cfg = it.data.keys.find { it.contains("cfg") }
+                val crt = it.data.keys.find { it.endsWith(".crt") }
+                cfg == null && crt == null
+            }.map {
+                it.copy(
+                    data = it.data.map {
+                        it.key to (it.value.decodeBase64()?.utf8() ?: "")
+                    }.filter {
+                        it.first.isNotEmpty()
+                                && it.second.isNotEmpty()
+                                && !it.first.contains("cfg")
+                                && !it.first.contains(".crt")
+                    }.toMap()
+                )
+            }.filter { it.data.isNotEmpty() }
+    }
+} catch (ex: java.lang.Exception) {
+    ex.printStackTrace()
+    listOf()
 }
 
 @Serializable

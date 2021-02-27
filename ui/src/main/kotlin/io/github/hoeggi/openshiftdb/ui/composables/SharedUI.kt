@@ -93,57 +93,6 @@ fun EditTextField(
     onValueChange: (TextFieldValue) -> Unit,
 ) {
     OutlinedTextField(
-        modifier = modifier.shortcuts {
-            on(Key.CtrlLeft + Key.V) {
-                val text = Toolkit.getDefaultToolkit()
-                    .systemClipboard.getData(DataFlavor.stringFlavor)?.toString()
-                if (text.isNullOrEmpty().not()) onValueChange(TextFieldValue(text!!))
-            }
-            on(Key.Delete) {
-                val start = value.selection.start
-                val end = value.selection.start
-                val length = value.text.length
-                if (start <= end && start < length && end < length) {
-                    onValueChange(
-                        value.copy(
-                            text = value.text.removeRange(start..end)
-                        )
-                    )
-                }
-            }
-            on(Key.Home) {
-                onValueChange(value.moveCursor(0))
-            }
-            on(Key(KeyEvent.VK_END)) {
-                onValueChange(value.moveCursor(value.text.length))
-            }
-            on(Key.ShiftLeft + Key(KeyEvent.VK_RIGHT)) {
-                onValueChange(value.selectNext())
-            }
-            on(Key.ShiftLeft + Key(KeyEvent.VK_LEFT)) {
-                onValueChange(value.selectPrev())
-            }
-        },
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-    )
-}
-
-
-@Composable
-fun StatefulEditTextField(
-    initialValue: TextFieldValue,
-    label: String,
-    modifier: Modifier = Modifier,
-    onValueChange: (TextFieldValue) -> Unit,
-) {
-    var value by remember { mutableStateOf(initialValue) }
-    val _onValueChange: (TextFieldValue) -> Unit = {
-        value = it
-        onValueChange(it)
-    }
-    OutlinedTextField(
         modifier = modifier
             .shortcuts {
                 on(Key.CtrlLeft + Key.V) {
@@ -153,7 +102,7 @@ fun StatefulEditTextField(
                         if (value.selection.collapsed) {
                             val prefix = value.text.substring(0, value.selection.start)
                             val postfix = value.text.substring(value.selection.start)
-                            _onValueChange(
+                            onValueChange(
                                 value.copy(
                                     text = "$prefix$text$postfix",
                                     selection = TextRange(value.selection.start + text!!.length)
@@ -163,7 +112,7 @@ fun StatefulEditTextField(
                             val selected = value.selection
                             val prefix = value.text.substring(0, selected.start.coerceAtMost(selected.end))
                             val postfix = value.text.substring(selected.start.coerceAtLeast(selected.end))
-                            _onValueChange(
+                            onValueChange(
                                 value.copy(
                                     text = "$prefix$text$postfix",
                                     selection = TextRange(selected.start.coerceAtMost(selected.end) + text!!.length)
@@ -186,7 +135,7 @@ fun StatefulEditTextField(
                     val end = value.selection.start
                     val length = value.text.length
                     if (start <= end && start < length && end < length) {
-                        _onValueChange(
+                        onValueChange(
                             value.copy(
                                 text = value.text.removeRange(start..end)
                             )
@@ -194,21 +143,42 @@ fun StatefulEditTextField(
                     }
                 }
                 on(Key.Home) {
-                    _onValueChange(value.moveCursor(0))
+                    onValueChange(value.moveCursor(0))
                 }
                 on(Key(KeyEvent.VK_END)) {
-                    _onValueChange(value.moveCursor(value.text.length))
+                    onValueChange(value.moveCursor(value.text.length))
                 }
                 on(Key.ShiftLeft + Key(KeyEvent.VK_RIGHT)) {
-                    _onValueChange(value.selectNext())
+                    onValueChange(value.selectNext())
                 }
                 on(Key.ShiftLeft + Key(KeyEvent.VK_LEFT)) {
-                    _onValueChange(value.selectPrev())
+                    onValueChange(value.selectPrev())
                 }
             },
         value = value,
-        onValueChange = _onValueChange,
+        onValueChange = onValueChange,
         label = { Text(label) },
+    )
+}
+
+
+@Composable
+fun StatefulEditTextField(
+    initialValue: TextFieldValue,
+    label: String,
+    modifier: Modifier = Modifier,
+    onValueChange: (TextFieldValue) -> Unit,
+) {
+    var value by remember { mutableStateOf(initialValue) }
+    val _onValueChange: (TextFieldValue) -> Unit = {
+        value = it
+        onValueChange(it)
+    }
+    EditTextField(
+        value = value,
+        label = label,
+        modifier = modifier,
+        onValueChange = _onValueChange
     )
 }
 

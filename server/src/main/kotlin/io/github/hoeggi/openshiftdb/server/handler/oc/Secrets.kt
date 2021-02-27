@@ -1,6 +1,7 @@
 package io.github.hoeggi.openshiftdb.server.handler.oc
 
 import io.github.hoeggi.openshiftdb.api.response.ApiResponse
+import io.github.hoeggi.openshiftdb.api.response.SecretsApi
 import io.github.hoeggi.openshiftdb.oc.OC
 import io.ktor.application.*
 import io.ktor.http.*
@@ -13,11 +14,23 @@ fun Password(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
         if (username == null) {
             call.respond(HttpStatusCode.BadRequest, "missing username")
         } else {
-            val secret = OC.secrets(username)
+            val secret = OC.password(username)
             if (secret.password.isNullOrEmpty()) {
                 call.respond(HttpStatusCode.NotFound)
             } else {
                 call.respond(ApiResponse(secret.password, secret.result))
             }
+        }
+    }
+
+fun Secrets(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+    {
+        val secrets = OC.secrets()
+        if (secrets.secrets.isNullOrEmpty()) {
+            call.respond(HttpStatusCode.NotFound)
+        } else {
+            call.respond(ApiResponse(secrets.secrets.map {
+                SecretsApi(it.metadata.name, it.data)
+            }, secrets.result))
         }
     }

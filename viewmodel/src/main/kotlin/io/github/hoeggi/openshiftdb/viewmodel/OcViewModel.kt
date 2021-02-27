@@ -60,6 +60,7 @@ class OcViewModel(port: Int) {
     val projects: StateFlow<List<ProjectApi>> = _projects.asStateFlow()
     suspend fun projects() {
         _projects.value = api.projects().getOrDefault(listOf())
+            .filterNot { it.name.startsWith("openshift") or it.name.startsWith("kube")}
     }
 
     val currentProject: StateFlow<ProjectApi> = _currentProject.asStateFlow()
@@ -87,23 +88,22 @@ class OcViewModel(port: Int) {
 
     private val openPortForwars = mutableMapOf<PortForwardTarget, Job>()
     val portForward: StateFlow<Map<PortForwardTarget, List<PortForwardMessage>>> = _portForward.asStateFlow()
-    suspend fun portForward(svc: String, port: Int) {
-        portForward(PortForwardTarget(currentProject.value.name, svc, port))
+    fun portForward(svc: String, port: Int, scope: CoroutineScope) {
+        portForward(PortForwardTarget(currentProject.value.name, svc, port), scope)
     }
 
-    suspend fun portForward(target: PortForwardTarget) {
-        withContext(Dispatchers.IO) {
-            val launch = launch {
+    fun portForward(target: PortForwardTarget, scope: CoroutineScope) {
+        GlobalScope.launch {
+            val launch = scope.async(Dispatchers.IO) {
                 val flow: Flow<PortForwardMessage> = api.portForward(target.project, target.svc, target.port)
                 flow.collect {
                     ensureActive()
                     logger.debug("message from port-forward: $it")
-                    _portForward.value = _portForward.value.toMutableMap().apply {
-                        putIfAbsent(target, listOf())!!.toMutableList().apply {
-                            add(it)
-                        }
-
-                    }
+                    val map = _portForward.value.toMutableMap()
+                    val list = map.getOrDefault(target, listOf()).toMutableList()
+                    list.add(it)
+                    map[target] = list
+                    _portForward.value = map
                 }
             }
             openPortForwars.put(target, launch)
@@ -116,6 +116,9 @@ class OcViewModel(port: Int) {
 
     fun closePortForward(target: PortForwardTarget) {
         openPortForwars.remove(target)?.cancel()
+        _portForward.value = _portForward.value.toMutableMap().apply {
+            remove(target)
+        }
     }
 
 }
