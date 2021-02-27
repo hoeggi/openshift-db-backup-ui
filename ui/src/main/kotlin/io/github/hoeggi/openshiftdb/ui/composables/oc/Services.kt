@@ -16,6 +16,7 @@ import io.github.hoeggi.openshiftdb.OcViewModel
 import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.api.response.ServicesApi
 import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
+import kotlinx.coroutines.launch
 
 @Composable
 fun Service() {
@@ -41,9 +42,13 @@ fun Service() {
                 Service(
                     service = item,
                     onServiceClicked = { service, port ->
-                        launchInIo(scope) {
-                            viewModel.portForward(service.name, port)
-                        }
+//                        launchInIo(scope) {
+//                            viewModel.portForward(service.name, port, scope)
+//                        }
+                        viewModel.portForward(service.name, port, scope)
+//                        scope.launch {
+//                            viewModel.portForward(service.name, port, scope)
+//                        }
                     }
                 )
             }

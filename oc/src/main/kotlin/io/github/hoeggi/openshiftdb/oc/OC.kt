@@ -18,6 +18,7 @@ object OC {
         class Projects(val projects: List<String>, result: ProcessResult) : OcResult(result)
         class Services(val services: List<Service>, result: ProcessResult) : OcResult(result)
         class Secret(val password: String?, result: ProcessResult) : OcResult(result)
+        class Secrets(val secrets: List<SecretItem>, result: ProcessResult) : OcResult(result)
         class Server(val server: List<Cluster>, result: ProcessResult) : OcResult(result)
 
         sealed class LoginState(result: ProcessResult = ProcessResult.Ok) : OcResult(result) {
@@ -88,6 +89,7 @@ object OC {
 
         val text = process.readStdout()
         val error = process.readError()
+        logger.debug(error)
         process.let {
             OcResult.Server(parseServer(text), it.result())
         }
@@ -140,9 +142,19 @@ object OC {
         }
     }
 
-    suspend fun secrets(username: String): OcResult.Secret = withContext(Dispatchers.IO) {
+    suspend fun secrets(): OcResult.Secrets = withContext(Dispatchers.IO) {
         val process = ProcessBuilder(Commands.Secrets.commands).start()
 
+        val text = process.readStdout()
+        val error = process.readError()
+        logger.debug(error)
+        process.let {
+            OcResult.Secrets(parseSecrets(text), it.result())
+        }
+    }
+
+    suspend fun password(username: String): OcResult.Secret = withContext(Dispatchers.IO) {
+        val process = ProcessBuilder(Commands.Secrets.commands).start()
         val text = process.readStdout()
         val error = process.readError()
         logger.debug(error)

@@ -28,7 +28,10 @@ fun Route.oc() {
             get("", Projects())
             get("/current", Project())
         }
-        get("/password", Password())
+        route("/secrets") {
+            get("/password", Password())
+            get(Secrets())
+        }
         webSocket("/port-forward", null, PortForward())
     }
 }

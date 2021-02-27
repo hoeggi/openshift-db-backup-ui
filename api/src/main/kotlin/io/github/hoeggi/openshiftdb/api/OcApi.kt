@@ -28,6 +28,7 @@ interface OcApi {
     suspend fun services(): Result<List<ServicesApi>>
     suspend fun login(token: String, server: String): Result<Unit>
     suspend fun checkLogin(): Result<Unit>
+    suspend fun secrets(): Result<List<SecretsApi>>
 
     suspend fun portForward(
         project: String,
@@ -67,13 +68,13 @@ private class OcApiImpl(url: BasePath) : OcApi {
 
     override suspend fun switchProject(project: String) = switchProject(ProjectApi(project))
 
+    override suspend fun secrets(): Result<List<SecretsApi>> = client.get("secrets")
     override suspend fun password(username: String): Result<String> =
         client.first.newCall(
-            client.second.withPath("password")
+            client.second.withPath("secrets/password")
                 .withQuery("username" to username)
                 .toGetRequest()
-        )
-            .execute().get()
+        ).execute().get()
 
     override suspend fun services(): Result<List<ServicesApi>> = client.get("services")
 

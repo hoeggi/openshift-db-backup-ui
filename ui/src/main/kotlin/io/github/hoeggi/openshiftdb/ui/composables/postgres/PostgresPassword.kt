@@ -1,10 +1,15 @@
 package io.github.hoeggi.openshiftdb.ui.composables.postgres
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +38,7 @@ fun PostgresPassword() {
     ) {
         EditTextField(
             value = internalPassword,
-            modifier = Modifier.fillMaxWidth(0.75f),
+            modifier = Modifier.fillMaxWidth(0.7f),
             label = "Password"
         ) {
             internalPassword = it
@@ -47,9 +52,16 @@ fun PostgresPassword() {
                 }
             }
         ) {
-            Text(
-                text = "Detect"
-            )
+            Text(text = "Detect")
+        }
+        IconButton(
+            onClick = {
+                launchInIo(scope) {
+                    viewModel.secrets()
+                }
+            },
+        ){
+            Icon(Icons.Outlined.List, contentDescription = "")
         }
     }
 }

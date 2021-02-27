@@ -93,6 +93,9 @@ class Server(private val listeningPort: Int) : Runnable {
             mdc(HttpHeaders.UserAgent) { call ->
                 call.request.header(HttpHeaders.UserAgent)
             }
+            mdc("query") { call ->
+                call.request.queryString()
+            }
             format { call ->
                 "[${
                     MDC.getCopyOfContextMap().apply {

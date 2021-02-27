@@ -5,6 +5,7 @@ import io.github.hoeggi.openshiftdb.api.Api
 import io.github.hoeggi.openshiftdb.api.PostgresApi
 import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
 import io.github.hoeggi.openshiftdb.api.response.DatabasesApi
+import io.github.hoeggi.openshiftdb.api.response.SecretsApi
 import io.github.hoeggi.openshiftdb.api.response.ToolsVersionApi
 import kotlinx.coroutines.flow.*
 
@@ -15,6 +16,7 @@ class PostgresViewModel(port: Int) {
     private val _dumpPath = MutableStateFlow("")
     private val _password = MutableStateFlow("")
     private val _userName = MutableStateFlow("postgres")
+    private val _secrets = MutableStateFlow(listOf<SecretsApi>())
 
     private val _databases = MutableStateFlow("")
     private val _databasesLines = MutableStateFlow(listOf<String>())
@@ -86,7 +88,7 @@ class PostgresViewModel(port: Int) {
         val databases = api.databases(userName.value, password.value, PostgresApi.DatabaseViewFormat.Table)
         databases.onSuccess {
             _databases.value = when (it) {
-                is DatabasesApi.Text -> it.databases
+                is DatabasesApi.Tabel -> it.databases
                 else -> ""
             }
         }
@@ -110,6 +112,17 @@ class PostgresViewModel(port: Int) {
         _password.value = password
     }
 
+    val secrets = _secrets.asStateFlow()
+    suspend fun secrets() {
+        val result = api.secrets()
+        result.onSuccess {
+            _secrets.value = it
+        }
+    }
+
+    fun clearSecrets() {
+        _secrets.value = listOf()
+    }
 
     suspend fun detectPassword() {
         val result = api.password(userName.value)
