@@ -1,4 +1,4 @@
-package io.github.hoeggi.openshiftdb
+package io.github.hoeggi.openshiftdb.ui.composables
 
 import androidx.compose.desktop.AppManager
 import androidx.compose.foundation.*
@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
+import io.github.hoeggi.openshiftdb.GlobalState
 
 data class Error(val t: Thread? = Thread.currentThread(), val th: Throwable? = Throwable(), val fired: Boolean = false)
 

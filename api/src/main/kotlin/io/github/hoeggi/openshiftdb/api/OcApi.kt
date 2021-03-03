@@ -14,6 +14,8 @@ import okhttp3.*
 import okio.ByteString
 import org.slf4j.LoggerFactory
 import java.io.Closeable
+import java.io.IOException
+import java.util.concurrent.Executors
 import kotlin.coroutines.coroutineContext
 
 interface OcApi {
@@ -90,12 +92,15 @@ private class OcApiImpl(url: BasePath) : OcApi {
         )
     }
 
-    private fun authorize(request: Request): Result<Unit> {
+    private fun authorize(request: Request): Result<Unit> = try {
         val result = client.first.newCall(request).execute()
-        return when (result.code) {
+        when (result.code) {
             204 -> Result.success(Unit)
             else -> Result.failure(RuntimeException("Unauthorized"))
         }
+    } catch (ex: IOException) {
+        logger.warn("unable to reach api", ex)
+        Result.failure(RuntimeException("Unauthorized"))
     }
 
     override suspend fun portForward(project: String, svc: String, port: Int) = callbackFlow {
