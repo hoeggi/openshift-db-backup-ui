@@ -2,6 +2,7 @@ package io.github.hoeggi.openshiftdb
 
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
 import java.util.concurrent.Executors
+import io.github.hoeggi.openshiftdb.ui.composables.Error
 
 fun exception(
     delay: Long = 1000,

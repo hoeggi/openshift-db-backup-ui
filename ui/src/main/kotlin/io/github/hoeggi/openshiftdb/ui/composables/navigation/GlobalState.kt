@@ -2,9 +2,9 @@ package io.github.hoeggi.openshiftdb.ui.composables.navigation
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import io.github.hoeggi.openshiftdb.Error
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import io.github.hoeggi.openshiftdb.ui.composables.Error
 
 sealed class Screen {
     object Main : Screen()

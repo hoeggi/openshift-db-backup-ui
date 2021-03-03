@@ -14,9 +14,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import io.github.hoeggi.openshiftdb.ErrorView
 import io.github.hoeggi.openshiftdb.GlobalState
 import io.github.hoeggi.openshiftdb.Scope
+import io.github.hoeggi.openshiftdb.ui.composables.ErrorView
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.Theme
 
 
