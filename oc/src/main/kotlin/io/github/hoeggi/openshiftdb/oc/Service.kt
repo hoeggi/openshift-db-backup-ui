@@ -4,10 +4,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okio.ByteString.Companion.decodeBase64
+import org.slf4j.LoggerFactory
+
+private val logger = LoggerFactory.getLogger("io.github.hoeggi.openshiftdb.oc.Service")
 
 
 private val jsonParser = Json {
     ignoreUnknownKeys = true
+    isLenient = true
 }
 
 @Serializable
@@ -28,7 +32,7 @@ internal fun parseVersion(version: String) = try {
     if (version.isNullOrBlank()) null
     else jsonParser.decodeFromString<OcVersion>(version)
 } catch (ex: Exception) {
-    ex.printStackTrace()
+    logger.warn("unable to parse version", ex)
     null
 }
 
@@ -45,7 +49,7 @@ data class Metadata(val name: String)
 internal data class ServiceSpec(val ports: List<Port>?)
 
 @Serializable
-data class Port(val port: Int, val targetPort: Int, val protocol: String)
+data class Port(val port: Int, val targetPort: String, val protocol: String)
 
 data class Service(val name: String, val ports: List<Port>)
 
@@ -61,7 +65,7 @@ internal fun parseServices(json: String?) = try {
             }
         }
 } catch (ex: Exception) {
-    ex.printStackTrace()
+    logger.warn("unable to parse services", ex)
     listOf()
 }
 
@@ -88,7 +92,7 @@ internal fun findPassword(json: String?, userName: String): String? = try {
             }.filterNotNull().firstOrNull()
     }
 } catch (ex: java.lang.Exception) {
-    ex.printStackTrace()
+    logger.warn("unable to parse password", ex)
     null
 }
 
@@ -115,7 +119,7 @@ internal fun parseSecrets(json: String?) = try {
             }.filter { it.data.isNotEmpty() }
     }
 } catch (ex: java.lang.Exception) {
-    ex.printStackTrace()
+    logger.warn("unable to parse secrets", ex)
     listOf()
 }
 
@@ -133,7 +137,7 @@ internal fun parseServer(json: String?) = try {
     else jsonParser.decodeFromString<Clusters>(json)
         .clusters
 } catch (ex: Exception) {
-    ex.printStackTrace()
+    logger.warn("unable to parse server", ex)
     listOf()
 }
 

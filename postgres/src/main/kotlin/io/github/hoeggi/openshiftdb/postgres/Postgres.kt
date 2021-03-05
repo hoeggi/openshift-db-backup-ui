@@ -3,11 +3,7 @@ package io.github.hoeggi.openshiftdb.postgres
 import io.github.hoeggi.openshiftdb.commons.buffer
 import io.github.hoeggi.openshiftdb.commons.bufferError
 import io.github.hoeggi.openshiftdb.commons.messageAndResult
-import io.github.hoeggi.openshiftdb.commons.text
-import io.ktor.application.*
-import io.ktor.auth.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
@@ -16,13 +12,12 @@ import java.io.Closeable
 import java.io.File
 import java.io.IOException
 import java.time.LocalDateTime
-import java.util.concurrent.Executors
 
 object Postgres {
     val logger = LoggerFactory.getLogger(Postgres::class.java)
 
     sealed class PostgresResult {
-        class Dump(private val process: Process, path: File) : PostgresResult(), Closeable {
+        class DumpPlain(private val process: Process, path: File) : PostgresResult(), Closeable {
             val buffer = process.buffer()
             val bufferError = process.bufferError()
 
@@ -39,9 +34,18 @@ object Postgres {
                     process.errorStream.close()
                     output.close()
                 } catch (ex: IOException) {
-                    ex.printStackTrace()
+                    logger.warn("error closing postgres dump", ex)
                 }
             }
+        }
+
+        class DumpCustom(private val process: Process, path: File) : PostgresResult() {
+            val exitCode
+                @Throws(IllegalThreadStateException::class)
+                get() = process.exitValue()
+            val bufferError = process.bufferError()
+            val output = path.absolutePath
+            fun await() = process.await().exitValue()
         }
 
         sealed class Download {
@@ -59,15 +63,15 @@ object Postgres {
 
     private fun Process.await() = also {
         it.onExit().thenAcceptAsync {
-            logger.debug("postges onExit: ${it.exitValue()} - ${Thread.currentThread().name}")
+            logger.debug("postges onExit: ${it.exitValue()} - ${Thread.currentThread().name} - ${it.toHandle().info()}")
         }
         it.waitFor()
     }
 
-    suspend fun dumpDatabase(database: String, path: String, username: String, password: String) =
+    suspend fun dumpDatabasePlain(database: String, path: String, username: String, password: String) =
         withContext(Dispatchers.IO) {
-            val commands = Commands.PgDump.Dump(username, database).commands
-            PostgresResult.Dump(
+            val commands = Commands.PgDump.DumpPlain(username, database).commands
+            PostgresResult.DumpPlain(
                 ProcessBuilder(commands)
                     .withPassword(password)
                     .start()
@@ -76,7 +80,29 @@ object Postgres {
                             logger.debug("dumpDatabase onExit: ${it.exitValue()} - ${Thread.currentThread().name}")
                         }
                     },
-                File(path, "$database-${LocalDateTime.now().toString().replace(" ", "-")}")
+                File(path, "$database-${LocalDateTime.now().toString().replace(" ", "-")}.sql")
+            )
+        }
+
+    suspend fun dumpDatabaseCustom(database: String, path: String, username: String, password: String) =
+        withContext(Dispatchers.IO) {
+            val outPath = File(path, "$database-${LocalDateTime.now().toString().replace(" ", "-")}.backup")
+            val commands = Commands.PgDump.DumpCustom(
+                username,
+                database,
+                outPath
+            ).commands
+
+            PostgresResult.DumpCustom(
+                ProcessBuilder(commands)
+                    .withPassword(password)
+                    .start()
+                    .also {
+                        it.onExit().thenAcceptAsync {
+                            logger.debug("dumpDatabase onExit: ${it.exitValue()} - ${Thread.currentThread().name}")
+                        }
+                    },
+                outPath
             )
         }
 

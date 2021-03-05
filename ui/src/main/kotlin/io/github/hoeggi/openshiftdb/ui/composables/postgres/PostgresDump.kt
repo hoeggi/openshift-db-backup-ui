@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.hoeggi.openshiftdb.GlobalState
 import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
@@ -25,6 +26,7 @@ import java.io.File
 fun PostgresDump() {
 
     val viewModel = PostgresViewModel.current
+    val globalState = GlobalState.current
     val scope = Scope.current
     val selectedDatabase by viewModel.selectedDatabase.collectAsState(-1, scope.coroutineContext)
     val resultState by viewModel.downloadState.collectAsState(scope.coroutineContext)
@@ -35,7 +37,7 @@ fun PostgresDump() {
     ) {
         Button(onClick = {
             launchInIo(scope) {
-                viewModel.dumpDatabase(databases[selectedDatabase])
+                viewModel.dumpDatabase(databases[selectedDatabase], globalState.exportFormat.value.format)
             }
         }) {
             Text(text = "Dump")

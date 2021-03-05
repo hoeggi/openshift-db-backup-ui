@@ -37,9 +37,9 @@ class PostgresViewModel(port: Int) {
 
     val downloadState: StateFlow<DatabaseDownloadMessage> = _downloadState.asStateFlow()
     val downloadProgress: StateFlow<List<DatabaseDownloadMessage.InProgressMessage>> = _downloadProgress.asStateFlow()
-    suspend fun dumpDatabase(database: String) {
+    suspend fun dumpDatabase(database: String, format: String) {
         if (database.isEmpty()) return
-        val dumpDatabases = api.dumpDatabases(userName.value, password.value, database, dumpPath.value)
+        val dumpDatabases = api.dumpDatabases(userName.value, password.value, database, dumpPath.value, format)
         dumpDatabases.collect {
             when (it) {
                 is DatabaseDownloadMessage.InProgressMessage -> {

@@ -23,6 +23,7 @@ import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 import io.github.hoeggi.openshiftdb.viewmodel.PostgresViewModel
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import java.lang.RuntimeException
 
 const val APP_NAME = "Openshift DB Backup GUI"
 

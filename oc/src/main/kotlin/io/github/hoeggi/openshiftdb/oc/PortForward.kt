@@ -42,7 +42,7 @@ class PortForward(
             }
             awaitAll(stream, error)
         } catch (e: Throwable) {
-            e.printStackTrace()
+            logger.warn("error forwarding port", e)
         } finally {
             logger.debug("finally close")
             portForward?.stop()
