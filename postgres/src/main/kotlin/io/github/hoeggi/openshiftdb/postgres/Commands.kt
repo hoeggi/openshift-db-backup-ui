@@ -1,6 +1,8 @@
 package io.github.hoeggi.openshiftdb.postgres
 
 import io.github.hoeggi.openshiftdb.commons.Command
+import java.io.File
+import java.time.LocalDateTime
 
 internal sealed class Commands(vararg commands: String) : Command {
 
@@ -33,12 +35,21 @@ internal sealed class Commands(vararg commands: String) : Command {
         override val commands = listOf("pg_dump", *_commands)
 
         object Version : PgDump("--version")
-        class Dump(username: String, database: String) : PgDump(
+        class DumpPlain(username: String, database: String) : PgDump(
             "--user=$username",
             "--host=localhost",
             "--port=5432",
             "--clean", "--create", "--format=p",
-            database,
+            "--dbname=$database",
+        )
+
+        class DumpCustom(username: String, database: String, path: File) : PgDump(
+            "--user=$username",
+            "--host=localhost",
+            "--port=5432",
+            "--clean", "--create", "--format=p",
+            "--dbname=$database",
+            "--file=${path.absolutePath}"
         )
     }
 }

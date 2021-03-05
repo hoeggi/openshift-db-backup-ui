@@ -56,7 +56,7 @@ data class ServicesApi(
 @Serializable
 data class ServicesPortApi(
     val port: Int = -1,
-    val targetPort: Int = -1,
+    val targetPort: String = "",
     val protocol: String = "",
 ) {
     @Transient

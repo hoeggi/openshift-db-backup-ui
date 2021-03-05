@@ -35,4 +35,16 @@ fun main() {
             }
         logDelegate.stop()
     }
+
+    Executors.newSingleThreadExecutor().execute {
+        while (true) {
+            Thread.sleep(10000)
+            val instance = MemoryAppenderInstance.instance
+            val events = instance?.getEvents()
+            events?.forEach {
+                //
+            }
+        }
+
+    }
 }

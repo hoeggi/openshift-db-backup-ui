@@ -37,7 +37,8 @@ interface PostgresApi {
         username: String,
         password: String,
         database: String,
-        path: String
+        path: String,
+        format: String = "custom"
     ): Flow<DatabaseDownloadMessage>
 
     companion object {
@@ -94,12 +95,14 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
         username: String,
         password: String,
         database: String,
-        path: String
+        path: String,
+        format: String
     ): Flow<DatabaseDownloadMessage> = callbackFlow {
         val request = webSocketClient.second.withPath("databases/dump")
             .withQuery(
                 "database" to database,
                 "path" to path,
+                "format" to format
             ).toGetRequest(Credentials.basic(username, password))
 
         val listener: WebSocketListener = createListener(this@callbackFlow)
@@ -121,11 +124,14 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
             }
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                logger.debug("onClosing - $code - $reason")
+                logger.debug("onClosed - $code - $reason")
+                val message = Json.decodeFromString<DatabaseDownloadMessage>(reason)
+                if (!producer.isClosedForSend) producer.sendBlocking(message)
+                logger.debug("onClosed emit result: $message")
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                t.printStackTrace()
+                logger.warn("websocket failed, $response", t)
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {

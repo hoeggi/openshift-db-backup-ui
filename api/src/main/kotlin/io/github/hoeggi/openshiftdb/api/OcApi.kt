@@ -135,7 +135,7 @@ private class OcApiImpl(url: BasePath) : OcApi {
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                t.printStackTrace()
+                logger.warn("websocket failed", t)
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {

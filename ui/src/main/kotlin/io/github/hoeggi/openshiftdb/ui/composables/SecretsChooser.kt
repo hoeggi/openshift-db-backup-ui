@@ -34,7 +34,7 @@ fun SecretsChooser(modifier: Modifier = Modifier, viewModel: PostgresViewModel) 
                 .fillMaxHeight(0.75f)
                 .padding(16.dp)
                 .background(color = MaterialTheme.colors.background, shape = RoundedCornerShape(6.dp))
-                .border(1.dp, color = Color.White, shape = RoundedCornerShape(6.dp)),
+                .border(1.dp, color = MaterialTheme.colors.onBackground, shape = RoundedCornerShape(6.dp)),
             contentAlignment = Alignment.TopStart,
 
             ) {
