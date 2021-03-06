@@ -18,5 +18,6 @@ include(
     ":viewmodel",
     ":api_models",
     ":ui",
-    ":i18n"
+    ":i18n",
+    ":errorhandler"
 )

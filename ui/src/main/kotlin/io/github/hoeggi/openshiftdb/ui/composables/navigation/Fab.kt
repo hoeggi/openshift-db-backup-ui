@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.GlobalState
-import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_EXPORT_FORMAT_CUSTOM
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_EXPORT_FORMAT_LABEL
@@ -21,20 +20,22 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_EXPORT_FORMAT_
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_DARK
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_LIGHT
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun Fab(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    coroutineScope: CoroutineScope,
 ) {
     val globalState = GlobalState.current
-    val settings by globalState.settings.collectAsState(Scope.current.coroutineContext)
+    val settings by globalState.settings.collectAsState(coroutineScope.coroutineContext)
 
 
     Column(modifier = modifier) {
         if (settings) {
             Row {
-                ExportFormatChooser()
-                ThemeChooser()
+                ExportFormatChooser(coroutineScope)
+                ThemeChooser(coroutineScope)
             }
         }
 
@@ -50,9 +51,9 @@ fun Fab(
 }
 
 @Composable
-fun ThemeChooser() {
+fun ThemeChooser(coroutineScope: CoroutineScope) {
     val globalState = GlobalState.current
-    val dark by globalState.theme.collectAsState(Scope.current.coroutineContext)
+    val dark by globalState.theme.collectAsState(coroutineScope.coroutineContext)
 
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
         Text(
@@ -91,9 +92,9 @@ fun ThemeChooser() {
 }
 
 @Composable
-fun ExportFormatChooser() {
+fun ExportFormatChooser(coroutineScope: CoroutineScope) {
     val globalState = GlobalState.current
-    val format by globalState.exportFormat.collectAsState(Scope.current.coroutineContext)
+    val format by globalState.exportFormat.collectAsState(coroutineScope.coroutineContext)
 
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
         Text(

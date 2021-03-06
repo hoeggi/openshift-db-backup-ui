@@ -7,21 +7,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
-import io.github.hoeggi.openshiftdb.Scope
-import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
+import io.github.hoeggi.openshiftdb.collectAsState
 
 @Composable
 fun ConsoleOutput() {
     val viewModel = PostgresViewModel.current
-    val text by viewModel.databases.collectAsState("", Scope.current.coroutineContext)
-    val downloadProgress: List<DatabaseDownloadMessage.InProgressMessage> by viewModel.downloadProgress
-        .collectAsState(Scope.current.coroutineContext)
+    val text by viewModel.collectAsState(viewModel.databases)
+    val downloadProgress by viewModel.collectAsState(viewModel.downloadProgress)
 
     Text(
         text = text,

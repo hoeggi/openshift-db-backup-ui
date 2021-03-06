@@ -24,6 +24,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(project(":server"))
     implementation(project(":ui"))
+    implementation(project(":errorhandler"))
     compileOnly(Dependencies.slf4j_api)
     implementation(Dependencies.logback)
 }

@@ -2,6 +2,7 @@ package io.github.hoeggi.openshiftdb.viewmodel
 
 import io.github.hoeggi.openshiftdb.api.getOrDefault
 import io.github.hoeggi.openshiftdb.api.response.*
+import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.slf4j.LoggerFactory
@@ -12,7 +13,8 @@ enum class LoginState {
 
 data class PortForwardTarget(val project: String, val svc: String, val port: Int)
 
-class OcViewModel(port: Int, coroutineScope: CoroutineScope) : BaseViewModel(port, coroutineScope) {
+class OcViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
+    BaseViewModel(port, coroutineScope, errorViewer) {
 
     private val logger = LoggerFactory.getLogger(OcViewModel::class.java)
 
@@ -86,26 +88,24 @@ class OcViewModel(port: Int, coroutineScope: CoroutineScope) : BaseViewModel(por
 
     private val openPortForwars = mutableMapOf<PortForwardTarget, Job>()
     val portForward: StateFlow<Map<PortForwardTarget, List<PortForwardMessage>>> = _portForward.asStateFlow()
-    fun portForward(svc: String, port: Int, scope: CoroutineScope) {
-        portForward(PortForwardTarget(currentProject.value.name, svc, port), scope)
+    fun portForward(svc: String, port: Int) {
+        portForward(PortForwardTarget(currentProject.value.name, svc, port))
     }
 
-    fun portForward(target: PortForwardTarget, scope: CoroutineScope) {
-        GlobalScope.launch {
-            val launch = scope.async(Dispatchers.IO) {
-                val flow: Flow<PortForwardMessage> = ocApi.portForward(target.project, target.svc, target.port)
-                flow.collect {
-                    ensureActive()
-                    logger.debug("message from port-forward: $it")
-                    val map = _portForward.value.toMutableMap()
-                    val list = map.getOrDefault(target, listOf()).toMutableList()
-                    list.add(it)
-                    map[target] = list
-                    _portForward.value = map
-                }
+    fun portForward(target: PortForwardTarget) {
+        val launch = coroutineScope.launch(Dispatchers.IO) {
+            val flow: Flow<PortForwardMessage> = ocApi.portForward(target.project, target.svc, target.port)
+            flow.collect {
+                ensureActive()
+                logger.debug("message from port-forward: $it")
+                val map = _portForward.value.toMutableMap()
+                val list = map.getOrDefault(target, listOf()).toMutableList()
+                list.add(it)
+                map[target] = list
+                _portForward.value = map
             }
-            openPortForwars.put(target, launch)
         }
+        openPortForwars.put(target, launch)
     }
 
     fun closePortForward(target: PortForwardTarget) {

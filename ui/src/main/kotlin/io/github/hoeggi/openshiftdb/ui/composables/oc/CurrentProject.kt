@@ -7,13 +7,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.OcViewModel
-import io.github.hoeggi.openshiftdb.Scope
-import io.github.hoeggi.openshiftdb.api.response.ProjectApi
+import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PROJECT_CURRENT_LABEL
 
@@ -21,7 +19,8 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PROJECT_CURRENT_LABE
 @Composable
 fun CurrentProject() {
 
-    val currentProject by OcViewModel.current.currentProject.collectAsState(Scope.current.coroutineContext)
+    val ocViewModel = OcViewModel.current
+    val currentProject by ocViewModel.collectAsState(ocViewModel.currentProject)
 
     Column(
         modifier = Modifier

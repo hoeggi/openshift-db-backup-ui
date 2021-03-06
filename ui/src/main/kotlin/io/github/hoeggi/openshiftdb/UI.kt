@@ -22,14 +22,10 @@ import io.github.hoeggi.openshiftdb.viewmodel.LoginState
 import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 import io.github.hoeggi.openshiftdb.viewmodel.PostgresViewModel
 import io.github.hoeggi.openshiftdb.viewmodel.viewModels
-import kotlinx.coroutines.CoroutineScope
 import org.slf4j.LoggerFactory
 
 const val APP_NAME = "Openshift DB Backup GUI"
 
-val Scope = staticCompositionLocalOf<CoroutineScope> {
-    error("unexpected call to Scope")
-}
 val PostgresViewModel = staticCompositionLocalOf<PostgresViewModel> {
     error("unexpected call to PostgresViewModel")
 }
@@ -43,7 +39,6 @@ val GlobalState = staticCompositionLocalOf<GlobalState> {
 class UI {
     val logger = LoggerFactory.getLogger(UI::class.java)
 
-    @ExperimentalFoundationApi
     fun show(port: Int, globalState: GlobalState, onClose: (() -> Unit)) {
         logger.info("starting ui")
         Window(
@@ -56,7 +51,7 @@ class UI {
         ) {
 
             val scope = rememberCoroutineScope()
-            val (ocViewModel, postgresViewModel) = viewModels(port, scope)
+            val (ocViewModel, postgresViewModel) = viewModels(port, scope, globalState)
 
             val loginState by ocViewModel.loginState.collectAsState(
                 scope.coroutineContext
@@ -64,18 +59,18 @@ class UI {
             ocViewModel.checkLoginState()
 
             CompositionLocalProvider(
-                Scope provides scope,
                 GlobalState provides globalState,
             ) {
-                ColorMuskTheme {
+                ColorMuskTheme(scope) {
                     val navigationState = GlobalState.current
-                    val screen by navigationState.screen.collectAsState(Scope.current.coroutineContext)
+                    val screen by navigationState.screen.collectAsState(scope.coroutineContext)
                     when (screen) {
                         is Screen.Detail -> {
                             Log(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 48.dp),
+                                coroutineScope = scope
                             )
                         }
                         is Screen.Main -> {
@@ -92,11 +87,13 @@ class UI {
                         }
                     }
                     BottomNav(
-                        Modifier.align(Alignment.BottomCenter).height(48.dp)
+                        modifier = Modifier.align(Alignment.BottomCenter).height(48.dp),
+                        coroutineScope = scope
                     )
                     Fab(
                         modifier = Modifier.align(Alignment.BottomEnd)
                             .padding(bottom = 15.dp, end = 15.dp),
+                        coroutineScope = scope
                     )
                 }
             }

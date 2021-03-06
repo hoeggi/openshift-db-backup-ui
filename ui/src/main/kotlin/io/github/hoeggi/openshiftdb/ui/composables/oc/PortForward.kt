@@ -11,12 +11,11 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.OcViewModel
-import io.github.hoeggi.openshiftdb.Scope
+import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_PORT
@@ -28,7 +27,7 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_STREAM_L
 fun PortForward() {
 
     val viewModel = OcViewModel.current
-    val portForwards by viewModel.portForward.collectAsState(Scope.current.coroutineContext)
+    val portForwards by viewModel.collectAsState(viewModel.portForward)
     LazyColumn {
         items(portForwards.entries.map {
             it.key to it.value

@@ -23,6 +23,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(project(":viewmodel"))
     implementation(project(":i18n"))
+    implementation(project(":errorhandler"))
     implementation(Dependencies.Kotlin.coroutines)
     compileOnly(Dependencies.slf4j_api)
     implementation(Dependencies.guava)

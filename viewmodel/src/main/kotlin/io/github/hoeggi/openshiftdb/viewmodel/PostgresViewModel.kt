@@ -1,7 +1,6 @@
 package io.github.hoeggi.openshiftdb.viewmodel
 
 import com.google.common.collect.EvictingQueue
-import io.github.hoeggi.openshiftdb.api.Api
 import io.github.hoeggi.openshiftdb.api.PostgresApi
 import io.github.hoeggi.openshiftdb.api.getOrDefault
 import io.github.hoeggi.openshiftdb.api.onSuccess
@@ -9,11 +8,17 @@ import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
 import io.github.hoeggi.openshiftdb.api.response.DatabasesApi
 import io.github.hoeggi.openshiftdb.api.response.SecretsApi
 import io.github.hoeggi.openshiftdb.api.response.ToolsVersionApi
+import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class PostgresViewModel(port: Int, coroutineScope: CoroutineScope) : BaseViewModel(port, coroutineScope) {
+class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
+    BaseViewModel(port, coroutineScope, errorViewer) {
     private val downloadQueue = EvictingQueue.create<DatabaseDownloadMessage.InProgressMessage>(150)
 
     private val _dumpPath = MutableStateFlow(System.getProperty("user.home"))
@@ -40,22 +45,24 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope) : BaseViewMod
 
     val downloadState: StateFlow<DatabaseDownloadMessage> = _downloadState.asStateFlow()
     val downloadProgress: StateFlow<List<DatabaseDownloadMessage.InProgressMessage>> = _downloadProgress.asStateFlow()
-    suspend fun dumpDatabase(database: String, format: String) {
+    fun dumpDatabase(database: String, format: String) {
         if (database.isEmpty()) return
-        val dumpDatabases = postgresApi.dumpDatabases(userName.value, password.value, database, dumpPath.value, format)
-        dumpDatabases.collect {
-            when (it) {
-                is DatabaseDownloadMessage.InProgressMessage -> {
-                    downloadQueue.add(it)
-                    _downloadProgress.value = downloadQueue.toList()
-                    _downloadState.value = it
-                }
-                else -> {
-                    downloadQueue.clear()
-                    _downloadState.value = it
+        coroutineScope.launch(Dispatchers.IO) {
+            val dumpDatabases =
+                postgresApi.dumpDatabases(userName.value, password.value, database, dumpPath.value, format)
+            dumpDatabases.collect {
+                when (it) {
+                    is DatabaseDownloadMessage.InProgressMessage -> {
+                        downloadQueue.add(it)
+                        _downloadProgress.value = downloadQueue.toList()
+                        _downloadState.value = it
+                    }
+                    else -> {
+                        downloadQueue.clear()
+                        _downloadState.value = it
+                    }
                 }
             }
-
         }
     }
 
