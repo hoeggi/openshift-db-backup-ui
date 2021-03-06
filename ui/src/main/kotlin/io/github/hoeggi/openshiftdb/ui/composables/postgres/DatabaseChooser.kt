@@ -1,7 +1,6 @@
 package io.github.hoeggi.openshiftdb.ui.composables.postgres
 
 import androidx.compose.desktop.LocalAppWindow
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
@@ -21,7 +20,6 @@ import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.collectAsState
 import javax.swing.JFileChooser
 
-@ExperimentalFoundationApi
 @Composable
 fun DatabaseChooser() {
     val viewModel = PostgresViewModel.current

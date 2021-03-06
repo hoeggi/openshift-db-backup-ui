@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.github.hoeggi"
-version = "1.0.0-alpha01"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -32,10 +32,11 @@ dependencies {
 allprojects {
     tasks.withType<KotlinCompile> {
 //        kotlinOptions.useIR = true
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = "15"
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi",
+            "-Xuse-experimental=androidx.compose.material.ExperimentalMaterialApi",
             "-Xinline-classes"
         )
     }
@@ -49,7 +50,7 @@ compose.desktop {
     application {
         mainClass = "io.github.hoeggi.openshiftdb.MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Deb)
+            targetFormats(TargetFormat.Deb, TargetFormat.Rpm)
             packageName = "openshift-db-gui"
             modules("java.logging", "java.naming", "java.management")
         }
