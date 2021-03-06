@@ -12,14 +12,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import io.github.hoeggi.openshiftdb.GlobalState
-import io.github.hoeggi.openshiftdb.Scope
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun BottomNav(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    coroutineScope: CoroutineScope,
 ) {
     val viewModel = GlobalState.current
-    val screen by viewModel.screen.collectAsState(Scope.current.coroutineContext)
+    val screen by viewModel.screen.collectAsState(coroutineScope.coroutineContext)
 
 
     BottomNavigation(

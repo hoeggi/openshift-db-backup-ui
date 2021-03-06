@@ -8,21 +8,19 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.OcViewModel
-import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.api.response.ProjectApi
+import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PROJECT_ALL_LABEL
 
 @Composable
 fun AllProjects() {
     val viewModel = OcViewModel.current
-    val scope = Scope.current
-    val projects: List<ProjectApi> by viewModel.projects.collectAsState(scope.coroutineContext)
+    val projects: List<ProjectApi> by viewModel.collectAsState(viewModel.projects)
 
     Column(
         modifier = Modifier

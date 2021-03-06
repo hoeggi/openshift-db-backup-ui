@@ -22,8 +22,7 @@ import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 @Composable
 fun LoginScreen(ocViewModel: OcViewModel) {
 
-    val scope = Scope.current
-    val server: List<ClusterApi> by ocViewModel.server.collectAsState(scope.coroutineContext)
+    val server: List<ClusterApi> by ocViewModel.collectAsState(ocViewModel.server)
 
     var token by remember { mutableStateOf(TextFieldValue("")) }
     var selected by remember { mutableStateOf(-1) }

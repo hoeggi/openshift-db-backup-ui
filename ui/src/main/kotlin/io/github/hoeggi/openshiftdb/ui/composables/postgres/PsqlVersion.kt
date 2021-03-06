@@ -7,29 +7,28 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
-import io.github.hoeggi.openshiftdb.Scope
+import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_CONNECTION_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_USERNAME_HINT
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_USERNAME_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_VERSION_LABEL
-import io.github.hoeggi.openshiftdb.ui.composables.StatefulEditTextField
 import io.github.hoeggi.openshiftdb.ui.composables.ExpandableText
+import io.github.hoeggi.openshiftdb.ui.composables.StatefulEditTextField
 
 @Composable
 fun PsqlVersion() {
 
     val viewModel = PostgresViewModel.current
-    val version by viewModel.version.collectAsState(Scope.current.coroutineContext)
-    val postgresVersion by viewModel.postgresVersion.collectAsState(Scope.current.coroutineContext)
-    val userName by viewModel.userName.collectAsState(Scope.current.coroutineContext)
+    val version by viewModel.collectAsState(viewModel.version)
+    val postgresVersion by viewModel.collectAsState(viewModel.postgresVersion)
+    val userName by viewModel.collectAsState(viewModel.userName)
 
     Column(
         modifier = Modifier

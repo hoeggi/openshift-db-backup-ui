@@ -18,14 +18,13 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_EXIT
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_OK
 
-data class Error(val t: Thread? = Thread.currentThread(), val th: Throwable? = Throwable(), val fired: Boolean = false)
 
 @Composable
 fun ErrorView(t: Thread?, th: Throwable?, modifier: Modifier = Modifier) {
     Box(modifier.fillMaxSize().background(
         color = Color.Black.copy(alpha = 0.8f),
     ).clickable { println("box") }) {
-        val viewModel = GlobalState.current
+        val globalState = GlobalState.current
         Box(
             modifier = Modifier.align(Alignment.Center)
                 .fillMaxWidth(0.5f)
@@ -41,7 +40,7 @@ fun ErrorView(t: Thread?, th: Throwable?, modifier: Modifier = Modifier) {
                     modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
                 )
                 Text(
-                    text = MessageProvider.message(MessageProvider.ERROR_MESSAGE, t,th?.stackTraceToString()),
+                    text = MessageProvider.message(MessageProvider.ERROR_MESSAGE, t, th?.stackTraceToString()),
                     style = MaterialTheme.typography.caption,
                     modifier = Modifier.fillMaxHeight(0.15f)
                         .verticalScroll(state = ScrollState(0)).padding(horizontal = 12.dp),
@@ -52,7 +51,7 @@ fun ErrorView(t: Thread?, th: Throwable?, modifier: Modifier = Modifier) {
                     modifier = Modifier.padding(6.dp)
                 ) {
                     Button(onClick = {
-                        viewModel.showError(Error())
+                        globalState.showError(globalState.error())
                     }, modifier = Modifier.weight(1f).padding(6.dp)) {
                         Text(MessageProvider.message(GLOBAL_OK))
                     }

@@ -8,24 +8,22 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.GlobalState
 import io.github.hoeggi.openshiftdb.PostgresViewModel
-import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
+import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.ext.DesktopApi
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_DUMP_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_DUMP_LOADING
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_DUMP_SUCCESS
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import java.io.File
+
 
 @Composable
 fun PostgresDump() {
@@ -34,18 +32,16 @@ fun PostgresDump() {
 
     val viewModel = PostgresViewModel.current
     val globalState = GlobalState.current
-    val scope = Scope.current
-    val selectedDatabase by viewModel.selectedDatabase.collectAsState(-1, scope.coroutineContext)
-    val resultState by viewModel.downloadState.collectAsState(scope.coroutineContext)
-    val databases by viewModel.databasesLines.collectAsState(listOf(), scope.coroutineContext)
+
+    val selectedDatabase by viewModel.collectAsState(viewModel.selectedDatabase)
+    val resultState by viewModel.collectAsState(viewModel.downloadState)
+    val databases by viewModel.collectAsState(viewModel.databasesLines)
 
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(onClick = {
-            scope.launch(Dispatchers.IO) {
-                viewModel.dumpDatabase(databases[selectedDatabase], globalState.exportFormat.value.format)
-            }
+            viewModel.dumpDatabase(databases[selectedDatabase], globalState.exportFormat.value.format)
         }) {
             Text(text = MessageProvider.message(POSTGRES_DUMP_LABEL))
         }

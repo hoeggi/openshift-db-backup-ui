@@ -1,5 +1,6 @@
 package io.github.hoeggi.openshiftdb
 
+import io.github.hoeggi.openshiftdb.errorhandler.ExceptionHandler
 import io.github.hoeggi.openshiftdb.server.Server
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
 import org.slf4j.LoggerFactory
@@ -34,17 +35,5 @@ fun main() {
                 it.destroy()
             }
         logDelegate.stop()
-    }
-
-    Executors.newSingleThreadExecutor().execute {
-        while (true) {
-            Thread.sleep(10000)
-            val instance = MemoryAppenderInstance.instance
-            val events = instance?.getEvents()
-            events?.forEach {
-                //
-            }
-        }
-
     }
 }

@@ -13,18 +13,17 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.Scope
+import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.viewmodel.PostgresViewModel
 
 @Composable
 fun SecretsChooser(modifier: Modifier = Modifier, viewModel: PostgresViewModel) {
 
-    val secrets by viewModel.secrets.collectAsState(Scope.current.coroutineContext)
+    val secrets by viewModel.collectAsState(viewModel.secrets)
 
     if (secrets.isNotEmpty()) {
         Box(

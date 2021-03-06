@@ -8,13 +8,12 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.OcViewModel
-import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.api.response.ServicesApi
+import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_SERVICE_AVAILABLE
 
@@ -22,8 +21,7 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_SERVICE_AVAILABLE
 fun Service() {
 
     val viewModel = OcViewModel.current
-    val scope = Scope.current
-    val services by viewModel.services.collectAsState(scope.coroutineContext)
+    val services by viewModel.collectAsState(viewModel.services)
     Column(
         modifier = Modifier
             .padding(10.dp)
@@ -42,7 +40,7 @@ fun Service() {
                 Service(
                     service = item,
                     onServiceClicked = { service, port ->
-                        viewModel.portForward(service.name, port, scope)
+                        viewModel.portForward(service.name, port)
                     }
                 )
             }
@@ -53,7 +51,7 @@ fun Service() {
 @Composable
 fun Service(
     service: ServicesApi,
-    onServiceClicked: (ServicesApi, Int) -> Unit
+    onServiceClicked: (ServicesApi, Int) -> Unit,
 ) {
     Column {
         Text(

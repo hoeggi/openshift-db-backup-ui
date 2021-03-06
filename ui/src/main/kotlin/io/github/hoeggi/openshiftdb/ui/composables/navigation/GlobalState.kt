@@ -1,25 +1,10 @@
 package io.github.hoeggi.openshiftdb.ui.composables.navigation
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import io.github.hoeggi.openshiftdb.ui.composables.ColorMapping
+import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import io.github.hoeggi.openshiftdb.ui.composables.Error
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import net.rubygrapefruit.ansi.AnsiParser
-import net.rubygrapefruit.ansi.token.ForegroundColor
-import net.rubygrapefruit.ansi.token.NewLine
-import net.rubygrapefruit.ansi.token.Text
-import java.util.concurrent.Callable
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Executors
-import java.util.concurrent.FutureTask
 
 sealed class Screen {
     object Main : Screen()
@@ -36,7 +21,7 @@ sealed class ExportFormat(val format: String) {
     object Plain : ExportFormat("plain")
 }
 
-class GlobalState {
+class GlobalState : ErrorViewer {
     private val _exportFormat: MutableStateFlow<ExportFormat> = MutableStateFlow(ExportFormat.Custom)
     val exportFormat = _exportFormat.asStateFlow()
     fun updateExportFormat(exportFormat: ExportFormat) {
@@ -86,9 +71,9 @@ class GlobalState {
         _theme.value = theme
     }
 
-    private val _errors = MutableStateFlow(Error())
+    private val _errors: MutableStateFlow<ErrorViewer.Error> = MutableStateFlow(error())
     val errors = _errors.asStateFlow()
-    fun showError(e: Error) {
-        _errors.value = e
+    override fun showError(error: ErrorViewer.Error) {
+        _errors.value = error
     }
 }

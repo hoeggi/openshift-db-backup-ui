@@ -13,22 +13,21 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
-import io.github.hoeggi.openshiftdb.Scope
+import io.github.hoeggi.openshiftdb.collectAsState
 import javax.swing.JFileChooser
 
 @ExperimentalFoundationApi
 @Composable
 fun DatabaseChooser() {
     val viewModel = PostgresViewModel.current
-    val selectedDatabase by viewModel.selectedDatabase.collectAsState(Scope.current.coroutineContext)
-    val databases by viewModel.databasesLines.collectAsState(Scope.current.coroutineContext)
-    val dumpPath by viewModel.dumpPath.collectAsState(Scope.current.coroutineContext)
+    val selectedDatabase by viewModel.collectAsState(viewModel.selectedDatabase)
+    val databases by viewModel.collectAsState(viewModel.databasesLines)
+    val dumpPath by viewModel.collectAsState(viewModel.dumpPath)
 
     Column {
         LazyVerticalGrid(

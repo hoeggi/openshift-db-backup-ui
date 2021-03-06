@@ -110,21 +110,22 @@ private class OcApiImpl(url: BasePath) : OcApi {
         Result.failure(RuntimeException("Unauthorized"))
     }
 
-    override suspend fun portForward(project: String, svc: String, port: Int) = callbackFlow {
-        val request = webSocketClient.second.withPath("port-forward")
-            .withQuery(
-                "project" to project,
-                "svc" to svc,
-                "port" to "$port"
-            ).toGetRequest()
+    override suspend fun portForward(project: String, svc: String, port: Int) =
+        callbackFlow {
+            val request = webSocketClient.second.withPath("port-forward")
+                .withQuery(
+                    "project" to project,
+                    "svc" to svc,
+                    "port" to "$port"
+                ).toGetRequest()
 
-        val listener: WebSocketListener = createListener(this@callbackFlow)
-        val webSocket = webSocketClient.first.newWebSocket(request, listener)
-        awaitClose {
-            logger.debug("closing flow")
-            webSocket.close(1000, Json.encodeToString(PortForwardMessage.close("closing")))
-        }
-    }.shareIn(CoroutineScope(coroutineContext), SharingStarted.Eagerly)
+            val listener: WebSocketListener = createListener(this@callbackFlow)
+            val webSocket = webSocketClient.first.newWebSocket(request, listener)
+            awaitClose {
+                logger.debug("closing flow")
+                webSocket.close(1000, Json.encodeToString(PortForwardMessage.close("closing")))
+            }
+        }.shareIn(CoroutineScope(coroutineContext), SharingStarted.Eagerly)
 
 
     private fun createListener(producer: ProducerScope<PortForwardMessage>): WebSocketListener {

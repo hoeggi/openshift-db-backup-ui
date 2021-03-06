@@ -15,13 +15,15 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.SYSLOG_LABEL
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun Log(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    coroutineScope: CoroutineScope,
 ) {
     val viewModel = GlobalState.current
-    val errors by viewModel.syslog.collectAsState(Scope.current.coroutineContext)
+    val errors by viewModel.syslog.collectAsState(coroutineScope.coroutineContext)
     val listState = rememberLazyListState(errors.size, 0)
     Column(modifier = modifier) {
         Text(
