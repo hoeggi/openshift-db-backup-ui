@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.OcViewModel
 import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.api.response.ProjectApi
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PROJECT_ALL_LABEL
 import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
 
 @Composable
@@ -28,7 +30,7 @@ fun AllProjects() {
             .padding(10.dp)
     ) {
         Text(
-            text = "All projects:",
+            text = MessageProvider.message(OC_PROJECT_ALL_LABEL),
             style = MaterialTheme.typography.body1
         )
         Spacer(

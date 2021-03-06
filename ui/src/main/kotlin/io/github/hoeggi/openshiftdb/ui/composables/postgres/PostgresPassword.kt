@@ -1,6 +1,5 @@
 package io.github.hoeggi.openshiftdb.ui.composables.postgres
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,6 +16,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.Scope
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_PASSWORD_DETECT
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_PASSWORD_LABEL
 import io.github.hoeggi.openshiftdb.ui.composables.EditTextField
 import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
 
@@ -39,7 +41,7 @@ fun PostgresPassword() {
         EditTextField(
             value = internalPassword,
             modifier = Modifier.fillMaxWidth(0.7f),
-            label = "Password"
+            label = MessageProvider.message(POSTGRES_PASSWORD_LABEL)
         ) {
             internalPassword = it
             viewModel.updatePassword(it.text)
@@ -52,7 +54,7 @@ fun PostgresPassword() {
                 }
             }
         ) {
-            Text(text = "Detect")
+            Text(text = MessageProvider.message(POSTGRES_PASSWORD_DETECT))
         }
         IconButton(
             onClick = {
@@ -60,7 +62,7 @@ fun PostgresPassword() {
                     viewModel.secrets()
                 }
             },
-        ){
+        ) {
             Icon(Icons.Outlined.List, contentDescription = "")
         }
     }

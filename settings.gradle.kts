@@ -17,5 +17,6 @@ include(
     ":api",
     ":viewmodel",
     ":api_models",
-    ":ui"
+    ":ui",
+    ":i18n"
 )

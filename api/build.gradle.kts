@@ -29,12 +29,3 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     // to allow using kotlin.Result
     kotlinOptions.freeCompilerArgs += "-Xallow-result-return-type"
 }
-
-val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
-val compileTestKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}

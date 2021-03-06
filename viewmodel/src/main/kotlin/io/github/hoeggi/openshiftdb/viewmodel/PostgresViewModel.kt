@@ -13,7 +13,7 @@ class PostgresViewModel(port: Int) {
     private val api: Api = Api(port)
     private val downloadQueue = EvictingQueue.create<DatabaseDownloadMessage.InProgressMessage>(150)
 
-    private val _dumpPath = MutableStateFlow("")
+    private val _dumpPath = MutableStateFlow(System.getProperty("user.home"))
     private val _password = MutableStateFlow("")
     private val _userName = MutableStateFlow("postgres")
     private val _secrets = MutableStateFlow(listOf<SecretsApi>())

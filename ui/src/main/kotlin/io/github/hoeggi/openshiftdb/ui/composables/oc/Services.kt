@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.OcViewModel
 import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.api.response.ServicesApi
-import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
-import kotlinx.coroutines.launch
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_SERVICE_AVAILABLE
 
 @Composable
 fun Service() {
@@ -29,7 +29,7 @@ fun Service() {
             .padding(10.dp)
     ) {
         Text(
-            text = "Available services:",
+            text = MessageProvider.message(OC_SERVICE_AVAILABLE),
             style = MaterialTheme.typography.body1
         )
         Spacer(
@@ -42,13 +42,7 @@ fun Service() {
                 Service(
                     service = item,
                     onServiceClicked = { service, port ->
-//                        launchInIo(scope) {
-//                            viewModel.portForward(service.name, port, scope)
-//                        }
                         viewModel.portForward(service.name, port, scope)
-//                        scope.launch {
-//                            viewModel.portForward(service.name, port, scope)
-//                        }
                     }
                 )
             }

@@ -21,7 +21,6 @@ object Dependencies {
     object ktor {
         val core = "io.ktor:ktor:${Versions.ktor}"
         val server = "io.ktor:ktor-server-netty:${Versions.ktor}"
-//        val client = "io.ktor:ktor-client-core:${Versions.ktor}"
 
         val logging = "io.ktor:ktor-client-logging:${Versions.ktor}"
         val websockets = "io.ktor:ktor-websockets:${Versions.ktor}"

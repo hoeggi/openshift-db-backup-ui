@@ -17,6 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.OcViewModel
 import io.github.hoeggi.openshiftdb.Scope
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_LABEL
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_PORT
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_PROJECT
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_SERVICE
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_STREAM_LABEL
 
 @Composable
 fun PortForward() {
@@ -38,29 +44,29 @@ fun PortForward() {
             ) {
 
                 Text(
-                    text = "Forwarding to:",
+                    text = MessageProvider.message(OC_PORTFORWARD_LABEL),
                     style = MaterialTheme.typography.caption
                 )
                 Spacer(
                     modifier = Modifier.height(10.dp)
                 )
                 Text(
-                    text = "Project: ${target.project}",
+                    text = MessageProvider.message(OC_PORTFORWARD_PROJECT, target.project),
                     style = MaterialTheme.typography.overline
                 )
                 Text(
-                    text = "Service: ${target.svc}",
+                    text = MessageProvider.message(OC_PORTFORWARD_SERVICE, target.svc),
                     style = MaterialTheme.typography.overline
                 )
                 Text(
-                    text = "Port: ${target.port}:${target.port}",
+                    text = MessageProvider.message(OC_PORTFORWARD_PORT, target.port, target.port),
                     style = MaterialTheme.typography.overline
                 )
                 Spacer(
                     modifier = Modifier.height(10.dp)
                 )
                 Text(
-                    text = "Stream: ",
+                    text = MessageProvider.message(OC_PORTFORWARD_STREAM_LABEL),
                     style = MaterialTheme.typography.caption,
                 )
                 messages.forEach {

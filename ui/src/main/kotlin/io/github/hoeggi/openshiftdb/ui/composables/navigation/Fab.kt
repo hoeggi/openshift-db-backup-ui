@@ -3,20 +3,24 @@ package io.github.hoeggi.openshiftdb.ui.composables.navigation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.RadioButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.GlobalState
 import io.github.hoeggi.openshiftdb.Scope
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_EXPORT_FORMAT_CUSTOM
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_EXPORT_FORMAT_LABEL
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_EXPORT_FORMAT_PLAIN
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_DARK
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_LABEL
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_LIGHT
 
 @Composable
 fun Fab(
@@ -25,10 +29,13 @@ fun Fab(
     val globalState = GlobalState.current
     val settings by globalState.settings.collectAsState(Scope.current.coroutineContext)
 
+
     Column(modifier = modifier) {
         if (settings) {
-            ExportFormatChooser()
-            ThemeChooser()
+            Row {
+                ExportFormatChooser()
+                ThemeChooser()
+            }
         }
 
         FloatingActionButton(
@@ -46,38 +53,39 @@ fun Fab(
 fun ThemeChooser() {
     val globalState = GlobalState.current
     val dark by globalState.theme.collectAsState(Scope.current.coroutineContext)
-    Row {
+
+    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
         Text(
             modifier = Modifier.padding(4.dp),
-            text = "Theme:"
+            text = MessageProvider.message(THEME_LABEL)
         )
-        Column {
-            Row {
-                RadioButton(
-                    modifier = Modifier.padding(4.dp),
-                    selected = dark == Theme.Dark,
-                    onClick = {
-                        globalState.toggleTheme()
-                    },
-                )
-                Text(
-                    modifier = Modifier.padding(4.dp),
-                    text = "dark"
-                )
-            }
-            Row {
-                RadioButton(
-                    modifier = Modifier.padding(4.dp),
-                    selected = dark == Theme.Light,
-                    onClick = {
-                        globalState.toggleTheme()
-                    },
-                )
-                Text(
-                    modifier = Modifier.padding(4.dp),
-                    text = "light"
-                )
-            }
+        Row {
+            RadioButton(
+                modifier = Modifier.padding(4.dp),
+                selected = dark == Theme.Dark,
+                onClick = {
+                    globalState.toggleTheme()
+                },
+            )
+            Text(
+                modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically),
+                style = MaterialTheme.typography.body2,
+                text = MessageProvider.message(THEME_DARK)
+            )
+        }
+        Row {
+            RadioButton(
+                modifier = Modifier.padding(4.dp),
+                selected = dark == Theme.Light,
+                onClick = {
+                    globalState.toggleTheme()
+                },
+            )
+            Text(
+                modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically),
+                style = MaterialTheme.typography.body2,
+                text = MessageProvider.message(THEME_LIGHT)
+            )
         }
     }
 }
@@ -86,38 +94,39 @@ fun ThemeChooser() {
 fun ExportFormatChooser() {
     val globalState = GlobalState.current
     val format by globalState.exportFormat.collectAsState(Scope.current.coroutineContext)
-    Row {
+
+    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
         Text(
             modifier = Modifier.padding(4.dp),
-            text = "Export Format:"
+            text = MessageProvider.message(POSTGRES_EXPORT_FORMAT_LABEL)
         )
-        Column {
-            Row {
-                RadioButton(
-                    modifier = Modifier.padding(4.dp),
-                    selected = format == ExportFormat.Custom,
-                    onClick = {
-                        globalState.updateExportFormat(ExportFormat.Custom)
-                    },
-                )
-                Text(
-                    modifier = Modifier.padding(4.dp),
-                    text = "custom"
-                )
-            }
-            Row {
-                RadioButton(
-                    modifier = Modifier.padding(4.dp),
-                    selected = format == ExportFormat.Plain,
-                    onClick = {
-                        globalState.updateExportFormat(ExportFormat.Plain)
-                    },
-                )
-                Text(
-                    modifier = Modifier.padding(4.dp),
-                    text = "plain"
-                )
-            }
+        Row {
+            RadioButton(
+                modifier = Modifier.padding(4.dp),
+                selected = format == ExportFormat.Custom,
+                onClick = {
+                    globalState.updateExportFormat(ExportFormat.Custom)
+                },
+            )
+            Text(
+                modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically),
+                style = MaterialTheme.typography.body2,
+                text = MessageProvider.message(POSTGRES_EXPORT_FORMAT_CUSTOM)
+            )
+        }
+        Row {
+            RadioButton(
+                modifier = Modifier.padding(4.dp),
+                selected = format == ExportFormat.Plain,
+                onClick = {
+                    globalState.updateExportFormat(ExportFormat.Plain)
+                },
+            )
+            Text(
+                modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically),
+                style = MaterialTheme.typography.body2,
+                text = MessageProvider.message(POSTGRES_EXPORT_FORMAT_PLAIN)
+            )
         }
     }
 }
