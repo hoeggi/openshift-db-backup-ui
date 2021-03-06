@@ -29,16 +29,12 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3")
 }
 
-//sourceSets {
-//    main.kotlin.srcDirs = [ 'src' ]
-//    main.resources.srcDirs = [ 'resources' ]
-//}
-
 tasks.test {
     useJUnit()
 }
 
 tasks.withType<KotlinCompile> {
+    kotlinOptions.useIR = true
     kotlinOptions.jvmTarget = "11"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi"
 }

@@ -131,7 +131,6 @@ class Logger(private val globalState: GlobalState) {
         }
 
         override fun write(buf: ByteArray, off: Int, len: Int) {
-//            ansiParser.write(buf, off, len)
             sink.write(buf, off, len).flush()
             super.write(buf, off, len)
         }

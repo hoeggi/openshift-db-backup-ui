@@ -17,6 +17,9 @@ import io.github.hoeggi.openshiftdb.ui.composables.StatefulEditTextField
 import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
 import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 import androidx.compose.runtime.getValue
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.LOGIN_LABEL
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.LOGIN_TOKEN_HINT
 
 @Composable
 fun LoginScreen(ocViewModel: OcViewModel) {
@@ -46,7 +49,7 @@ fun LoginScreen(ocViewModel: OcViewModel) {
             ) {
                 StatefulEditTextField(
                     initialValue = TextFieldValue(""),
-                    label = "Token",
+                    label = MessageProvider.message(LOGIN_TOKEN_HINT),
                 ) {
                     token = it
                 }
@@ -59,7 +62,7 @@ fun LoginScreen(ocViewModel: OcViewModel) {
                     enabled = token.text.isNotEmpty() && selected != -1,
                     modifier = Modifier.padding(4.dp),
                 ) {
-                    Text(text = "Login")
+                    Text(text = MessageProvider.message(LOGIN_LABEL))
                 }
             }
             LazyColumn(

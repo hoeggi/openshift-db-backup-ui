@@ -17,7 +17,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.viewmodel.PostgresViewModel
@@ -29,7 +28,7 @@ fun SecretsChooser(modifier: Modifier = Modifier, viewModel: PostgresViewModel) 
 
     if (secrets.isNotEmpty()) {
         Box(
-            modifier = modifier//Modifier.align(Alignment.TopCenter)
+            modifier = modifier
                 .fillMaxWidth(0.5f)
                 .fillMaxHeight(0.75f)
                 .padding(16.dp)

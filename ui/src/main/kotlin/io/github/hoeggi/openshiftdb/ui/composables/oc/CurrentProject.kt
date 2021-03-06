@@ -8,12 +8,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.OcViewModel
 import io.github.hoeggi.openshiftdb.Scope
-import androidx.compose.runtime.getValue
 import io.github.hoeggi.openshiftdb.api.response.ProjectApi
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PROJECT_CURRENT_LABEL
 
 
 @Composable
@@ -23,11 +25,10 @@ fun CurrentProject() {
 
     Column(
         modifier = Modifier
-            //.background(Color.Black.copy(alpha = 0.2f), RoundedCornerShape(5.dp))
             .padding(10.dp)
     ) {
         Text(
-            text = "Current project:",
+            text = MessageProvider.message(OC_PROJECT_CURRENT_LABEL),
             style = MaterialTheme.typography.body1
         )
         Spacer(

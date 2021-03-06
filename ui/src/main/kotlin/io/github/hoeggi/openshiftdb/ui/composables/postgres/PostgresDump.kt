@@ -18,12 +18,18 @@ import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
 import io.github.hoeggi.openshiftdb.ext.DesktopApi
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_DUMP_LABEL
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_DUMP_LOADING
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_DUMP_SUCCESS
 import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
+import org.slf4j.LoggerFactory
 import java.io.File
-
 
 @Composable
 fun PostgresDump() {
+
+    val logger = LoggerFactory.getLogger("io.github.hoeggi.openshiftdb.ui.composables.postgres.PostgresDump")
 
     val viewModel = PostgresViewModel.current
     val globalState = GlobalState.current
@@ -40,17 +46,17 @@ fun PostgresDump() {
                 viewModel.dumpDatabase(databases[selectedDatabase], globalState.exportFormat.value.format)
             }
         }) {
-            Text(text = "Dump")
+            Text(text = MessageProvider.message(POSTGRES_DUMP_LABEL))
         }
         when (resultState) {
             is DatabaseDownloadMessage.FinishMessage -> {
                 val path = resultState.message
                 Text(
-                    text = "Success: $path",
+                    text = MessageProvider.message(POSTGRES_DUMP_SUCCESS, path),
                     style = MaterialTheme.typography.body2,
                     modifier = Modifier.padding(10.dp).clickable {
                         val open = DesktopApi.open(File(path).parentFile)
-                        println("opened: $open")
+                        logger.debug("openend: $open")
                     },
                 )
             }
@@ -68,7 +74,7 @@ fun PostgresDump() {
                 ) {
                     CircularProgressIndicator(modifier = Modifier.padding(10.dp))
                     Text(
-                        text = "Waiting...",
+                        text = MessageProvider.message(POSTGRES_DUMP_LOADING),
                         style = MaterialTheme.typography.body2,
                         modifier = Modifier.padding(10.dp)
                     )

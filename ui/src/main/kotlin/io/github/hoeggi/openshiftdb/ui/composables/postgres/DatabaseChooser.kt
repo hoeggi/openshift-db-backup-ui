@@ -28,7 +28,7 @@ fun DatabaseChooser() {
     val viewModel = PostgresViewModel.current
     val selectedDatabase by viewModel.selectedDatabase.collectAsState(Scope.current.coroutineContext)
     val databases by viewModel.databasesLines.collectAsState(Scope.current.coroutineContext)
-    val dumpPath by viewModel.dumpPath.collectAsState(System.getProperty("user.home"), Scope.current.coroutineContext)
+    val dumpPath by viewModel.dumpPath.collectAsState(Scope.current.coroutineContext)
 
     Column {
         LazyVerticalGrid(

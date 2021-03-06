@@ -9,9 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.Scope
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_CONNECT_LABEL
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_TABLE_LABEL
 import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun ConnectButtons() {
@@ -32,7 +33,7 @@ fun ConnectButtons() {
             }
         ) {
             Text(
-                text = "Connect"
+                text = MessageProvider.message(POSTGRES_CONNECT_LABEL)
             )
         }
         Button(
@@ -44,7 +45,7 @@ fun ConnectButtons() {
             }
         ) {
             Text(
-                text = "List Databases Tabel"
+                text = MessageProvider.message(POSTGRES_TABLE_LABEL)
             )
         }
     }

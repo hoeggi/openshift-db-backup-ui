@@ -14,6 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.GlobalState
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_EXIT
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_OK
 
 data class Error(val t: Thread? = Thread.currentThread(), val th: Throwable? = Throwable(), val fired: Boolean = false)
 
@@ -32,13 +35,13 @@ fun ErrorView(t: Thread?, th: Throwable?, modifier: Modifier = Modifier) {
             Column(modifier = Modifier.padding(6.dp)) {
                 Text(
                     modifier = modifier.padding(4.dp),
-                    text = "An error occurred: ${th?.message}",
+                    text = MessageProvider.message(MessageProvider.ERROR_HEADER, th?.message),
                 )
                 Divider(
                     modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
                 )
                 Text(
-                    text = "\nThread: $t\n\n${th?.stackTraceToString()}",
+                    text = MessageProvider.message(MessageProvider.ERROR_MESSAGE, t,th?.stackTraceToString()),
                     style = MaterialTheme.typography.caption,
                     modifier = Modifier.fillMaxHeight(0.15f)
                         .verticalScroll(state = ScrollState(0)).padding(horizontal = 12.dp),
@@ -51,12 +54,12 @@ fun ErrorView(t: Thread?, th: Throwable?, modifier: Modifier = Modifier) {
                     Button(onClick = {
                         viewModel.showError(Error())
                     }, modifier = Modifier.weight(1f).padding(6.dp)) {
-                        Text("Ok")
+                        Text(MessageProvider.message(GLOBAL_OK))
                     }
                     Button(onClick = {
                         AppManager.exit()
                     }, modifier = Modifier.weight(1f).padding(6.dp)) {
-                        Text("Exit")
+                        Text(MessageProvider.message(GLOBAL_EXIT))
                     }
                 }
             }

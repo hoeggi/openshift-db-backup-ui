@@ -15,6 +15,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.Scope
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_CONNECTION_LABEL
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_USERNAME_HINT
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_USERNAME_LABEL
+import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_VERSION_LABEL
 import io.github.hoeggi.openshiftdb.ui.composables.StatefulEditTextField
 import io.github.hoeggi.openshiftdb.ui.composables.ExpandableText
 
@@ -31,7 +36,7 @@ fun PsqlVersion() {
             .padding(10.dp)
     ) {
         ExpandableText(
-            text = "postgres version data"
+            text = MessageProvider.message(POSTGRES_VERSION_LABEL)
         ) {
             Spacer(
                 modifier = Modifier.height(5.dp)
@@ -67,7 +72,7 @@ fun PsqlVersion() {
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
-                        text = "Username: ",
+                        text = MessageProvider.message(POSTGRES_USERNAME_LABEL),
                         style = MaterialTheme.typography.body1
                     )
                     Text(
@@ -84,7 +89,7 @@ fun PsqlVersion() {
         ) {
             StatefulEditTextField(
                 initialValue = TextFieldValue(userName),
-                label = "Username",
+                label = MessageProvider.message(POSTGRES_USERNAME_HINT),
                 onValueChange = {
                     viewModel.updateUserName(it.text)
                 }
@@ -94,7 +99,7 @@ fun PsqlVersion() {
             verticalAlignment = Alignment.Bottom
         ) {
             Text(
-                text = "Connection: ",
+                text = MessageProvider.message(POSTGRES_CONNECTION_LABEL),
                 style = MaterialTheme.typography.body1
             )
             Text(
