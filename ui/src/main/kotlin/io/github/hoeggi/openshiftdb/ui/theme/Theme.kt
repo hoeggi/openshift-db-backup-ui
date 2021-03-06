@@ -27,8 +27,6 @@ fun ColorMuskTheme(
 ) {
     val viewModel = GlobalState.current
     val dark by viewModel.theme.collectAsState(coroutineScope.coroutineContext)
-//    val error by viewModel.errors.collectAsState(coroutineScope.coroutineContext)
-
 
     val colors = when (dark) {
         Theme.Dark -> darkColors(

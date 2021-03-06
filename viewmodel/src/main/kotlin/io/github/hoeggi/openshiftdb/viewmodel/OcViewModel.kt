@@ -89,6 +89,7 @@ class OcViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorV
         _projects.value = projects.onFailure {
             showWarning(it)
         }.getOrDefault(listOf())
+            .filterNot { it.name.startsWith("openshift") or it.name.startsWith("kube") }
     }
 
     val currentProject: StateFlow<ProjectApi> = _currentProject.asStateFlow()

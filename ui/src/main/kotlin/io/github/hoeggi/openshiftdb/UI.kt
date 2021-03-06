@@ -2,7 +2,6 @@ package io.github.hoeggi.openshiftdb
 
 import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
@@ -112,7 +111,6 @@ class UI {
         }
     }
 
-    @ExperimentalFoundationApi
     @Composable
     private fun MainScreen(
         ocViewModel: OcViewModel,
@@ -120,7 +118,6 @@ class UI {
     ) {
         ocViewModel.update()
         postgresViewModel.update()
-
         Box {
             Row(
                 modifier = Modifier
