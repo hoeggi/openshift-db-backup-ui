@@ -30,18 +30,4 @@ dependencies {
     implementation(Dependencies.ktor.serialization)
     implementation(Dependencies.ktor.metrics)
     implementation(Dependencies.ktor.metrics_micrometer)
-//    implementation("com.squareup.okhttp3:okhttp:4.9.0")
-}
-
-tasks.test {
-    useJUnit()
-}
-
-val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
-val compileTestKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
 }

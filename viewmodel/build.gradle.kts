@@ -20,7 +20,3 @@ dependencies {
     implementation(Dependencies.guava)
     compileOnly(Dependencies.slf4j_api)
 }
-
-tasks.test {
-    useJUnit()
-}

@@ -2,6 +2,7 @@ package io.github.hoeggi.openshiftdb.api
 
 import io.github.hoeggi.openshiftdb.api.response.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.sendBlocking
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -28,7 +30,7 @@ interface PostgresApi {
     suspend fun databases(
         username: String,
         password: String,
-        format: DatabaseViewFormat? = null
+        format: DatabaseViewFormat? = null,
     ): Result<DatabasesApi>
 
     suspend fun defaultDatabases(username: String, password: String): Result<DefaultDatabaseApi>
@@ -38,7 +40,7 @@ interface PostgresApi {
         password: String,
         database: String,
         path: String,
-        format: String = "custom"
+        format: String = "custom",
     ): Flow<DatabaseDownloadMessage>
 
     companion object {
@@ -64,16 +66,20 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
         }
         .build() + url
 
-    override suspend fun toolsVersion(): Result<ToolsVersionApi> = client.get("version/tools")
+    override suspend fun toolsVersion(): Result<ToolsVersionApi> =
+        withContext(Dispatchers.IO) { client.get("version/tools") }
 
     override suspend fun databaseVersion(username: String, password: String): Result<DatabaseVersionApi> =
-        client.get("version/database", Credentials.basic(username, password))
+        withContext(Dispatchers.IO) {
+            client.get("version/database", Credentials.basic(username, password))
+        }
+
 
     override suspend fun databases(
         username: String,
         password: String,
-        format: PostgresApi.DatabaseViewFormat?
-    ): Result<DatabasesApi> =
+        format: PostgresApi.DatabaseViewFormat?,
+    ): Result<DatabasesApi> = withContext(Dispatchers.IO) {
         client.first.newCall(
             client.second.withPath("databases")
                 .newBuilder()
@@ -85,18 +91,21 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
                 .build()
                 .toGetRequest(Credentials.basic(username, password)))
             .execute().get()
+    }
 
     override suspend fun defaultDatabases(
         username: String,
-        password: String
-    ): Result<DefaultDatabaseApi> = client.get("databases/default", Credentials.basic(username, password))
+        password: String,
+    ): Result<DefaultDatabaseApi> = withContext(Dispatchers.IO) {
+        client.get("databases/default", Credentials.basic(username, password))
+    }
 
     override suspend fun dumpDatabases(
         username: String,
         password: String,
         database: String,
         path: String,
-        format: String
+        format: String,
     ): Flow<DatabaseDownloadMessage> = callbackFlow {
         val request = webSocketClient.second.withPath("databases/dump")
             .withQuery(

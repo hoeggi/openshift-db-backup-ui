@@ -1,7 +1,6 @@
 package io.github.hoeggi.openshiftdb.viewmodel
 
-import io.github.hoeggi.openshiftdb.api.Api
-import io.github.hoeggi.openshiftdb.api.OcApi
+import io.github.hoeggi.openshiftdb.api.getOrDefault
 import io.github.hoeggi.openshiftdb.api.response.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -13,8 +12,7 @@ enum class LoginState {
 
 data class PortForwardTarget(val project: String, val svc: String, val port: Int)
 
-class OcViewModel(port: Int) {
-    private val api: OcApi = Api(port)
+class OcViewModel(port: Int, coroutineScope: CoroutineScope) : BaseViewModel(port, coroutineScope) {
 
     private val logger = LoggerFactory.getLogger(OcViewModel::class.java)
 
@@ -34,7 +32,7 @@ class OcViewModel(port: Int) {
     private val _server: MutableStateFlow<List<ClusterApi>> =
         MutableStateFlow(listOf())
 
-    suspend fun update() {
+    fun update() {
         version()
         projects()
         currentProject()
@@ -42,48 +40,48 @@ class OcViewModel(port: Int) {
     }
 
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
-    suspend fun checkLoginState() {
-        val checkLogin = api.checkLogin()
+    fun checkLoginState() = coroutineScope.launch {
+        val checkLogin = ocApi.checkLogin()
         _loginState.value = if (checkLogin.isSuccess) LoginState.LOGGEDIN else LoginState.NOT_LOGGEDIN
     }
 
-    suspend fun login(token: String, server: String) {
-        val login = api.login(token, server)
+    fun login(token: String, server: String) = coroutineScope.launch {
+        val login = ocApi.login(token, server)
         _loginState.value = if (login.isSuccess) LoginState.LOGGEDIN else LoginState.NOT_LOGGEDIN
     }
 
     val server: StateFlow<List<ClusterApi>> = _server.asStateFlow()
-    suspend fun listServer() {
-        _server.value = api.server().getOrDefault(listOf())
+    fun listServer() = coroutineScope.launch {
+        _server.value = ocApi.server().getOrDefault(listOf())
     }
 
-    val projects: StateFlow<List<ProjectApi>> = _projects.asStateFlow()
-    suspend fun projects() {
-        _projects.value = api.projects().getOrDefault(listOf())
-            .filterNot { it.name.startsWith("openshift") or it.name.startsWith("kube")}
-    }
-
-    val currentProject: StateFlow<ProjectApi> = _currentProject.asStateFlow()
-    suspend fun currentProject() {
-        _currentProject.value = api.currentProject().getOrDefault(ProjectApi())
-    }
-
-    suspend fun switchProject(project: String) {
-        val switchProject = api.switchProject(project)
+    fun switchProject(project: String) = coroutineScope.launch {
+        val switchProject = ocApi.switchProject(project)
         _currentProject.value = switchProject.getOrDefault(ProjectApi())
         if (switchProject.isSuccess) {
-            _services.value = api.services().getOrDefault(listOf())
+            _services.value = ocApi.services().getOrDefault(listOf())
         }
     }
 
+    val projects: StateFlow<List<ProjectApi>> = _projects.asStateFlow()
+    private fun projects() = coroutineScope.launch {
+        _projects.value = ocApi.projects().getOrDefault(listOf())
+            .filterNot { it.name.startsWith("openshift") or it.name.startsWith("kube") }
+    }
+
+    val currentProject: StateFlow<ProjectApi> = _currentProject.asStateFlow()
+    private fun currentProject() = coroutineScope.launch {
+        _currentProject.value = ocApi.currentProject().getOrDefault(ProjectApi())
+    }
+
     val version: StateFlow<VersionApi> = _version.asStateFlow()
-    suspend fun version() {
-        _version.value = api.version().getOrDefault(VersionApi())
+    private fun version() = coroutineScope.launch {
+        _version.value = ocApi.version().getOrDefault(VersionApi())
     }
 
     val services: StateFlow<List<ServicesApi>> = _services.asStateFlow()
-    suspend fun services() {
-        _services.value = api.services().getOrDefault(listOf())
+    private fun services() = coroutineScope.launch {
+        _services.value = ocApi.services().getOrDefault(listOf())
     }
 
     private val openPortForwars = mutableMapOf<PortForwardTarget, Job>()
@@ -95,7 +93,7 @@ class OcViewModel(port: Int) {
     fun portForward(target: PortForwardTarget, scope: CoroutineScope) {
         GlobalScope.launch {
             val launch = scope.async(Dispatchers.IO) {
-                val flow: Flow<PortForwardMessage> = api.portForward(target.project, target.svc, target.port)
+                val flow: Flow<PortForwardMessage> = ocApi.portForward(target.project, target.svc, target.port)
                 flow.collect {
                     ensureActive()
                     logger.debug("message from port-forward: $it")
@@ -108,10 +106,6 @@ class OcViewModel(port: Int) {
             }
             openPortForwars.put(target, launch)
         }
-    }
-
-    fun closePortForward(project: String, svc: String, port: Int) {
-        closePortForward(PortForwardTarget(project, svc, port))
     }
 
     fun closePortForward(target: PortForwardTarget) {

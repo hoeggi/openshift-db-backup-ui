@@ -20,7 +20,3 @@ dependencies {
     implementation(Dependencies.okio)
     compileOnly(Dependencies.slf4j_api)
 }
-
-tasks.test {
-    useJUnit()
-}

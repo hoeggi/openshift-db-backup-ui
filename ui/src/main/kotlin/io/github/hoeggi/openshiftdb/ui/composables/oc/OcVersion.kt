@@ -35,15 +35,12 @@ fun OcVersion() {
                 modifier = Modifier.height(5.dp)
             )
             Text(
-                text = when (version) {
-                    is VersionApi -> MessageProvider.message(
-                        OC_VERSION_TEXT,
-                        version.oc,
-                        version.openshift,
-                        version.kubernets
-                    )
-                    else -> "Unset"
-                },
+                text = MessageProvider.message(
+                    OC_VERSION_TEXT,
+                    version.oc,
+                    version.openshift,
+                    version.kubernets
+                ),
                 style = MaterialTheme.typography.caption
             )
         }

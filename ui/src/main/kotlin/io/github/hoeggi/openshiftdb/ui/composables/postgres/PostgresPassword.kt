@@ -20,7 +20,6 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_PASSWORD_DETECT
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_PASSWORD_LABEL
 import io.github.hoeggi.openshiftdb.ui.composables.EditTextField
-import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
 
 @Composable
 fun PostgresPassword() {
@@ -49,18 +48,14 @@ fun PostgresPassword() {
         Button(
             modifier = Modifier.padding(horizontal = 10.dp),
             onClick = {
-                launchInIo(scope) {
-                    viewModel.detectPassword()
-                }
+                viewModel.detectPassword()
             }
         ) {
             Text(text = MessageProvider.message(POSTGRES_PASSWORD_DETECT))
         }
         IconButton(
             onClick = {
-                launchInIo(scope) {
-                    viewModel.secrets()
-                }
+                viewModel.secrets()
             },
         ) {
             Icon(Icons.Outlined.List, contentDescription = "")

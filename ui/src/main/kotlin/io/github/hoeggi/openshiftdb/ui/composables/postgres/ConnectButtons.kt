@@ -12,7 +12,6 @@ import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_CONNECT_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_TABLE_LABEL
-import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
 
 @Composable
 fun ConnectButtons() {
@@ -26,10 +25,8 @@ fun ConnectButtons() {
         Button(
             modifier = Modifier.weight(1f).padding(end = 10.dp),
             onClick = {
-                launchInIo(scope) {
-                    viewModel.postgresVersion()
-                    viewModel.listLines()
-                }
+                viewModel.postgresVersion()
+                viewModel.listLines()
             }
         ) {
             Text(
@@ -39,9 +36,7 @@ fun ConnectButtons() {
         Button(
             modifier = Modifier.weight(1f).padding(start = 10.dp),
             onClick = {
-                launchInIo(scope) {
-                    viewModel.listPretty()
-                }
+                viewModel.listPretty()
             }
         ) {
             Text(

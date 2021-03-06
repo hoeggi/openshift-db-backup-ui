@@ -16,13 +16,3 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     implementation(Dependencies.ktor.serialization)
 }
-
-tasks.test {
-    useJUnit()
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
-    // to allow using kotlin.Result
-    kotlinOptions.freeCompilerArgs += "-Xallow-result-return-type"
-}
