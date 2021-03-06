@@ -1,5 +1,5 @@
-private object Versions {
-    val kotlin = "1.4.30"
+object Versions {
+    val kotlin = "1.4.31"
     val okio = "2.10.0"
     val ktor = "1.5.1"
     val kotlinx_coroutines = "1.4.2"
@@ -9,6 +9,8 @@ private object Versions {
     val okhttp = "4.9.0"
     val slf4j = "1.7.30"
     val guava = "30.1-jre"
+    val logback = "1.2.3"
+    val compose = "0.4.0-build171"
 }
 
 object Dependencies {
@@ -30,6 +32,7 @@ object Dependencies {
         val metrics_micrometer = "io.ktor:ktor-metrics-micrometer:${Versions.ktor}"
     }
 
+    val logback = "ch.qos.logback:logback-classic:${Versions.logback}"
     val guava = "com.google.guava:guava:${Versions.guava}"
     val slf4j_api = "org.slf4j:slf4j-api:${Versions.slf4j}"
     val okhttp = "com.squareup.okhttp3:okhttp:${Versions.okhttp}"

@@ -3,14 +3,17 @@ package io.github.hoeggi.openshiftdb.viewmodel
 import com.google.common.collect.EvictingQueue
 import io.github.hoeggi.openshiftdb.api.Api
 import io.github.hoeggi.openshiftdb.api.PostgresApi
+import io.github.hoeggi.openshiftdb.api.getOrDefault
+import io.github.hoeggi.openshiftdb.api.onSuccess
 import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
 import io.github.hoeggi.openshiftdb.api.response.DatabasesApi
 import io.github.hoeggi.openshiftdb.api.response.SecretsApi
 import io.github.hoeggi.openshiftdb.api.response.ToolsVersionApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
-class PostgresViewModel(port: Int) {
-    private val api: Api = Api(port)
+class PostgresViewModel(port: Int, coroutineScope: CoroutineScope) : BaseViewModel(port, coroutineScope) {
     private val downloadQueue = EvictingQueue.create<DatabaseDownloadMessage.InProgressMessage>(150)
 
     private val _dumpPath = MutableStateFlow(System.getProperty("user.home"))
@@ -31,7 +34,7 @@ class PostgresViewModel(port: Int) {
     private val _downloadState: MutableStateFlow<DatabaseDownloadMessage> =
         MutableStateFlow(DatabaseDownloadMessage.unspecified())
 
-    suspend fun update() {
+    fun update() {
         version()
     }
 
@@ -39,7 +42,7 @@ class PostgresViewModel(port: Int) {
     val downloadProgress: StateFlow<List<DatabaseDownloadMessage.InProgressMessage>> = _downloadProgress.asStateFlow()
     suspend fun dumpDatabase(database: String, format: String) {
         if (database.isEmpty()) return
-        val dumpDatabases = api.dumpDatabases(userName.value, password.value, database, dumpPath.value, format)
+        val dumpDatabases = postgresApi.dumpDatabases(userName.value, password.value, database, dumpPath.value, format)
         dumpDatabases.collect {
             when (it) {
                 is DatabaseDownloadMessage.InProgressMessage -> {
@@ -57,8 +60,8 @@ class PostgresViewModel(port: Int) {
     }
 
     val version = _version.asStateFlow()
-    suspend fun version() {
-        _version.value = api.toolsVersion().getOrDefault(ToolsVersionApi())
+    private fun version() = coroutineScope.launch {
+        _version.value = postgresApi.toolsVersion().getOrDefault(ToolsVersionApi())
     }
 
     val dumpPath = _dumpPath.asStateFlow()
@@ -72,8 +75,8 @@ class PostgresViewModel(port: Int) {
     }
 
     val databasesLines = _databasesLines.asStateFlow()
-    suspend fun listLines() {
-        val databases = api.databases(userName.value, password.value, PostgresApi.DatabaseViewFormat.List)
+    fun listLines() = coroutineScope.launch {
+        val databases = postgresApi.databases(userName.value, password.value, PostgresApi.DatabaseViewFormat.List)
         databases.onSuccess {
             _databasesLines.value = when (it) {
                 is DatabasesApi.List -> it.databases.map { it }
@@ -84,8 +87,8 @@ class PostgresViewModel(port: Int) {
     }
 
     val databases = _databases.asStateFlow()
-    suspend fun listPretty() {
-        val databases = api.databases(userName.value, password.value, PostgresApi.DatabaseViewFormat.Table)
+    fun listPretty() = coroutineScope.launch {
+        val databases = postgresApi.databases(userName.value, password.value, PostgresApi.DatabaseViewFormat.Table)
         databases.onSuccess {
             _databases.value = when (it) {
                 is DatabasesApi.Tabel -> it.databases
@@ -95,8 +98,8 @@ class PostgresViewModel(port: Int) {
     }
 
     val postgresVersion = _postgresVersion.asStateFlow()
-    suspend fun postgresVersion() {
-        val databaseVersion = api.databaseVersion(userName.value, password.value)
+    fun postgresVersion() = coroutineScope.launch {
+        val databaseVersion = postgresApi.databaseVersion(userName.value, password.value)
         databaseVersion.onSuccess {
             _postgresVersion.value = it.database
         }
@@ -113,8 +116,8 @@ class PostgresViewModel(port: Int) {
     }
 
     val secrets = _secrets.asStateFlow()
-    suspend fun secrets() {
-        val result = api.secrets()
+    fun secrets() = coroutineScope.launch {
+        val result = ocApi.secrets()
         result.onSuccess {
             _secrets.value = it
         }
@@ -124,16 +127,15 @@ class PostgresViewModel(port: Int) {
         _secrets.value = listOf()
     }
 
-    suspend fun detectPassword() {
-        val result = api.password(userName.value)
+    fun detectPassword() = coroutineScope.launch {
+        val result = ocApi.password(userName.value)
         result.onSuccess {
             _password.value = it
         }
     }
 
-    private suspend fun selectDefaultDatabase() {
-        //        postgres.defaultDB(password.value.text).replace("\n", "")
-        val default = api.defaultDatabases(userName.value, password.value)
+    private fun selectDefaultDatabase() = coroutineScope.launch {
+        val default = postgresApi.defaultDatabases(userName.value, password.value)
         default.onSuccess { db ->
             val defaultDb = databasesLines.value.indexOfFirst {
                 it == db.database

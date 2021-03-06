@@ -17,20 +17,11 @@ import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.event.KeyEvent
 
-
-fun launchInIo(scope: CoroutineScope, block: suspend () -> Unit) {
-    scope.launch(Dispatchers.IO) {
-        block()
-    }
-}
 
 @Composable
 fun ExpandableText(

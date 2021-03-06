@@ -9,7 +9,7 @@ object MessageProvider {
     private val formatter = MessageFormat("")
 
     fun message(message: String, vararg arguments: Any?): String {
-        if (arguments == null || arguments.isEmpty()) return messages.getString(message)
+        if (arguments.isEmpty()) return messages.getString(message)
         formatter.applyPattern(messages.getString(message))
         return formatter.format(arguments)
     }

@@ -22,7 +22,8 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_DUMP_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_DUMP_LOADING
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_DUMP_SUCCESS
-import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -42,7 +43,7 @@ fun PostgresDump() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(onClick = {
-            launchInIo(scope) {
+            scope.launch(Dispatchers.IO) {
                 viewModel.dumpDatabase(databases[selectedDatabase], globalState.exportFormat.value.format)
             }
         }) {
@@ -68,7 +69,8 @@ fun PostgresDump() {
                 )
             }
             is DatabaseDownloadMessage.InProgressMessage,
-            is DatabaseDownloadMessage.StartMessage -> {
+            is DatabaseDownloadMessage.StartMessage,
+            -> {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {

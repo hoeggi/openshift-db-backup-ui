@@ -35,10 +35,7 @@ fun CurrentProject() {
             modifier = Modifier.height(10.dp)
         )
         Text(
-            text = when (currentProject) {
-                is ProjectApi -> currentProject.name
-                else -> "Unset"
-            },
+            text = currentProject.name,
             style = MaterialTheme.typography.caption
         )
     }

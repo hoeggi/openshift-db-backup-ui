@@ -3,9 +3,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.30"
-    id("org.jetbrains.compose") version "0.3.0-build154"
-//    id("org.jetbrains.kotlin.kapt") version "1.4.30"
+    kotlin("jvm") version Versions.kotlin
+    id("org.jetbrains.compose") version Versions.compose
 }
 
 group = "io.github.hoeggi"
@@ -26,17 +25,23 @@ dependencies {
     implementation(project(":server"))
     implementation(project(":ui"))
     compileOnly(Dependencies.slf4j_api)
-    implementation("ch.qos.logback:logback-classic:1.2.3")
+    implementation(Dependencies.logback)
+}
+
+allprojects {
+    tasks.withType<KotlinCompile> {
+//        kotlinOptions.useIR = true
+        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi",
+            "-Xinline-classes"
+        )
+    }
 }
 
 tasks.test {
     useJUnit()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.useIR = true
-    kotlinOptions.jvmTarget = "11"
-    kotlinOptions.freeCompilerArgs += "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi"
 }
 
 compose.desktop {

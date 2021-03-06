@@ -4,7 +4,7 @@ import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,10 +21,9 @@ import io.github.hoeggi.openshiftdb.ui.theme.ColorMuskTheme
 import io.github.hoeggi.openshiftdb.viewmodel.LoginState
 import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 import io.github.hoeggi.openshiftdb.viewmodel.PostgresViewModel
-import kotlinx.coroutines.*
+import io.github.hoeggi.openshiftdb.viewmodel.viewModels
+import kotlinx.coroutines.CoroutineScope
 import org.slf4j.LoggerFactory
-import java.lang.RuntimeException
-import java.util.concurrent.Executors
 
 const val APP_NAME = "Openshift DB Backup GUI"
 
@@ -57,17 +56,13 @@ class UI {
         ) {
 
             val scope = rememberCoroutineScope()
-            val ocViewModel = OcViewModel(port)
-            val postgresViewModel = PostgresViewModel(port)
+            val (ocViewModel, postgresViewModel) = viewModels(port, scope)
 
             val loginState by ocViewModel.loginState.collectAsState(
                 scope.coroutineContext
             )
+            ocViewModel.checkLoginState()
 
-            scope.launch(Dispatchers.IO) {
-                delay(1000)
-                ocViewModel.checkLoginState()
-            }
             CompositionLocalProvider(
                 Scope provides scope,
                 GlobalState provides globalState,
@@ -126,10 +121,9 @@ class UI {
         ocViewModel: OcViewModel,
         postgresViewModel: PostgresViewModel,
     ) {
-        Scope.current.launch(Dispatchers.IO) {
-            ocViewModel.update()
-            postgresViewModel.update()
-        }
+        ocViewModel.update()
+        postgresViewModel.update()
+
         Box {
             Row(
                 modifier = Modifier

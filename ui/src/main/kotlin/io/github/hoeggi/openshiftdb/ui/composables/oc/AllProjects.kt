@@ -17,7 +17,6 @@ import io.github.hoeggi.openshiftdb.Scope
 import io.github.hoeggi.openshiftdb.api.response.ProjectApi
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PROJECT_ALL_LABEL
-import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
 
 @Composable
 fun AllProjects() {
@@ -41,9 +40,7 @@ fun AllProjects() {
                 Project(
                     name = it.name,
                     onProjectClicked = {
-                        launchInIo(scope) {
-                            viewModel.switchProject(it)
-                        }
+                        viewModel.switchProject(it)
                     }
                 )
             }
@@ -54,7 +51,7 @@ fun AllProjects() {
 @Composable
 fun Project(
     name: String,
-    onProjectClicked: (String) -> Unit
+    onProjectClicked: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier

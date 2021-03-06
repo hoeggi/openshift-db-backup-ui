@@ -13,13 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.api.response.ClusterApi
-import io.github.hoeggi.openshiftdb.ui.composables.StatefulEditTextField
-import io.github.hoeggi.openshiftdb.ui.composables.launchInIo
-import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
-import androidx.compose.runtime.getValue
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.LOGIN_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.LOGIN_TOKEN_HINT
+import io.github.hoeggi.openshiftdb.ui.composables.StatefulEditTextField
+import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 
 @Composable
 fun LoginScreen(ocViewModel: OcViewModel) {
@@ -29,9 +27,7 @@ fun LoginScreen(ocViewModel: OcViewModel) {
 
     var token by remember { mutableStateOf(TextFieldValue("")) }
     var selected by remember { mutableStateOf(-1) }
-    launchInIo(scope) {
-        ocViewModel.listServer()
-    }
+    ocViewModel.listServer()
 
     Box(
         contentAlignment = Alignment.Center,
@@ -55,9 +51,7 @@ fun LoginScreen(ocViewModel: OcViewModel) {
                 }
                 Button(
                     onClick = {
-                        launchInIo(scope) {
-                            ocViewModel.login(token.text, server[selected].server)
-                        }
+                        ocViewModel.login(token.text, server[selected].server)
                     },
                     enabled = token.text.isNotEmpty() && selected != -1,
                     modifier = Modifier.padding(4.dp),

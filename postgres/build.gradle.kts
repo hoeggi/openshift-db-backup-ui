@@ -20,7 +20,3 @@ dependencies {
     implementation(Dependencies.Kotlin.serialization)
     implementation(Dependencies.okio)
 }
-
-tasks.test {
-    useJUnit()
-}

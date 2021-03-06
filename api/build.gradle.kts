@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization") version Dependencies.Kotlin.version
@@ -18,14 +20,4 @@ dependencies {
     implementation(Dependencies.Kotlin.coroutines)
     implementation(Dependencies.okhttp)
     api(project(":api_models"))
-}
-
-tasks.test {
-    useJUnit()
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
-    // to allow using kotlin.Result
-    kotlinOptions.freeCompilerArgs += "-Xallow-result-return-type"
 }
