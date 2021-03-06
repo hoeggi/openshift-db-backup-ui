@@ -51,7 +51,7 @@ fun ErrorView(t: Thread?, th: Throwable?, modifier: Modifier = Modifier) {
                     modifier = Modifier.padding(6.dp)
                 ) {
                     Button(onClick = {
-                        globalState.showError(globalState.error())
+                        globalState.showError(globalState.empty())
                     }, modifier = Modifier.weight(1f).padding(6.dp)) {
                         Text(MessageProvider.message(GLOBAL_OK))
                     }

@@ -21,7 +21,7 @@ fun viewModels(
     postgresViewModel = PostgresViewModel(port, coroutineScope, errorViewer)
 )
 
-abstract class BaseViewModel(port: Int, private val scope: CoroutineScope, errorViewer: ErrorViewer) {
+abstract class BaseViewModel(port: Int, private val scope: CoroutineScope, private val errorViewer: ErrorViewer) {
     private val coroutineExceptionHandler = CoroutineExceptionHandler(errorViewer)
     private val api: Api = Api(port)
 
@@ -33,4 +33,13 @@ abstract class BaseViewModel(port: Int, private val scope: CoroutineScope, error
     val coroutineScope
         get() = scope + Job() + coroutineExceptionHandler
 
+    val showWarning: (Throwable) -> Unit = {
+        showWarning(it.message)
+    }
+
+    fun showWarning(message: String?) {
+        message?.run {
+            errorViewer.showError(errorViewer.warning(this))
+        }
+    }
 }

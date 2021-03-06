@@ -3,6 +3,7 @@ package io.github.hoeggi.openshiftdb.viewmodel
 import com.google.common.collect.EvictingQueue
 import io.github.hoeggi.openshiftdb.api.PostgresApi
 import io.github.hoeggi.openshiftdb.api.getOrDefault
+import io.github.hoeggi.openshiftdb.api.onFailure
 import io.github.hoeggi.openshiftdb.api.onSuccess
 import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
 import io.github.hoeggi.openshiftdb.api.response.DatabasesApi
@@ -90,7 +91,7 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
                 else -> listOf("")
             }
             selectDefaultDatabase()
-        }
+        }.onFailure(showWarning)
     }
 
     val databases = _databases.asStateFlow()
@@ -101,7 +102,7 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
                 is DatabasesApi.Tabel -> it.databases
                 else -> ""
             }
-        }
+        }.onFailure(showWarning)
     }
 
     val postgresVersion = _postgresVersion.asStateFlow()
@@ -109,7 +110,7 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
         val databaseVersion = postgresApi.databaseVersion(userName.value, password.value)
         databaseVersion.onSuccess {
             _postgresVersion.value = it.database
-        }
+        }.onFailure(showWarning)
     }
 
     val userName = _userName.asStateFlow()
@@ -127,7 +128,7 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
         val result = ocApi.secrets()
         result.onSuccess {
             _secrets.value = it
-        }
+        }.onFailure(showWarning)
     }
 
     fun clearSecrets() {
@@ -138,7 +139,7 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
         val result = ocApi.password(userName.value)
         result.onSuccess {
             _password.value = it
-        }
+        }.onFailure(showWarning)
     }
 
     private fun selectDefaultDatabase() = coroutineScope.launch {
@@ -148,6 +149,6 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
                 it == db.database
             }
             _selectedDatabase.value = defaultDb
-        }
+        }.onFailure(showWarning)
     }
 }
