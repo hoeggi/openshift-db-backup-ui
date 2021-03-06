@@ -56,24 +56,22 @@ fun DatabaseChooser() {
         }
 
         if (selectedDatabase != -1) {
+            val window = LocalAppWindow.current.window
             Row(
-                modifier = Modifier.padding(10.dp),
+                modifier = Modifier.padding(10.dp).clickable {
+                    val chooser = JFileChooser().apply {
+                        fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+                    }
+                    val returnVal = chooser.showOpenDialog(window)
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        viewModel.dumpPath(chooser.selectedFile.absolutePath)
+                    }
+                },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val window = LocalAppWindow.current.window
                 Icon(
                     imageVector = Icons.Default.FolderOpen,
                     contentDescription = "",
-                    modifier = Modifier.clickable {
-                        val chooser = JFileChooser().apply {
-                            fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
-
-                        }
-                        val returnVal = chooser.showOpenDialog(window)
-                        if (returnVal == JFileChooser.APPROVE_OPTION) {
-                            viewModel.dumpPath(chooser.selectedFile.absolutePath)
-                        }
-                    }
                 )
                 Text(
                     text = dumpPath,

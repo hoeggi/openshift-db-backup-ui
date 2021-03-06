@@ -71,9 +71,13 @@ class GlobalState : ErrorViewer {
         _theme.value = theme
     }
 
-    private val _errors: MutableStateFlow<ErrorViewer.Error> = MutableStateFlow(error())
+    private val _errors: MutableStateFlow<ErrorViewer.Message> = MutableStateFlow(empty())
     val errors = _errors.asStateFlow()
-    override fun showError(error: ErrorViewer.Error) {
+    override fun showError(error: ErrorViewer.Message) {
         _errors.value = error
+    }
+
+    override fun showWarning(warning: ErrorViewer.Message) {
+        _errors.value = warning
     }
 }

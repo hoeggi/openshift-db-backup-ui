@@ -7,18 +7,31 @@ import kotlin.coroutines.CoroutineContext
 
 
 interface ErrorViewer {
-    fun showError(e: Error)
-    interface Error {
-        val thread: Thread?
-        val throwable: Throwable?
+    fun showError(error: Message)
+    fun showWarning(warning: Message)
+
+    interface Message {
         val fired: Boolean
     }
 
+    interface Error : Message {
+        val thread: Thread?
+        val throwable: Throwable?
+    }
+
+    interface Warning : Message {
+        val message: String
+    }
+
+    fun empty() = object : Message {
+        override val fired = false
+    }
+
+    fun warning(message: String): Warning = Warning(message, true)
     fun error(
         thread: Thread? = Thread.currentThread(),
         throwable: Throwable? = Throwable(),
-        fired: Boolean = false,
-    ): Error = Error(thread, throwable, fired)
+    ): Error = Error(thread, throwable, true)
 
 }
 
@@ -40,10 +53,14 @@ class ExceptionHandler(private val errorViewer: ErrorViewer) : Thread.UncaughtEx
     private val logger = LoggerFactory.getLogger(ExceptionHandler::class.java)
     override fun uncaughtException(t: Thread?, e: Throwable?) {
         logger.error("$t", e)
-        errorViewer.showError(errorViewer.error(t, e, true))
+        errorViewer.showError(errorViewer.error(t, e))
     }
 }
 
+private data class Warning(
+    override val message: String,
+    override val fired: Boolean,
+) : ErrorViewer.Warning
 
 private data class Error(
     override val thread: Thread?,
