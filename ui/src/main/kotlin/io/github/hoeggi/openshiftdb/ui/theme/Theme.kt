@@ -2,13 +2,14 @@
 
 package io.github.hoeggi.openshiftdb.ui.theme
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,10 +17,13 @@ import io.github.hoeggi.openshiftdb.GlobalState
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import io.github.hoeggi.openshiftdb.settings.Theme
 import io.github.hoeggi.openshiftdb.ui.composables.ErrorView
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.BottomNav
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.Drawer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
+@ExperimentalAnimationApi
 @Composable
 fun ColorMuskTheme(
     coroutineScope: CoroutineScope,
@@ -27,7 +31,6 @@ fun ColorMuskTheme(
 ) {
     val viewModel = GlobalState.current
     val dark by viewModel.theme.collectAsState(coroutineScope.coroutineContext)
-
     val colors = when (dark) {
         Theme.Dark -> darkColors(
             primary = Color(0xFF3C5EE6),
@@ -43,9 +46,32 @@ fun ColorMuskTheme(
     ) {
         Surface {
             val state = rememberScaffoldState()
-            Scaffold(scaffoldState = state) {
+            var settings by remember { mutableStateOf(false) }
+            Scaffold(
+                scaffoldState = state,
+                bottomBar = {
+                    BottomNav(
+                        coroutineScope = coroutineScope
+                    )
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = {
+                            settings = !settings
+                        },
+                    ) {
+                        Icon(Icons.Outlined.Settings, "")
+                    }
+                },
+                floatingActionButtonPosition = FabPosition.End,
+                isFloatingActionButtonDocked = true,
+
+                ) {
                 Box {
                     content()
+                    Drawer(settings, coroutineScope) {
+                        settings = !settings
+                    }
                     Overlays(coroutineScope, state)
                 }
             }
@@ -62,8 +88,7 @@ fun BoxScope.Overlays(coroutineScope: CoroutineScope, state: ScaffoldState) {
         when (val message = error) {
             is ErrorViewer.Error -> ErrorView(
                 message.thread,
-                message.throwable,
-                Modifier.align(Alignment.Center)
+                message.throwable
             )
             is ErrorViewer.Warning -> coroutineScope.launch {
                 state.snackbarHostState

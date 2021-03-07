@@ -1,5 +1,6 @@
 package io.github.hoeggi.openshiftdb.ui.composables.navigation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -23,33 +24,6 @@ import io.github.hoeggi.openshiftdb.settings.Theme
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-fun Fab(
-    modifier: Modifier = Modifier,
-    coroutineScope: CoroutineScope,
-) {
-    var settings by remember { mutableStateOf(false) }
-
-
-    Column(modifier = modifier) {
-        if (settings) {
-            Row {
-                ExportFormatChooser(coroutineScope)
-                ThemeChooser(coroutineScope)
-            }
-        }
-
-        FloatingActionButton(
-            modifier = Modifier.align(Alignment.End),
-            onClick = {
-                settings = !settings
-            },
-        ) {
-            Icon(Icons.Outlined.Settings, "")
-        }
-    }
-}
-
-@Composable
 fun ThemeChooser(coroutineScope: CoroutineScope) {
     val globalState = GlobalState.current
     val dark by globalState.theme.collectAsState(coroutineScope.coroutineContext)
@@ -59,13 +33,15 @@ fun ThemeChooser(coroutineScope: CoroutineScope) {
             modifier = Modifier.padding(4.dp),
             text = MessageProvider.message(THEME_LABEL)
         )
-        Row {
+        Row(
+            modifier = Modifier.clickable {
+                globalState.themeDark()
+            }
+        ) {
             RadioButton(
                 modifier = Modifier.padding(4.dp),
                 selected = dark == Theme.Dark,
-                onClick = {
-                    globalState.toggleTheme()
-                },
+                onClick = null,
             )
             Text(
                 modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically),
@@ -73,13 +49,15 @@ fun ThemeChooser(coroutineScope: CoroutineScope) {
                 text = MessageProvider.message(THEME_DARK)
             )
         }
-        Row {
+        Row(
+            modifier = Modifier.clickable {
+                globalState.themeLight()
+            }
+        ) {
             RadioButton(
                 modifier = Modifier.padding(4.dp),
                 selected = dark == Theme.Light,
-                onClick = {
-                    globalState.toggleTheme()
-                },
+                onClick = null,
             )
             Text(
                 modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically),
@@ -100,13 +78,15 @@ fun ExportFormatChooser(coroutineScope: CoroutineScope) {
             modifier = Modifier.padding(4.dp),
             text = MessageProvider.message(POSTGRES_EXPORT_FORMAT_LABEL)
         )
-        Row {
+        Row(
+            modifier = Modifier.clickable {
+                globalState.updateExportFormat(ExportFormat.Custom)
+            }
+        ) {
             RadioButton(
                 modifier = Modifier.padding(4.dp),
                 selected = format == ExportFormat.Custom,
-                onClick = {
-                    globalState.updateExportFormat(ExportFormat.Custom)
-                },
+                onClick = null,
             )
             Text(
                 modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically),
@@ -114,13 +94,15 @@ fun ExportFormatChooser(coroutineScope: CoroutineScope) {
                 text = MessageProvider.message(POSTGRES_EXPORT_FORMAT_CUSTOM)
             )
         }
-        Row {
+        Row(
+            modifier = Modifier.clickable {
+                globalState.updateExportFormat(ExportFormat.Plain)
+            }
+        ) {
             RadioButton(
                 modifier = Modifier.padding(4.dp),
                 selected = format == ExportFormat.Plain,
-                onClick = {
-                    globalState.updateExportFormat(ExportFormat.Plain)
-                },
+                onClick = null,
             )
             Text(
                 modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically),

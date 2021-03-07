@@ -22,7 +22,6 @@ object OC {
         class Server(val server: List<Cluster>, result: ProcessResult) : OcResult(result)
 
         sealed class LoginState(result: ProcessResult = ProcessResult.Ok) : OcResult(result) {
-            //            object Unchecked : LoginState()
             object LoggedIn : LoginState()
             class NotLogedIn(result: ProcessResult) : LoginState(result)
         }

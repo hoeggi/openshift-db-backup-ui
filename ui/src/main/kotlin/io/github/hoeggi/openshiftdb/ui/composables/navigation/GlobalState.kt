@@ -55,6 +55,24 @@ class GlobalState : ErrorViewer {
     private val _theme: MutableStateFlow<Theme> =
         MutableStateFlow(settings.theme)
     val theme = _theme.asStateFlow()
+    fun themeDark() {
+        _theme.value = Theme.Dark
+        coroutineScope.launch {
+            settings = settings.copy(theme = _theme.value).apply {
+                save()
+            }
+        }
+    }
+
+    fun themeLight() {
+        _theme.value = Theme.Light
+        coroutineScope.launch {
+            settings = settings.copy(theme = _theme.value).apply {
+                save()
+            }
+        }
+    }
+
     fun toggleTheme() {
         _theme.value = when (_theme.value) {
             Theme.Dark -> Theme.Light
@@ -69,6 +87,7 @@ class GlobalState : ErrorViewer {
 
     private val _errors: MutableStateFlow<ErrorViewer.Message> = MutableStateFlow(empty())
     val errors = _errors.asStateFlow()
+
     override fun showError(error: ErrorViewer.Message) {
         _errors.value = error
     }

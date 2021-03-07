@@ -38,6 +38,7 @@ allprojects {
             "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi",
             "-Xuse-experimental=androidx.compose.material.ExperimentalMaterialApi",
             "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi",
+            "-Xuse-experimental=androidx.compose.animation.ExperimentalAnimationApi",
             "-Xinline-classes"
         )
     }

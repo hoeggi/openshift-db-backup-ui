@@ -48,7 +48,7 @@ fun ExpandableText(
 fun ExpandableText(
     text: String,
     initialState: Boolean = false,
-    content: @Composable (() -> Unit)
+    content: @Composable (() -> Unit),
 ) {
     ExpandableText(
         initialState = initialState,
@@ -138,6 +138,16 @@ fun EditTextField(
                 }
                 on(Key(KeyEvent.VK_END)) {
                     onValueChange(value.moveCursor(value.text.length))
+                }
+                on(Key.ShiftLeft + Key.Home) {
+                    onValueChange(value.copy(
+                        selection = TextRange(value.selection.start, 0)
+                    ))
+                }
+                on(Key.ShiftLeft + Key(KeyEvent.VK_END)) {
+                    onValueChange(value.copy(
+                        selection = TextRange(value.selection.start, value.text.length)
+                    ))
                 }
                 on(Key.ShiftLeft + Key(KeyEvent.VK_RIGHT)) {
                     onValueChange(value.selectNext())

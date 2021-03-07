@@ -20,6 +20,7 @@ dependencies {
 //    testImplementation(kotlin("test-junit"))
     implementation(compose.desktop.currentOs)
     implementation(compose.materialIconsExtended)
+    implementation(compose.animation)
     implementation(kotlin("stdlib-jdk8"))
     implementation(project(":viewmodel"))
     implementation(project(":i18n"))
