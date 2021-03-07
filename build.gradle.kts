@@ -37,6 +37,7 @@ allprojects {
             "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi",
             "-Xuse-experimental=androidx.compose.material.ExperimentalMaterialApi",
+            "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi",
             "-Xinline-classes"
         )
     }
@@ -51,7 +52,7 @@ compose.desktop {
         mainClass = "io.github.hoeggi.openshiftdb.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Deb, TargetFormat.Rpm)
-            packageName = "openshift-db-gui"
+            packageName = rootProject.name
             modules("java.logging", "java.naming", "java.management")
         }
     }

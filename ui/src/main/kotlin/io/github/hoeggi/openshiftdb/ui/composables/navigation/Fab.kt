@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,6 +18,8 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_EXPORT_FORMAT_
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_DARK
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_LIGHT
+import io.github.hoeggi.openshiftdb.settings.ExportFormat
+import io.github.hoeggi.openshiftdb.settings.Theme
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -27,8 +27,7 @@ fun Fab(
     modifier: Modifier = Modifier,
     coroutineScope: CoroutineScope,
 ) {
-    val globalState = GlobalState.current
-    val settings by globalState.settings.collectAsState(coroutineScope.coroutineContext)
+    var settings by remember { mutableStateOf(false) }
 
 
     Column(modifier = modifier) {
@@ -42,7 +41,7 @@ fun Fab(
         FloatingActionButton(
             modifier = Modifier.align(Alignment.End),
             onClick = {
-                globalState.toggleSettings()
+                settings = !settings
             },
         ) {
             Icon(Icons.Outlined.Settings, "")

@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import io.github.hoeggi.openshiftdb.GlobalState
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
+import io.github.hoeggi.openshiftdb.settings.Theme
 import io.github.hoeggi.openshiftdb.ui.composables.ErrorView
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.Theme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

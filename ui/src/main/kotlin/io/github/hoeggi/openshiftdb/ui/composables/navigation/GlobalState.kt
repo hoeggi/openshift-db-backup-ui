@@ -3,29 +3,35 @@ package io.github.hoeggi.openshiftdb.ui.composables.navigation
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
+import io.github.hoeggi.openshiftdb.settings.ExportFormat
+import io.github.hoeggi.openshiftdb.settings.Theme
+import io.github.hoeggi.openshiftdb.settings.loadSettings
+import io.github.hoeggi.openshiftdb.settings.save
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlin.coroutines.EmptyCoroutineContext
 
 sealed class Screen {
     object Main : Screen()
     object Detail : Screen()
 }
 
-sealed class Theme {
-    object Dark : Theme()
-    object Light : Theme()
-}
-
-sealed class ExportFormat(val format: String) {
-    object Custom : ExportFormat("custom")
-    object Plain : ExportFormat("plain")
-}
-
 class GlobalState : ErrorViewer {
-    private val _exportFormat: MutableStateFlow<ExportFormat> = MutableStateFlow(ExportFormat.Custom)
+
+    private val coroutineScope = CoroutineScope(EmptyCoroutineContext)
+    private var settings = loadSettings()
+
+    private val _exportFormat: MutableStateFlow<ExportFormat> = MutableStateFlow(settings.format)
     val exportFormat = _exportFormat.asStateFlow()
     fun updateExportFormat(exportFormat: ExportFormat) {
         _exportFormat.value = exportFormat
+        coroutineScope.launch {
+            settings = settings.copy(format = _exportFormat.value).apply {
+                save()
+            }
+        }
     }
 
     private val _syslog = MutableStateFlow(
@@ -47,28 +53,18 @@ class GlobalState : ErrorViewer {
     }
 
     private val _theme: MutableStateFlow<Theme> =
-        MutableStateFlow(Theme.Dark)
+        MutableStateFlow(settings.theme)
     val theme = _theme.asStateFlow()
-
     fun toggleTheme() {
         _theme.value = when (_theme.value) {
             Theme.Dark -> Theme.Light
             Theme.Light -> Theme.Dark
         }
-    }
-
-    private val _settings: MutableStateFlow<Boolean> =
-        MutableStateFlow(false)
-    val settings = _settings.asStateFlow()
-
-    fun toggleSettings() {
-        _settings.value = !_settings.value
-    }
-
-    fun dark() = theme(Theme.Dark)
-    fun light() = theme(Theme.Light)
-    fun theme(theme: Theme) {
-        _theme.value = theme
+        coroutineScope.launch {
+            settings = settings.copy(theme = _theme.value).apply {
+                save()
+            }
+        }
     }
 
     private val _errors: MutableStateFlow<ErrorViewer.Message> = MutableStateFlow(empty())
@@ -80,4 +76,5 @@ class GlobalState : ErrorViewer {
     override fun showWarning(warning: ErrorViewer.Message) {
         _errors.value = warning
     }
+
 }
