@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":viewmodel"))
     implementation(project(":i18n"))
     implementation(project(":errorhandler"))
+    implementation(project(":settings"))
     implementation(Dependencies.Kotlin.coroutines)
     compileOnly(Dependencies.slf4j_api)
     implementation(Dependencies.guava)

@@ -40,6 +40,7 @@ class UI {
 
     fun show(port: Int, globalState: GlobalState, onClose: (() -> Unit)) {
         logger.info("starting ui")
+
         Window(
             title = APP_NAME,
             undecorated = false,

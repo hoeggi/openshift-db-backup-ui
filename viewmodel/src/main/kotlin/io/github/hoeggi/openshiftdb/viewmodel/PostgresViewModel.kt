@@ -95,6 +95,10 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
     }
 
     val databases = _databases.asStateFlow()
+    fun clearDatabaseText() {
+        _databases.value = ""
+    }
+
     fun listPretty() = coroutineScope.launch {
         val databases = postgresApi.databases(userName.value, password.value, PostgresApi.DatabaseViewFormat.Table)
         databases.onSuccess {

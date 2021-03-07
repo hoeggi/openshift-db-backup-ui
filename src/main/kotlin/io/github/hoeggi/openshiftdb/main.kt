@@ -19,6 +19,7 @@ private fun port(): Int {
 
 private val logger = LoggerFactory.getLogger(UI::class.java)
 fun main() {
+
     logger.info("initializing")
     val globalState = GlobalState()
     val logDelegate = Logger(globalState)

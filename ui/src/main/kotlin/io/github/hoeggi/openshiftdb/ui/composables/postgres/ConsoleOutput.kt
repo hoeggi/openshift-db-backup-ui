@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
+import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
 import io.github.hoeggi.openshiftdb.collectAsState
 
 @Composable
@@ -19,6 +20,7 @@ fun ConsoleOutput() {
     val viewModel = PostgresViewModel.current
     val text by viewModel.collectAsState(viewModel.databases)
     val downloadProgress by viewModel.collectAsState(viewModel.downloadProgress)
+    val resultState by viewModel.collectAsState(viewModel.downloadState)
 
     Text(
         text = text,
@@ -27,6 +29,10 @@ fun ConsoleOutput() {
         ),
         modifier = Modifier.fillMaxWidth(1f).padding(10.dp)
     )
+
+    if (resultState is DatabaseDownloadMessage.StartMessage) {
+        viewModel.clearDatabaseText()
+    }
 
     if (downloadProgress.isNotEmpty()) {
         LazyColumn(

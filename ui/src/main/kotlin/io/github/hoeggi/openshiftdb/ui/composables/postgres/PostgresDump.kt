@@ -3,6 +3,7 @@ package io.github.hoeggi.openshiftdb.ui.composables.postgres
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -51,7 +52,7 @@ fun PostgresDump() {
                 Text(
                     text = MessageProvider.message(POSTGRES_DUMP_SUCCESS, path),
                     style = MaterialTheme.typography.body2,
-                    modifier = Modifier.padding(10.dp).clickable {
+                    modifier = Modifier.padding(horizontal = 10.dp).clickable {
                         val open = DesktopApi.open(File(path).parentFile)
                         logger.debug("openend: $open")
                     },
@@ -68,13 +69,13 @@ fun PostgresDump() {
             is DatabaseDownloadMessage.StartMessage,
             -> {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    CircularProgressIndicator(modifier = Modifier.padding(10.dp))
+                    CircularProgressIndicator(modifier = Modifier.padding(horizontal = 10.dp).size(32.dp))
                     Text(
+                        modifier = Modifier.padding(horizontal = 10.dp),
                         text = MessageProvider.message(POSTGRES_DUMP_LOADING),
                         style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(10.dp)
                     )
                 }
             }

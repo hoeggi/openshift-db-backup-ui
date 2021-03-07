@@ -19,5 +19,6 @@ include(
     ":api_models",
     ":ui",
     ":i18n",
-    ":errorhandler"
+    ":errorhandler",
+    ":settings"
 )
