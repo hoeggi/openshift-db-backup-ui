@@ -71,6 +71,10 @@ fun BoxScope.Drawer(open: Boolean, coroutineScope: CoroutineScope, onOutsideClic
                     Divider(
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
+                    LogLevelChooser(coroutineScope)
+                    Divider(
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
                 }
             }
         }

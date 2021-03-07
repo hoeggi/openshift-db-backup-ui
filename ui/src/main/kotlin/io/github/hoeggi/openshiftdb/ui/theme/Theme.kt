@@ -37,9 +37,13 @@ fun ColorMuskTheme(
             secondary = Color(0xFF1b3394),
             background = Color(0xFF242424),
             surface = Color(0xFF242424),
-            onBackground = Color(0xFFEEEEEE),
         )
-        Theme.Light -> lightColors()
+        Theme.Light -> lightColors(
+            primary = Color(0xFF3C5EE6),
+            secondary = Color(0xFF1b3394),
+            background = Color(0xFFF2F2F2),
+            surface = Color(0xFFF2F2F2)
+        )
     }
     DesktopMaterialTheme(
         colors = colors,
@@ -80,7 +84,7 @@ fun ColorMuskTheme(
 }
 
 @Composable
-fun BoxScope.Overlays(coroutineScope: CoroutineScope, state: ScaffoldState) {
+fun Overlays(coroutineScope: CoroutineScope, state: ScaffoldState) {
     val viewModel = GlobalState.current
     val error by viewModel.errors.collectAsState(coroutineScope.coroutineContext)
 

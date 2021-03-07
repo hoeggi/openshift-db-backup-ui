@@ -23,8 +23,12 @@ fun Log(
     coroutineScope: CoroutineScope,
 ) {
     val viewModel = GlobalState.current
-    val errors by viewModel.syslog.collectAsState(coroutineScope.coroutineContext)
-    val listState = rememberLazyListState(errors.size, 0)
+    val logLines by viewModel.syslog.collectAsState(coroutineScope.coroutineContext)
+    val logLevel by viewModel.logLevel.collectAsState(coroutineScope.coroutineContext)
+
+    val filteredLines = logLines.filter { logLevel.predicate(it) }
+    val listState = rememberLazyListState(filteredLines.size, 0)
+
     Column(modifier = modifier) {
         Text(
             text = MessageProvider.message(SYSLOG_LABEL),
@@ -36,13 +40,11 @@ fun Log(
                 .padding(10.dp),
             state = listState
         ) {
-            items(errors) { item ->
+            items(filteredLines) { item ->
                 Text(
                     text = item,
                     style = MaterialTheme.typography.caption
-                        .copy(
-                            fontFamily = FontFamily.Monospace,
-                        )
+                        .copy(fontFamily = FontFamily.Monospace)
                 )
             }
         }

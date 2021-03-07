@@ -16,8 +16,8 @@ class HighlightingCompositeConverterEx : ForegroundCompositeConverterBase<ILoggi
         return when (level.toInt()) {
             Level.ERROR_INT -> ANSIConstants.RED_FG // same as default color scheme
             Level.WARN_INT -> ANSIConstants.YELLOW_FG // same as default color scheme
-            Level.INFO_INT -> ANSIConstants.CYAN_FG // use CYAN instead of BLUE
-            Level.DEBUG_INT -> ANSIConstants.BLUE_FG // use CYAN instead of BLUE
+            Level.INFO_INT -> ANSIConstants.BLUE_FG // use CYAN instead of BLUE
+            Level.DEBUG_INT -> ANSIConstants.CYAN_FG // use CYAN instead of BLUE
             else -> ANSIConstants.DEFAULT_FG
         }
     }

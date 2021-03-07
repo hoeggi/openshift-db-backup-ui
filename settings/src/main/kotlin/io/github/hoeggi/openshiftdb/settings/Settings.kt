@@ -1,10 +1,7 @@
 package io.github.hoeggi.openshiftdb.settings
 
 import io.github.hoeggi.settings.BuildConfig
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 import okio.buffer
 import okio.sink
@@ -25,7 +22,7 @@ private val settingsPath = if (System.getenv("XDG_CONFIG_HOME") != null) {
     }
 }
 
-private val DefaultSettings = Settings(Theme.Dark, ExportFormat.Custom)
+private val DefaultSettings = Settings(Theme.Dark, ExportFormat.Custom, LogLevel.Debug)
 
 fun Settings.save() {
     val encodeToString = Json.encodeToString(this)
@@ -39,7 +36,39 @@ fun loadSettings(): Settings {
         DefaultSettings.save()
     }
     val readUtf8 = settingsPath.source().buffer().readUtf8()
-    return Json.decodeFromString(readUtf8)
+    return try {
+        Json.decodeFromString(readUtf8)
+    } catch (ex: SerializationException) {
+        DefaultSettings.save()
+        DefaultSettings
+    }
+}
+
+val LogLevels = listOf(
+    LogLevel.Debug,
+    LogLevel.Info,
+    LogLevel.Warn,
+    LogLevel.Error
+)
+
+@Serializable
+sealed class LogLevel(val name: String, val predicate: (CharSequence) -> Boolean) {
+    @Serializable
+    @SerialName("Debug")
+    object Debug : LogLevel("Debug", { true })
+
+    @Serializable
+    @SerialName("Info")
+    object Info : LogLevel("Info", { !it.startsWith("DEBUG") && Debug.predicate(it) })
+
+    @Serializable
+    @SerialName("Warn")
+    object Warn : LogLevel("Warn", { !it.startsWith("INFO") && Info.predicate(it) && Debug.predicate(it) })
+
+    @Serializable
+    @SerialName("Error")
+    object Error :
+        LogLevel("Error", { !it.startsWith("WARN") && Warn.predicate(it) && Info.predicate(it) && Debug.predicate(it) })
 }
 
 @Serializable
@@ -65,4 +94,4 @@ sealed class ExportFormat(val format: String) {
 }
 
 @Serializable
-data class Settings(val theme: Theme, val format: ExportFormat)
+data class Settings(val theme: Theme, val format: ExportFormat, val logLevel: LogLevel)
