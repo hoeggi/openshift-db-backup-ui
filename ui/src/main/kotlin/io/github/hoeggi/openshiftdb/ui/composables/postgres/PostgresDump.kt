@@ -39,7 +39,8 @@ fun PostgresDump() {
     val databases by viewModel.collectAsState(viewModel.databasesLines)
 
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(10.dp)
     ) {
         Button(onClick = {
             viewModel.dumpDatabase(databases[selectedDatabase], globalState.exportFormat.value.format)

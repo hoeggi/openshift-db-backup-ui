@@ -13,12 +13,23 @@ import kotlin.coroutines.EmptyCoroutineContext
 sealed class Screen {
     object Main : Screen()
     object Detail : Screen()
+    object Restore : Screen()
 }
 
 class GlobalState : ErrorViewer {
 
     private val coroutineScope = CoroutineScope(EmptyCoroutineContext)
     private var settings = loadSettings()
+
+    private val _showDrawer: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showDrawer = _showDrawer.asStateFlow()
+    fun toggleDrawer() {
+        _showDrawer.value = !_showDrawer.value
+    }
+
+    fun hideDrawer() {
+        _showDrawer.value = false
+    }
 
     private val _logLevel: MutableStateFlow<LogLevel> = MutableStateFlow(settings.logLevel)
     val logLevel = _logLevel.asStateFlow()
@@ -52,6 +63,7 @@ class GlobalState : ErrorViewer {
 
     fun main() = navigateTo(Screen.Main)
     fun detail() = navigateTo(Screen.Detail)
+    fun restore() = navigateTo(Screen.Restore)
     fun navigateTo(screen: Screen) {
         _screen.value = screen
     }
@@ -104,7 +116,7 @@ class GlobalState : ErrorViewer {
             format = format ?: this.format,
             logLevel = logLevel ?: this.logLevel
         ).also {
-            save()
+            it.save()
         }
     }
 }

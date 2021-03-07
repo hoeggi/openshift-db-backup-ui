@@ -52,7 +52,7 @@ class CoroutineExceptionHandler(private val errorViewer: ErrorViewer) :
 class ExceptionHandler(private val errorViewer: ErrorViewer) : Thread.UncaughtExceptionHandler {
     private val logger = LoggerFactory.getLogger(ExceptionHandler::class.java)
     override fun uncaughtException(t: Thread?, e: Throwable?) {
-        logger.error("$t", e)
+//        logger.error("$t", e)
         errorViewer.showError(errorViewer.error(t, e))
     }
 }

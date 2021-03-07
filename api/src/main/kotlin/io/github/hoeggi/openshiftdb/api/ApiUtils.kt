@@ -55,7 +55,8 @@ internal inline fun <reified T> Response.get(): Result<T> = if (isSuccessful && 
     val data = Json.decodeFromString<ApiResponse<T>>(body!!.string()).data
     Result.success(data)
 } else {
-    Result.failure(RuntimeException("$code - $message"))
+    val errorMessage = body?.string()?.trim()
+    Result.failure(RuntimeException("$code - $message - $errorMessage"))
 }
 
 internal inline fun <reified T> ApiClient.get(path: String, credentials: String? = null) = try {

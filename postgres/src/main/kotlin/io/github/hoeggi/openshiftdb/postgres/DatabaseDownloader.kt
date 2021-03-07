@@ -79,7 +79,7 @@ class DatabaseDownloaderCustom(
                 else -> onError(exitCode, dump.bufferError.readUtf8Line(), null)
             }
         } catch (ex: Exception) {
-            logger.warn("unable to dump database", ex)
+            logger.error("unable to dump database", ex)
             onError(dump.exitCode, null, ex)
         }
     }
