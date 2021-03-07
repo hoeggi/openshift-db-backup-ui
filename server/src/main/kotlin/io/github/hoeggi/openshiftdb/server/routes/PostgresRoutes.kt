@@ -28,8 +28,9 @@ fun Route.postgres() {
         }
         route("/restore") {
             get("/info", RestoreInfo())
-//            get("/default", DefaultDatabase())
-//            webSocket("/dump", null, PostgresDump())
+            authenticate("postgres") {
+                get("/command", RestoreCommand())
+            }
         }
     }
 }

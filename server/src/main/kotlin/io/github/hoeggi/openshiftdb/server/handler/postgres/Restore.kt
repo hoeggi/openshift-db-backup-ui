@@ -1,14 +1,32 @@
 package io.github.hoeggi.openshiftdb.server.handler.postgres
 
 import io.github.hoeggi.openshiftdb.api.response.ApiResponse
+import io.github.hoeggi.openshiftdb.api.response.RestoreCommandApi
 import io.github.hoeggi.openshiftdb.api.response.RestoreInfoApi
 import io.github.hoeggi.openshiftdb.postgres.Postgres
+import io.github.hoeggi.openshiftdb.postgres.PostgresPrincibal
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+
+fun RestoreCommand(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
+    val path = call.request.queryParameters["path"]
+    val principal = call.principal<PostgresPrincibal>()
+    val username = principal?.username
+    val password = principal?.password
+
+    if (principal == null || username == null || password == null) {
+        call.respond(HttpStatusCode.Unauthorized)
+    } else if (path == null) {
+        call.respond(HttpStatusCode.BadRequest, "missing path")
+    } else {
+        call.respond(ApiResponse(RestoreCommandApi(Postgres.restoreCommand(username, password, path)), 0))
+    }
+}
 
 fun RestoreInfo(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
     val path = call.request.queryParameters["path"]

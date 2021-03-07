@@ -35,7 +35,8 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
     private val _version = MutableStateFlow(ToolsVersionApi())
 
     private val _restoreInfo = MutableStateFlow(listOf<String>())
-
+    private val _restorePath = MutableStateFlow("")
+    private val _restoreCommand = MutableStateFlow("")
 
     private val _downloadProgress: MutableStateFlow<List<DatabaseDownloadMessage.InProgressMessage>> =
         MutableStateFlow(listOf())
@@ -164,5 +165,22 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
         databases.onSuccess {
             _restoreInfo.value = it.info
         }.onFailure(showWarning)
+    }
+
+    val restorePath = _restorePath.asStateFlow()
+    fun updateRestorePath(path: String) {
+        _restorePath.value = path
+        restoreInfo(path)
+        restoreCommand(path)
+    }
+
+    val restoreCommand = _restoreCommand.asStateFlow()
+    fun restoreCommand(path: String) = coroutineScope.launch {
+        val restoreCommand = postgresApi.restoreCommand(userName.value, password.value, path)
+        restoreCommand.onSuccess {
+            _restoreCommand.value = it.command
+        }.onFailure {
+            _restoreCommand.value = it.message ?: ""
+        }
     }
 }

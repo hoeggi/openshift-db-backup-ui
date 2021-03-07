@@ -58,7 +58,7 @@ fun PortForward() {
                     style = MaterialTheme.typography.overline
                 )
                 Text(
-                    text = MessageProvider.message(OC_PORTFORWARD_PORT, target.port, target.port),
+                    text = MessageProvider.message(OC_PORTFORWARD_PORT, "${target.port}", "${target.port}"),
                     style = MaterialTheme.typography.overline
                 )
                 Spacer(
