@@ -19,6 +19,8 @@ object MessageProvider {
     const val ERROR_HEADER = "error.header"
     const val GLOBAL_EXIT = "global.exit"
     const val GLOBAL_OK = "global.ok"
+    const val SECRETS_LABEL = "secrets.label"
+
 
     const val THEME_LABEL = "theme.label"
     const val THEME_LIGHT = "theme.light"

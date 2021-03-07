@@ -1,39 +1,40 @@
 package io.github.hoeggi.openshiftdb.ui.composables
 
 import androidx.compose.desktop.AppManager
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.GlobalState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_EXIT
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_OK
+import io.github.hoeggi.openshiftdb.outsideClickable
 
 
 @Composable
-fun ErrorView(t: Thread?, th: Throwable?, modifier: Modifier = Modifier) {
-    Box(modifier.fillMaxSize().background(
-        color = Color.Black.copy(alpha = 0.8f),
-    ).clickable { println("box") }) {
+fun ErrorView(t: Thread?, th: Throwable?) {
+    Box(
+        modifier = Modifier.fillMaxSize().background(
+            color = MaterialTheme.colors.background.copy(alpha = 0.7f),
+        ).outsideClickable()
+    ) {
         val globalState = GlobalState.current
-        Box(
+        Surface(
+            elevation = 8.dp,
+            shape = RoundedCornerShape(6.dp),
             modifier = Modifier.align(Alignment.Center)
                 .fillMaxWidth(0.5f)
-                .background(color = MaterialTheme.colors.background, shape = RoundedCornerShape(6.dp))
-                .border(2.dp, color = Color.Black, shape = RoundedCornerShape(6.dp))
         ) {
             Column(modifier = Modifier.padding(6.dp)) {
                 Text(
-                    modifier = modifier.padding(4.dp),
+                    modifier = Modifier.padding(4.dp),
                     text = MessageProvider.message(MessageProvider.ERROR_HEADER, th?.message),
                 )
                 Divider(

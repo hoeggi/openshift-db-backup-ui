@@ -2,7 +2,10 @@ package io.github.hoeggi.openshiftdb
 
 import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.ui.composables.SecretsChooser
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.BottomNav
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.Fab
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.Screen
 import io.github.hoeggi.openshiftdb.ui.composables.oc.OcPane
@@ -22,6 +23,8 @@ import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 import io.github.hoeggi.openshiftdb.viewmodel.PostgresViewModel
 import io.github.hoeggi.openshiftdb.viewmodel.viewModels
 import org.slf4j.LoggerFactory
+import java.lang.RuntimeException
+import java.util.concurrent.Executors
 
 const val APP_NAME = "Openshift DB Backup GUI"
 
@@ -86,15 +89,6 @@ class UI {
                             }
                         }
                     }
-                    BottomNav(
-                        modifier = Modifier.align(Alignment.BottomCenter).height(48.dp),
-                        coroutineScope = scope
-                    )
-                    Fab(
-                        modifier = Modifier.align(Alignment.BottomEnd)
-                            .padding(bottom = 15.dp, end = 15.dp),
-                        coroutineScope = scope
-                    )
                 }
             }
         }
@@ -132,7 +126,7 @@ class UI {
                     PostgresPane()
                 }
             }
-            SecretsChooser(Modifier.align(Alignment.TopCenter), postgresViewModel)
+            SecretsChooser(Modifier.align(Alignment.Center), postgresViewModel)
         }
     }
 }
