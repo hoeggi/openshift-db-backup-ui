@@ -26,6 +26,7 @@ interface PostgresApi {
     }
 
     suspend fun restoreInfo(path: String): Result<RestoreInfoApi>
+    suspend fun restoreCommand(user: String, password: String, path: String): Result<RestoreCommandApi>
     suspend fun toolsVersion(): Result<ToolsVersionApi>
     suspend fun databaseVersion(username: String, password: String): Result<DatabaseVersionApi>
     suspend fun databases(
@@ -71,10 +72,17 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
         withContext(Dispatchers.IO) {
             client.first.newCall(
                 client.second.withPath("restore/info")
-                    .newBuilder()
                     .withQuery("path" to path)
-                    .build()
                     .toGetRequest()
+            ).execute().get()
+        }
+
+    override suspend fun restoreCommand(user: String, password: String, path: String): Result<RestoreCommandApi> =
+        withContext(Dispatchers.IO) {
+            client.first.newCall(
+                client.second.withPath("restore/command")
+                    .withQuery("path" to path)
+                    .toGetRequest(Credentials.basic(user, password))
             ).execute().get()
         }
 

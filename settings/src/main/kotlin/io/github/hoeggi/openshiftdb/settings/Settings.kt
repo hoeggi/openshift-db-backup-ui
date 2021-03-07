@@ -37,7 +37,9 @@ fun loadSettings(): Settings {
     }
     val readUtf8 = settingsPath.source().buffer().readUtf8()
     return try {
-        Json.decodeFromString(readUtf8)
+        Json {
+            ignoreUnknownKeys = true
+        }.decodeFromString(readUtf8)
     } catch (ex: SerializationException) {
         DefaultSettings.save()
         DefaultSettings
@@ -94,4 +96,8 @@ sealed class ExportFormat(val format: String) {
 }
 
 @Serializable
-data class Settings(val theme: Theme, val format: ExportFormat, val logLevel: LogLevel)
+data class Settings(
+    val theme: Theme = Theme.Dark,
+    val format: ExportFormat = ExportFormat.Custom,
+    val logLevel: LogLevel = LogLevel.Debug,
+)

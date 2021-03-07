@@ -38,6 +38,10 @@ internal sealed class Commands(vararg commands: String) : Command {
         class Info(path: String) : PgRestore() {
             override val commands = listOf("pg_restore", "--list", path)
         }
+
+        class Restore(user: String, path: String) : PgRestore(
+            "-U", user, "-C", "-d", "postgres", path
+        )
 //
 //        sealed class WithUser(username: String, vararg commands: String) : Psql("-U", username, *commands) {
 //            class ConnectionCheck(username: String) : WithUser(username, "-c", "\\q")

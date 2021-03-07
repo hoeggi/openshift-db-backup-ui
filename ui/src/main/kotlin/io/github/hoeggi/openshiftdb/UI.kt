@@ -25,8 +25,12 @@ import androidx.compose.ui.window.MenuItem
 import io.github.hoeggi.openshiftdb.ui.composables.SecretsChooser
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.Screen
+import io.github.hoeggi.openshiftdb.ui.composables.oc.CurrentProject
 import io.github.hoeggi.openshiftdb.ui.composables.oc.OcPane
+import io.github.hoeggi.openshiftdb.ui.composables.oc.PortForward
 import io.github.hoeggi.openshiftdb.ui.composables.postgres.PostgresPane
+import io.github.hoeggi.openshiftdb.ui.composables.restore.RestoreView
+import io.github.hoeggi.openshiftdb.ui.composables.restore.User
 import io.github.hoeggi.openshiftdb.ui.theme.ColorMuskTheme
 import io.github.hoeggi.openshiftdb.viewmodel.LoginState
 import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
@@ -75,6 +79,23 @@ class UI {
                         onClick = { AppManager.exit() },
                         shortcut = KeyStroke(Key.F4)
                     )
+                ),
+                Menu("View",
+                    MenuItem(
+                        name = "Main",
+                        onClick = { globalState.main() },
+                        shortcut = KeyStroke(Key.M)
+                    ),
+                    MenuItem(
+                        name = "Restore",
+                        onClick = { globalState.restore() },
+                        shortcut = KeyStroke(Key.R)
+                    ),
+                    MenuItem(
+                        name = "Log",
+                        onClick = { globalState.detail() },
+                        shortcut = KeyStroke(Key.L)
+                    )
                 )
             )
         ) {
@@ -115,7 +136,12 @@ class UI {
                             }
                         }
                         is Screen.Restore -> {
-                            Restore(postgresViewModel = postgresViewModel)
+                            CompositionLocalProvider(
+                                OcViewModel provides ocViewModel,
+                                PostgresViewModel provides postgresViewModel
+                            ) {
+                                RestoreView()
+                            }
                         }
                     }
                 }
@@ -156,53 +182,6 @@ class UI {
                 }
             }
             SecretsChooser(Modifier.align(Alignment.Center), postgresViewModel)
-        }
-    }
-
-    @Composable
-    private fun Restore(
-        postgresViewModel: PostgresViewModel,
-    ) {
-        var path by remember { mutableStateOf("") }
-        val info by postgresViewModel.collectAsState(postgresViewModel.restoreInfo)
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 48.dp),
-        ) {
-            val window = LocalAppWindow.current.window
-            Column {
-                Row(
-                    modifier = Modifier.padding(10.dp).clickable {
-                        val chooser = JFileChooser().apply {
-                            fileSelectionMode = JFileChooser.FILES_ONLY
-                        }
-                        val returnVal = chooser.showOpenDialog(window)
-                        if (returnVal == JFileChooser.APPROVE_OPTION) {
-                            path = chooser.selectedFile.absolutePath
-                        }
-                    },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FolderOpen,
-                        contentDescription = "",
-                    )
-                    Text(
-                        text = path,
-                        modifier = Modifier.padding(horizontal = 5.dp)
-                    )
-                }
-                Divider()
-                if (!path.isNullOrBlank()) {
-                    postgresViewModel.restoreInfo(path)
-                }
-                LazyColumn(modifier = Modifier.padding(10.dp)) {
-                    items(info) {
-                        Text(text = it, style = MaterialTheme.typography.body2)
-                    }
-                }
-            }
         }
     }
 }

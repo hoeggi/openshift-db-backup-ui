@@ -155,6 +155,11 @@ object Postgres {
             .messageAndResult()
     }
 
+    fun restoreCommand(user: String, password: String, path: String): String {
+        val restoreCommand = Commands.PgRestore.Restore(user, path).commands.joinToString(" ")
+        return "PGPASSWORD='$password' $restoreCommand"
+    }
+
     suspend fun restoreInfo(path: String) = withContext(Dispatchers.IO) {
         ProcessBuilder(Commands.PgRestore.Info(path).commands)
             .start()
