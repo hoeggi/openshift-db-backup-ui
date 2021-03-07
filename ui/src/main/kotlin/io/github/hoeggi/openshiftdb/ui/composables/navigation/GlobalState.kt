@@ -3,10 +3,7 @@ package io.github.hoeggi.openshiftdb.ui.composables.navigation
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
-import io.github.hoeggi.openshiftdb.settings.ExportFormat
-import io.github.hoeggi.openshiftdb.settings.Theme
-import io.github.hoeggi.openshiftdb.settings.loadSettings
-import io.github.hoeggi.openshiftdb.settings.save
+import io.github.hoeggi.openshiftdb.settings.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,14 +20,21 @@ class GlobalState : ErrorViewer {
     private val coroutineScope = CoroutineScope(EmptyCoroutineContext)
     private var settings = loadSettings()
 
+    private val _logLevel: MutableStateFlow<LogLevel> = MutableStateFlow(settings.logLevel)
+    val logLevel = _logLevel.asStateFlow()
+    fun updateLogLevel(logLevel: LogLevel) {
+        _logLevel.value = logLevel
+        coroutineScope.launch {
+            settings = settings.update(logLevel = _logLevel.value)
+        }
+    }
+
     private val _exportFormat: MutableStateFlow<ExportFormat> = MutableStateFlow(settings.format)
     val exportFormat = _exportFormat.asStateFlow()
     fun updateExportFormat(exportFormat: ExportFormat) {
         _exportFormat.value = exportFormat
         coroutineScope.launch {
-            settings = settings.copy(format = _exportFormat.value).apply {
-                save()
-            }
+            settings = settings.update(format = _exportFormat.value)
         }
     }
 
@@ -58,18 +62,14 @@ class GlobalState : ErrorViewer {
     fun themeDark() {
         _theme.value = Theme.Dark
         coroutineScope.launch {
-            settings = settings.copy(theme = _theme.value).apply {
-                save()
-            }
+            settings = settings.update(theme = _theme.value)
         }
     }
 
     fun themeLight() {
         _theme.value = Theme.Light
         coroutineScope.launch {
-            settings = settings.copy(theme = _theme.value).apply {
-                save()
-            }
+            settings = settings.update(theme = _theme.value)
         }
     }
 
@@ -79,9 +79,7 @@ class GlobalState : ErrorViewer {
             Theme.Light -> Theme.Dark
         }
         coroutineScope.launch {
-            settings = settings.copy(theme = _theme.value).apply {
-                save()
-            }
+            settings = settings.update(theme = _theme.value)
         }
     }
 
@@ -96,4 +94,17 @@ class GlobalState : ErrorViewer {
         _errors.value = warning
     }
 
+    private fun Settings.update(
+        theme: Theme? = null,
+        format: ExportFormat? = null,
+        logLevel: LogLevel? = null,
+    ): Settings {
+        return copy(
+            theme = theme ?: this.theme,
+            format = format ?: this.format,
+            logLevel = logLevel ?: this.logLevel
+        ).also {
+            save()
+        }
+    }
 }

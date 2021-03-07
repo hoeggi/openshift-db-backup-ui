@@ -17,7 +17,6 @@ import java.io.PrintStream
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
-
 class Logger(private val globalState: GlobalState) {
 
     private val stdout: InterceptingStream = InterceptingStream(System.out)
