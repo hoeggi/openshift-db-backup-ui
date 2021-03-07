@@ -106,7 +106,7 @@ private class OcApiImpl(url: BasePath) : OcApi {
             else -> Result.failure<Unit>(RuntimeException("Unauthorized"))
         }
     } catch (ex: IOException) {
-        logger.warn("unable to reach api", ex)
+        logger.error("unable to reach api", ex)
         Result.failure(RuntimeException("Unauthorized"))
     }
 
@@ -143,7 +143,7 @@ private class OcApiImpl(url: BasePath) : OcApi {
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                logger.warn("websocket failed", t)
+                logger.error("websocket failed", t)
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {

@@ -1,5 +1,6 @@
 package io.github.hoeggi.openshiftdb
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import com.google.common.collect.EvictingQueue
@@ -8,6 +9,7 @@ import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import net.rubygrapefruit.ansi.AnsiParser
+import net.rubygrapefruit.ansi.TextColor
 import net.rubygrapefruit.ansi.token.ForegroundColor
 import net.rubygrapefruit.ansi.token.NewLine
 import net.rubygrapefruit.ansi.token.Text
@@ -56,10 +58,16 @@ class Logger(private val globalState: GlobalState) {
             while (running.get()) {
                 val line = stderr.source.readUtf8Line()
                 if (line != null) {
-                    AnnotatedString(text = "", spanStyle = SpanStyle())
-                    val parsed = parseLine(line)
                     globalState.updateSyslog(queue.apply {
-                        add(parsed)
+                        val parseLine = parseLine(line)
+                        val result = AnnotatedString.Builder()
+                            .apply {
+                                append(parseLine)
+                                addStyle(SpanStyle(ColorMapping.colors[TextColor.RED] ?: Color.Red),
+                                    0,
+                                    parseLine.length)
+                            }.toAnnotatedString()
+                        add(result)
                     }.toList())
                 }
             }

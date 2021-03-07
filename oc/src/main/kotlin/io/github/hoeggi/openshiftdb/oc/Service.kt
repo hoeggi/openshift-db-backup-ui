@@ -32,7 +32,7 @@ internal fun parseVersion(version: String) = try {
     if (version.isNullOrBlank()) null
     else jsonParser.decodeFromString<OcVersion>(version)
 } catch (ex: Exception) {
-    logger.warn("unable to parse version", ex)
+    logger.error("unable to parse version", ex)
     null
 }
 
@@ -65,7 +65,7 @@ internal fun parseServices(json: String?) = try {
             }
         }
 } catch (ex: Exception) {
-    logger.warn("unable to parse services", ex)
+    logger.error("unable to parse services", ex)
     listOf()
 }
 
@@ -92,7 +92,7 @@ internal fun findPassword(json: String?, userName: String): String? = try {
             }.filterNotNull().firstOrNull()
     }
 } catch (ex: java.lang.Exception) {
-    logger.warn("unable to parse password", ex)
+    logger.error("unable to parse password", ex)
     null
 }
 
@@ -119,7 +119,7 @@ internal fun parseSecrets(json: String?) = try {
             }.filter { it.data.isNotEmpty() }
     }
 } catch (ex: java.lang.Exception) {
-    logger.warn("unable to parse secrets", ex)
+    logger.error("unable to parse secrets", ex)
     listOf()
 }
 
@@ -137,7 +137,7 @@ internal fun parseServer(json: String?) = try {
     else jsonParser.decodeFromString<Clusters>(json)
         .clusters
 } catch (ex: Exception) {
-    logger.warn("unable to parse server", ex)
+    logger.error("unable to parse server", ex)
     listOf()
 }
 

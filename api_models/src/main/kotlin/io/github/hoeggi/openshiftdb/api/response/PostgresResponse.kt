@@ -44,6 +44,11 @@ data class ToolsVersionApi(
 )
 
 @Serializable
+data class RestoreInfoApi(
+    val info: List<String> = listOf(),
+)
+
+@Serializable
 data class DefaultDatabaseApi(
     val database: String = "",
 )

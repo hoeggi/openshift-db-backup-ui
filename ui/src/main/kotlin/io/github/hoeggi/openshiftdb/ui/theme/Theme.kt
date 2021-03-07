@@ -9,9 +9,10 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import io.github.hoeggi.openshiftdb.GlobalState
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
@@ -29,8 +30,8 @@ fun ColorMuskTheme(
     coroutineScope: CoroutineScope,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val viewModel = GlobalState.current
-    val dark by viewModel.theme.collectAsState(coroutineScope.coroutineContext)
+    val globalState = GlobalState.current
+    val dark by globalState.theme.collectAsState(coroutineScope.coroutineContext)
     val colors = when (dark) {
         Theme.Dark -> darkColors(
             primary = Color(0xFF3C5EE6),
@@ -50,7 +51,7 @@ fun ColorMuskTheme(
     ) {
         Surface {
             val state = rememberScaffoldState()
-            var settings by remember { mutableStateOf(false) }
+            val settings by globalState.showDrawer.collectAsState(coroutineScope.coroutineContext)
             Scaffold(
                 scaffoldState = state,
                 bottomBar = {
@@ -61,7 +62,7 @@ fun ColorMuskTheme(
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = {
-                            settings = !settings
+                            globalState.toggleDrawer()
                         },
                     ) {
                         Icon(Icons.Outlined.Settings, "")
@@ -74,7 +75,7 @@ fun ColorMuskTheme(
                 Box {
                     content()
                     Drawer(settings, coroutineScope) {
-                        settings = !settings
+                        globalState.hideDrawer()
                     }
                     Overlays(coroutineScope, state)
                 }
@@ -95,8 +96,10 @@ fun Overlays(coroutineScope: CoroutineScope, state: ScaffoldState) {
                 message.throwable
             )
             is ErrorViewer.Warning -> coroutineScope.launch {
-                state.snackbarHostState
-                    .showSnackbar(message.message)
+                state.snackbarHostState.showSnackbar(
+                    message = message.message,
+                    duration = if (message.message.length > 50) SnackbarDuration.Long else SnackbarDuration.Short
+                )
                 viewModel.showWarning(viewModel.empty())
             }
         }

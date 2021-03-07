@@ -34,7 +34,7 @@ object Postgres {
                     process.errorStream.close()
                     output.close()
                 } catch (ex: IOException) {
-                    logger.warn("error closing postgres dump", ex)
+                    logger.error("error closing postgres dump", ex)
                 }
             }
         }
@@ -150,6 +150,13 @@ object Postgres {
     suspend fun postgresVersion(username: String, password: String) = withContext(Dispatchers.IO) {
         ProcessBuilder(Commands.Psql.WithUser.DatabaseVersion(username).commands)
             .withPassword(password)
+            .start()
+            .await()
+            .messageAndResult()
+    }
+
+    suspend fun restoreInfo(path: String) = withContext(Dispatchers.IO) {
+        ProcessBuilder(Commands.PgRestore.Info(path).commands)
             .start()
             .await()
             .messageAndResult()

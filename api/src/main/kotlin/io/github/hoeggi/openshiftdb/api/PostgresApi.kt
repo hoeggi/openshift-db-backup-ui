@@ -25,6 +25,7 @@ interface PostgresApi {
         Table("table"), Text("text"), List("list")
     }
 
+    suspend fun restoreInfo(path: String): Result<RestoreInfoApi>
     suspend fun toolsVersion(): Result<ToolsVersionApi>
     suspend fun databaseVersion(username: String, password: String): Result<DatabaseVersionApi>
     suspend fun databases(
@@ -65,6 +66,17 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
             )
         }
         .build() + url
+
+    override suspend fun restoreInfo(path: String): Result<RestoreInfoApi> =
+        withContext(Dispatchers.IO) {
+            client.first.newCall(
+                client.second.withPath("restore/info")
+                    .newBuilder()
+                    .withQuery("path" to path)
+                    .build()
+                    .toGetRequest()
+            ).execute().get()
+        }
 
     override suspend fun toolsVersion(): Result<ToolsVersionApi> =
         withContext(Dispatchers.IO) { client.get("version/tools") }
@@ -140,7 +152,7 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                logger.warn("websocket failed, $response", t)
+                logger.error("websocket failed, $response", t)
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {

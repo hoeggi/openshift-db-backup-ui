@@ -8,6 +8,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Report
+import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,6 +36,14 @@ fun BottomNav(
                 viewModel.main()
             },
             icon = { Icon(Icons.Outlined.Home, "") }
+        )
+        BottomNavigationItem(
+            modifier = Modifier.fillMaxWidth(),
+            selected = screen == Screen.Detail,
+            onClick = {
+                viewModel.restore()
+            },
+            icon = { Icon(Icons.Outlined.Restore, "") }
         )
         BottomNavigationItem(
             modifier = Modifier.fillMaxWidth(),
