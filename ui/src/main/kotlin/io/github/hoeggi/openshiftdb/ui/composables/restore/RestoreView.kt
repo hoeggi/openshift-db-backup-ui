@@ -1,35 +1,33 @@
 package io.github.hoeggi.openshiftdb.ui.composables.restore
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.FlashOn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import io.github.hoeggi.openshiftdb.GlobalState
 import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.collectAsState
+import io.github.hoeggi.openshiftdb.outsideClickable
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
 import io.github.hoeggi.openshiftdb.ui.composables.oc.CurrentProject
 import io.github.hoeggi.openshiftdb.ui.composables.oc.PortForward
-import java.awt.Toolkit
-import java.awt.datatransfer.StringSelection
+import io.github.hoeggi.openshiftdb.ui.theme.customOverlay
 
 @Composable
 fun RestoreView() {
+    val globalState = GlobalState.current
     val postgresViewModel = PostgresViewModel.current
-    val info by postgresViewModel.collectAsState(postgresViewModel.restoreInfo)
-    val command by postgresViewModel.collectAsState(postgresViewModel.restoreCommand)
     val path by postgresViewModel.collectAsState(postgresViewModel.restorePath)
+    val command by postgresViewModel.collectAsState(postgresViewModel.restoreCommand)
 
     Column(
         modifier = Modifier
@@ -40,30 +38,18 @@ fun RestoreView() {
         Divider()
         if (!path.isNullOrBlank()) {
             Row {
-                Column(modifier = Modifier.padding(10.dp).fillMaxWidth(0.7f)) {
-                    LazyColumn {
-                        items(info) {
-                            Text(text = it, style = MaterialTheme.typography.body2)
+                Column(Modifier.fillMaxWidth(0.7f)) {
+                    RestoreData()
+                    Divider()
+                    Button(
+                        modifier = Modifier.padding(10.dp),
+                        onClick = {
+                            globalState.showOverlay(customOverlay {
+                                RestoreWarning(globalState, command.command)
+                            })
                         }
-                    }
-                    Divider(modifier = Modifier.padding(vertical = 10.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "Restore Command:")
-                        Icon(Icons.Outlined.ContentCopy, "",
-                            modifier = Modifier.padding(horizontal = 4.dp)
-                                .size(16.dp)
-                                .clickable {
-                                    Toolkit.getDefaultToolkit()
-                                        .systemClipboard.setContents(StringSelection(command), null)
-                                }
-                        )
-                    }
-                    SelectionContainer {
-                        Text(
-                            modifier = Modifier.padding(vertical = 5.dp),
-                            text = command,
-                            style = MaterialTheme.typography.caption
-                        )
+                    ) {
+                        Text("Restore Database")
                     }
                 }
                 Column {
@@ -72,6 +58,63 @@ fun RestoreView() {
                     PortForward()
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun RestoreWarning(globalState: GlobalState, command: String) {
+    Box(
+        modifier = Modifier.background(MaterialTheme.colors.background.copy(alpha = 0.7f))
+            .outsideClickable { globalState.resetOverlay() }
+            .fillMaxSize()
+    ) {
+        Surface(
+            elevation = 8.dp,
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth(0.75f)
+                .wrapContentHeight()
+                .outsideClickable(),
+        ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                Text(text = "Restoring Database", modifier = Modifier.padding(8.dp))
+                Divider()
+                Text(text = "Execute Command:", modifier = Modifier.padding(8.dp))
+                Text(
+                    text = command,
+                    style = MaterialTheme.typography.body2.copy(fontFamily = FontFamily.Monospace),
+                    modifier = Modifier.padding(8.dp),
+                )
+                Divider()
+                Row(
+                    modifier = Modifier
+                        .padding(8.dp)
+                ) {
+                    Button(
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(219, 84, 81)),
+                        modifier = Modifier.weight(1f).padding(end = 8.dp),
+                        onClick = {
+//                            viewModel.postgresVersion()
+//                            viewModel.listLines()
+                        }
+                    ) {
+                        Icon(Icons.Outlined.FlashOn, "", modifier = Modifier.size(16.dp))
+                        Text(text = "Restore")
+                        Icon(Icons.Outlined.FlashOn, "", modifier = Modifier.size(16.dp))
+                    }
+                    Button(
+                        modifier = Modifier.weight(1f).padding(start = 8.dp),
+                        onClick = {
+                            globalState.resetOverlay()
+                        }
+                    ) {
+                        Text(text = "Close")
+                    }
+                }
+            }
+
         }
     }
 }

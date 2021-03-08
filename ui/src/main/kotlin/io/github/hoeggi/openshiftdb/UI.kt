@@ -63,7 +63,7 @@ class UI {
         Window(
             title = APP_NAME,
             undecorated = false,
-            size = IntSize(1024, 1024),
+            size = IntSize(1280, 1024),
             events = WindowEvents(
                 onClose = onClose
             ),
@@ -168,6 +168,7 @@ class UI {
     ) {
         ocViewModel.update()
         postgresViewModel.update()
+
         Box {
             Row(
                 modifier = Modifier

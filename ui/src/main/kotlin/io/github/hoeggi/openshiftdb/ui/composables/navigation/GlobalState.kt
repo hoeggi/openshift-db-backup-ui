@@ -4,6 +4,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import io.github.hoeggi.openshiftdb.settings.*
+import io.github.hoeggi.openshiftdb.ui.theme.CustomOverlay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -97,6 +98,14 @@ class GlobalState : ErrorViewer {
 
     private val _errors: MutableStateFlow<ErrorViewer.Message> = MutableStateFlow(empty())
     val errors = _errors.asStateFlow()
+
+    fun resetOverlay() {
+        _errors.value = empty()
+    }
+
+    fun showOverlay(overlay: CustomOverlay) {
+        _errors.value = overlay
+    }
 
     override fun showError(error: ErrorViewer.Message) {
         _errors.value = error

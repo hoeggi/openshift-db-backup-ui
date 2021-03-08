@@ -51,6 +51,9 @@ data class RestoreInfoApi(
 @Serializable
 data class RestoreCommandApi(
     val command: String = "",
+    val existing: Boolean = true,
+    val defaultDatabase: String = "",
+    val database: String = "",
 )
 
 @Serializable

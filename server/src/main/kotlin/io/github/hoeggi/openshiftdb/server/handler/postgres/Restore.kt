@@ -24,7 +24,30 @@ fun RestoreCommand(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> U
     } else if (path == null) {
         call.respond(HttpStatusCode.BadRequest, "missing path")
     } else {
-        call.respond(ApiResponse(RestoreCommandApi(Postgres.restoreCommand(username, password, path)), 0))
+        val dbs = async {
+            Postgres.listLines(username, password).first
+        }
+        val restore = async {
+            Postgres.restoreInfo(path).first.split("\n")
+                .firstOrNull { it.contains("dbname:") }
+                ?.run {
+                    substring(indexOf(":") + 1).trim()
+                }
+        }
+        awaitAll(dbs, restore)
+
+        val databases = dbs.getCompleted()
+        val restoreDB = restore.getCompleted()
+        if (restoreDB.isNullOrBlank()) {
+            call.respond(HttpStatusCode.BadRequest, "unsupported format")
+        } else {
+            val isNew = !databases.contains(restoreDB)
+            val command =
+                if (isNew) Postgres.restoreCommand(username, password, path)
+                else Postgres.restoreCommand(username, password, path, restoreDB)
+
+            call.respond(ApiResponse(RestoreCommandApi(command.command(), !isNew, Postgres.DEFAULT_DB, restoreDB), 0))
+        }
     }
 }
 

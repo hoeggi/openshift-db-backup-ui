@@ -15,6 +15,7 @@ import java.time.LocalDateTime
 
 object Postgres {
     val logger = LoggerFactory.getLogger(Postgres::class.java)
+    const val DEFAULT_DB = "postgres"
 
     sealed class PostgresResult {
         class DumpPlain(private val process: Process, path: File) : PostgresResult(), Closeable {
@@ -44,16 +45,14 @@ object Postgres {
                 @Throws(IllegalThreadStateException::class)
                 get() = process.exitValue()
             val bufferError = process.bufferError()
-            val output = path.absolutePath
+            val output: String = path.absolutePath
             fun await() = process.await().exitValue()
         }
 
-        sealed class Download {
-            object Unspecified : Download()
-            object Started : Download()
-            class InProgres(val lines: List<String>) : Download()
-            class Success(val path: String) : Download()
-            class Error(val exitCode: Int, val ex: Exception?) : Download()
+        sealed class RestoreCommand(private val command: String, private val password: String) {
+            fun command() = "PGPASSWORD='$password' $command"
+            class Existing(command: String, password: String) : RestoreCommand(command, password)
+            class New(command: String, password: String) : RestoreCommand(command, password)
         }
     }
 
@@ -63,7 +62,9 @@ object Postgres {
 
     private fun Process.await() = also {
         it.onExit().thenAcceptAsync {
-            logger.debug("postges onExit: ${it.exitValue()} - ${Thread.currentThread().name} - ${it.toHandle().info()}")
+            logger.debug("postgres onExit: ${it.exitValue()} - ${Thread.currentThread().name} - ${
+                it.toHandle().info()
+            }")
         }
         it.waitFor()
     }
@@ -155,9 +156,18 @@ object Postgres {
             .messageAndResult()
     }
 
-    fun restoreCommand(user: String, password: String, path: String): String {
-        val restoreCommand = Commands.PgRestore.Restore(user, path).commands.joinToString(" ")
-        return "PGPASSWORD='$password' $restoreCommand"
+    fun restoreCommand(user: String, password: String, path: String, database: String? = null): PostgresResult.RestoreCommand {
+        return if (database == null) {
+            PostgresResult.RestoreCommand.New(
+                Commands.PgRestore.RestoreNew(user, path).commands.joinToString(" "),
+                password
+            )
+        } else {
+            PostgresResult.RestoreCommand.Existing(
+                Commands.PgRestore.RestoreExisting(user, database, path).commands.joinToString(" "),
+                password
+            )
+        }
     }
 
     suspend fun restoreInfo(path: String) = withContext(Dispatchers.IO) {
