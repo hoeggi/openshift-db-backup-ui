@@ -5,10 +5,7 @@ import io.github.hoeggi.openshiftdb.api.PostgresApi
 import io.github.hoeggi.openshiftdb.api.getOrDefault
 import io.github.hoeggi.openshiftdb.api.onFailure
 import io.github.hoeggi.openshiftdb.api.onSuccess
-import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
-import io.github.hoeggi.openshiftdb.api.response.DatabasesApi
-import io.github.hoeggi.openshiftdb.api.response.SecretsApi
-import io.github.hoeggi.openshiftdb.api.response.ToolsVersionApi
+import io.github.hoeggi.openshiftdb.api.response.*
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +33,7 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
 
     private val _restoreInfo = MutableStateFlow(listOf<String>())
     private val _restorePath = MutableStateFlow("")
-    private val _restoreCommand = MutableStateFlow("")
+    private val _restoreCommand = MutableStateFlow(RestoreCommandApi())
 
     private val _downloadProgress: MutableStateFlow<List<DatabaseDownloadMessage.InProgressMessage>> =
         MutableStateFlow(listOf())
@@ -178,9 +175,7 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
     fun restoreCommand(path: String) = coroutineScope.launch {
         val restoreCommand = postgresApi.restoreCommand(userName.value, password.value, path)
         restoreCommand.onSuccess {
-            _restoreCommand.value = it.command
-        }.onFailure {
-            _restoreCommand.value = it.message ?: ""
-        }
+            _restoreCommand.value = it
+        }.onFailure(showWarning)
     }
 }

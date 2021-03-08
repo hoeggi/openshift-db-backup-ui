@@ -70,8 +70,7 @@ fun ColorMuskTheme(
                 },
                 floatingActionButtonPosition = FabPosition.End,
                 isFloatingActionButtonDocked = true,
-
-                ) {
+            ) {
                 Box {
                     content()
                     Drawer(settings, coroutineScope) {
@@ -82,6 +81,15 @@ fun ColorMuskTheme(
             }
         }
     }
+}
+
+fun customOverlay(overlay: @Composable () -> Unit) = object : CustomOverlay {
+    override val overlay = overlay
+    override val fired = true
+}
+
+interface CustomOverlay : ErrorViewer.Message {
+    val overlay: @Composable () -> Unit
 }
 
 @Composable
@@ -102,6 +110,7 @@ fun Overlays(coroutineScope: CoroutineScope, state: ScaffoldState) {
                 )
                 viewModel.showWarning(viewModel.empty())
             }
+            is CustomOverlay -> message.overlay()
         }
     }
 }
