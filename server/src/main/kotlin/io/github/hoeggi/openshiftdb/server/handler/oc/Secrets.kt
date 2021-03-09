@@ -30,7 +30,8 @@ fun Secrets(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
             call.respond(HttpStatusCode.NotFound)
         } else {
             call.respond(ApiResponse(secrets.secrets.map {
-                SecretsApi(it.metadata.name, it.data)
+                val data = it.data
+                SecretsApi(it.metadata.name, it.data.filter { it.value != null } as Map<String, String>)
             }, secrets.result))
         }
     }

@@ -17,7 +17,7 @@ private val jsonParser = Json {
 @Serializable
 data class OcVersion(
     val releaseClientVersion: String,
-    val openshiftVersion: String,
+    val openshiftVersion: String = "",
     val serverVersion: VersionDetail
 )
 
@@ -73,7 +73,7 @@ internal fun parseServices(json: String?) = try {
 data class SecretResult(val items: List<SecretItem>)
 
 @Serializable
-data class SecretItem(val data: Map<String, String>, val metadata: Metadata)
+data class SecretItem(val data: Map<String, String?>, val metadata: Metadata)
 
 internal fun findPassword(json: String?, userName: String): String? = try {
     if (json.isNullOrBlank()) {
@@ -86,7 +86,7 @@ internal fun findPassword(json: String?, userName: String): String? = try {
                 val map = it.data.filter { (k, v) ->
                     matchesUsername(k, v, userName) || k.equals("password", true)
                 }.map { (k, v) ->
-                    k to v.decodeBase64()?.utf8()
+                    k to v?.decodeBase64()?.utf8()
                 }.toMap()
                 map["password"]
             }.filterNotNull().firstOrNull()
@@ -108,7 +108,7 @@ internal fun parseSecrets(json: String?) = try {
             }.map {
                 it.copy(
                     data = it.data.map {
-                        it.key to (it.value.decodeBase64()?.utf8() ?: "")
+                        it.key to (it.value?.decodeBase64()?.utf8() ?: "")
                     }.filter {
                         it.first.isNotEmpty()
                                 && it.second.isNotEmpty()
@@ -141,8 +141,8 @@ internal fun parseServer(json: String?) = try {
     listOf()
 }
 
-private fun matchesUsername(key: String, value: String, userName: String) =
+private fun matchesUsername(key: String, value: String?, userName: String) =
     (key.equals("username", true)
             || key.equals("user", true)
             || key.equals("database-user", true))
-            && value.decodeBase64()?.utf8().equals(userName, true)
+            && value?.decodeBase64()?.utf8().equals(userName, true)
