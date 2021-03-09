@@ -21,9 +21,9 @@ private val logger = LoggerFactory.getLogger(UI::class.java)
 fun main() {
 
     logger.info("initializing")
+    val port = port()
     val globalState = GlobalState()
     val logDelegate = Logger(globalState)
-    val port = port()
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
     Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(globalState))
     logger.info("starting server")

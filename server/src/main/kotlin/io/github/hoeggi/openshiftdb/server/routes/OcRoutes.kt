@@ -17,6 +17,8 @@ fun Route.oc() {
         get("/version", Version())
         get("/server", Cluster())
         get("/services", Services())
+        get("/context", Context())
+        post("/context", SwitchContext())
 
         route("/login") {
             get(CheckLogin())

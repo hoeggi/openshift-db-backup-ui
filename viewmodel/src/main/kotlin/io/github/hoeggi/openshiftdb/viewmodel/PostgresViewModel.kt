@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 
 class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
     BaseViewModel(port, coroutineScope, errorViewer) {
+
     private val downloadQueue = EvictingQueue.create<DatabaseDownloadMessage.InProgressMessage>(150)
     private val restoreQueue = EvictingQueue.create<DatabaseRestoreMessage.InProgressMessage>(300)
 

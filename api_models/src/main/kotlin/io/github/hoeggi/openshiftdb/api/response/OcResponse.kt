@@ -4,6 +4,25 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
+typealias FullContext = String
+
+fun FullContext.isSameCluster(other: FullContext): Boolean {
+    if (this == other) return true
+    return this.substring(this.indexOf("/"), this.lastIndexOf("/")) ==
+            other.substring(other.indexOf("/"), other.lastIndexOf("/"))
+}
+
+@Serializable
+data class SwitchContextApi(val context: FullContext)
+
+@Serializable
+data class ContextApi(val current: FullContext, val contexts: List<ContextsApi>)
+
+@Serializable
+data class ContextsApi(val cluster: String, val context: List<ContextDetailApi>)
+
+@Serializable
+data class ContextDetailApi(val name: FullContext, val user: String, val namespace: String)
 
 @Serializable
 data class SecretsApi(val name: String, val data: Map<String, String>)
@@ -37,8 +56,8 @@ sealed class PortForwardMessage {
 @Serializable
 data class VersionApi(
     val oc: String = "",
-    val kubernets: String  = "",
-    val openshift: String = ""
+    val kubernets: String = "",
+    val openshift: String = "",
 )
 
 @Serializable

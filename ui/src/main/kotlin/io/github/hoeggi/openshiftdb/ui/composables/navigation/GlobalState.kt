@@ -6,7 +6,9 @@ import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import io.github.hoeggi.openshiftdb.settings.*
 import io.github.hoeggi.openshiftdb.ui.theme.CustomOverlay
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.coroutines.EmptyCoroutineContext
@@ -18,6 +20,12 @@ sealed class Screen {
 }
 
 class GlobalState : ErrorViewer {
+
+    private val _refreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow()
+    val refreshTrigger = _refreshTrigger.asSharedFlow()
+    fun refresh(coroutineScope: CoroutineScope) = coroutineScope.launch {
+        _refreshTrigger.emit(Unit)
+    }
 
     private val coroutineScope = CoroutineScope(EmptyCoroutineContext)
     private var settings = loadSettings()

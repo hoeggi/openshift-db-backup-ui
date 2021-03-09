@@ -5,19 +5,18 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.*
 import io.github.hoeggi.openshiftdb.outsideClickable
 import kotlinx.coroutines.CoroutineScope
 
@@ -47,14 +46,12 @@ fun BoxScope.Drawer(open: Boolean, coroutineScope: CoroutineScope, onOutsideClic
         ),
         modifier = Modifier.align(Alignment.CenterEnd)
     ) {
+        LocalAppWindow.current.width.dp / 4
         Surface(
             modifier = Modifier.align(Alignment.CenterEnd)
                 .fillMaxHeight()
-                .width(250.dp)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                ) { },
+                .width((LocalAppWindow.current.width / 4).dp)
+                .outsideClickable(),
             elevation = 8.dp
         ) {
             Box(
@@ -72,6 +69,10 @@ fun BoxScope.Drawer(open: Boolean, coroutineScope: CoroutineScope, onOutsideClic
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                     LogLevelChooser(coroutineScope)
+                    Divider(
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    ClusterContext()
                     Divider(
                         modifier = Modifier.padding(vertical = 8.dp)
                     )

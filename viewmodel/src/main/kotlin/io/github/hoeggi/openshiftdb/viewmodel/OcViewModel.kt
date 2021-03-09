@@ -7,7 +7,6 @@ import io.github.hoeggi.openshiftdb.api.response.*
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import org.slf4j.LoggerFactory
 
 enum class LoginState {
     UNCHECKED, LOGGEDIN, NOT_LOGGEDIN
@@ -17,8 +16,6 @@ data class PortForwardTarget(val project: String, val svc: String, val port: Int
 
 class OcViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
     BaseViewModel(port, coroutineScope, errorViewer) {
-
-    private val logger = LoggerFactory.getLogger(OcViewModel::class.java)
 
     private val _projects: MutableStateFlow<List<ProjectApi>> =
         MutableStateFlow(listOf())
@@ -36,11 +33,34 @@ class OcViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorV
     private val _server: MutableStateFlow<List<ClusterApi>> =
         MutableStateFlow(listOf())
 
+    private val _context: MutableStateFlow<ContextApi> =
+        MutableStateFlow(ContextApi("", listOf()))
+
     fun update() {
         version()
         projects()
         currentProject()
         services()
+        context()
+    }
+
+    val context: StateFlow<ContextApi> = _context.asStateFlow()
+    private fun context() = coroutineScope.launch {
+        val context = ocApi.context()
+        context.onSuccess {
+            _context.value = it
+        }.onFailure {
+            showWarning(it)
+        }
+    }
+
+    fun switchContext(newContext: FullContext) = coroutineScope.launch {
+        val currentContext = ocApi.switchContext(SwitchContextApi(newContext))
+        if (!newContext.isSameCluster(context.value.current)) closeAllPortForward()
+        currentContext.onSuccess {
+            _context.value = context.value.copy(current = it.context)
+            update()
+        }.onFailure(showWarning)
     }
 
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
@@ -109,7 +129,7 @@ class OcViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorV
     val services: StateFlow<List<ServicesApi>> = _services.asStateFlow()
     private fun services() = coroutineScope.launch {
         _services.value = ocApi.services().onFailure {
-            showWarning(it)
+            if (it.message?.startsWith("404") != true) showWarning(it)
         }.getOrDefault(listOf())
     }
 
@@ -142,4 +162,10 @@ class OcViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorV
         }
     }
 
+    fun closeAllPortForward() {
+        openPortForwars.onEach {
+            it.value.cancel()
+        }.clear()
+        _portForward.value = mapOf()
+    }
 }
