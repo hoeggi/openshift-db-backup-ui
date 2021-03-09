@@ -1,16 +1,17 @@
 object Versions {
     val kotlin = "1.4.31"
     val okio = "2.10.0"
-    val ktor = "1.5.1"
-    val kotlinx_coroutines = "1.4.2"
+    val ktor = "1.5.2"
+    val kotlinx_coroutines = "1.4.3"
     val kotlinx_serialization = "1.1.0"
-    val metrics_jmx = "4.1.17"
+    val metrics_jmx = "4.1.18"
     val micrometer_registry_prometheus = "1.6.4"
-    val okhttp = "4.9.0"
+    val okhttp = "4.9.1"
     val slf4j = "1.7.30"
     val guava = "30.1-jre"
     val logback = "1.2.3"
     val compose = "0.4.0-build171"
+    val ansi_sequence = "0.2"
 }
 
 object Dependencies {
@@ -32,6 +33,7 @@ object Dependencies {
         val metrics_micrometer = "io.ktor:ktor-metrics-micrometer:${Versions.ktor}"
     }
 
+    val ansi_sequence = "net.rubygrapefruit:ansi-control-sequence-util:${Versions.ansi_sequence}"
     val logback = "ch.qos.logback:logback-classic:${Versions.logback}"
     val guava = "com.google.guava:guava:${Versions.guava}"
     val slf4j_api = "org.slf4j:slf4j-api:${Versions.slf4j}"
