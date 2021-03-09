@@ -45,7 +45,7 @@ class OcViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorV
     }
 
     val context: StateFlow<ContextApi> = _context.asStateFlow()
-    private fun context() = coroutineScope.launch {
+    fun context() = coroutineScope.launch {
         val context = ocApi.context()
         context.onSuccess {
             _context.value = it
@@ -59,6 +59,7 @@ class OcViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorV
         if (!newContext.isSameCluster(context.value.current)) closeAllPortForward()
         currentContext.onSuccess {
             _context.value = context.value.copy(current = it.context)
+            checkLoginState()
             update()
         }.onFailure(showWarning)
     }
