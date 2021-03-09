@@ -1,17 +1,19 @@
 package io.github.hoeggi.openshiftdb.api
 
 import io.github.hoeggi.openshiftdb.api.response.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ProducerScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.sendBlocking
-import kotlinx.coroutines.flow.*
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.decodeFromString
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okhttp3.*
-import okio.ByteString
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.WebSocketListener
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import kotlin.coroutines.coroutineContext
@@ -21,6 +23,8 @@ interface OcApi {
     suspend fun version(): Result<VersionApi>
     suspend fun server(): Result<List<ClusterApi>>
     suspend fun projects(): Result<List<ProjectApi>>
+    suspend fun switchContext(context: SwitchContextApi): Result<SwitchContextApi>
+    suspend fun context(): Result<ContextApi>
     suspend fun switchProject(project: ProjectApi): Result<ProjectApi>
     suspend fun switchProject(project: String): Result<ProjectApi>
     suspend fun currentProject(): Result<ProjectApi>
@@ -55,6 +59,14 @@ private class OcApiImpl(url: BasePath) : OcApi {
 
     override suspend fun projects(): Result<List<ProjectApi>> =
         withContext(Dispatchers.IO) { client.get("projects") }
+
+    override suspend fun switchContext(context: SwitchContextApi): Result<SwitchContextApi> =
+        withContext(Dispatchers.IO) { client.post("context", context) }
+
+    override suspend fun context(): Result<ContextApi> =
+        withContext(Dispatchers.IO) {
+            client.get("context")
+        }
 
     override suspend fun currentProject(): Result<ProjectApi> =
         withContext(Dispatchers.IO) { client.get("projects/current") }

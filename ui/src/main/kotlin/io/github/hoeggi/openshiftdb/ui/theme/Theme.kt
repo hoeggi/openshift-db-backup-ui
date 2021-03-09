@@ -12,7 +12,6 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import io.github.hoeggi.openshiftdb.GlobalState
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer

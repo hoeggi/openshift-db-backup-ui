@@ -8,6 +8,7 @@ import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.plus
+import org.slf4j.LoggerFactory
 
 data class ViewModels(val ocViewModel: OcViewModel, val postgresViewModel: PostgresViewModel)
 
@@ -22,6 +23,7 @@ fun viewModels(
 )
 
 abstract class BaseViewModel(port: Int, private val scope: CoroutineScope, private val errorViewer: ErrorViewer) {
+    internal val logger = LoggerFactory.getLogger(this.javaClass)
     private val coroutineExceptionHandler = CoroutineExceptionHandler(errorViewer)
     private val api: Api = Api(port)
 
@@ -34,6 +36,7 @@ abstract class BaseViewModel(port: Int, private val scope: CoroutineScope, priva
         get() = scope + Job() + coroutineExceptionHandler
 
     val showWarning: (Throwable) -> Unit = {
+        logger.warn("warning", it)
         showWarning(it.message)
     }
 

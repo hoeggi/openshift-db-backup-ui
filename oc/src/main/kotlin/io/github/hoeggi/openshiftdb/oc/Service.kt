@@ -46,7 +46,7 @@ internal data class ServiceItem(val metadata: Metadata, val spec: ServiceSpec)
 data class Metadata(val name: String)
 
 @Serializable
-internal data class ServiceSpec(val ports: List<Port>?)
+internal data class ServiceSpec(val ports: List<Port>? = null)
 
 @Serializable
 data class Port(val port: Int, val targetPort: String, val protocol: String)
@@ -124,6 +124,15 @@ internal fun parseSecrets(json: String?) = try {
 }
 
 @Serializable
+internal data class Contexts(val contexts: List<NamedContext>)
+
+@Serializable
+data class NamedContext(val name: String, val context: Context)
+
+@Serializable
+data class Context(val user: String, val cluster: String, val namespace: String)
+
+@Serializable
 internal data class Clusters(val clusters: List<Cluster>)
 
 @Serializable
@@ -131,6 +140,15 @@ data class Cluster(val name: String, val cluster: Server)
 
 @Serializable
 data class Server(val server: String)
+
+internal fun parseContext(json: String?) = try {
+    if (json.isNullOrBlank()) listOf()
+    else jsonParser.decodeFromString<Contexts>(json)
+        .contexts
+} catch (ex: Exception) {
+    logger.error("unable to parse server", ex)
+    listOf()
+}
 
 internal fun parseServer(json: String?) = try {
     if (json.isNullOrBlank()) listOf()

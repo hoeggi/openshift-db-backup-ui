@@ -15,7 +15,7 @@ internal sealed class Commands(override val commands: List<String>) : Command {
             class ConnectionCheck(username: String) : WithUser(username, "-c", "\\q")
             class List(username: String) : WithUser(
                 username, "-q", "-A", "-t",
-                "-c", "SELECT datname FROM pg_database"
+                "-c", "SELECT datname FROM pg_database;"
             )
 
             class ListPretty(username: String) : WithUser(username, "-c", "\\l")

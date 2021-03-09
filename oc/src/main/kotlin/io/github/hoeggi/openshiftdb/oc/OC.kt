@@ -20,6 +20,9 @@ object OC {
         class Secret(val password: String?, result: ProcessResult) : OcResult(result)
         class Secrets(val secrets: List<SecretItem>, result: ProcessResult) : OcResult(result)
         class Server(val server: List<Cluster>, result: ProcessResult) : OcResult(result)
+        class CurrentContext(val context: String, result: ProcessResult) : OcResult(result)
+        class Context(val contexts: List<NamedContext>, result: ProcessResult) : OcResult(result)
+        class SwitchContext(val newContext: String, result: ProcessResult) : OcResult(result)
 
         sealed class LoginState(result: ProcessResult = ProcessResult.Ok) : OcResult(result) {
             object LoggedIn : LoginState()
@@ -55,7 +58,10 @@ object OC {
         object Secrets : Commands("get", "secrets", "-ojson")
 
         class Login(token: String, server: String) : Commands("login", "--token=$token", "--server=$server")
-        object ListServer : Commands("config", "view", "-ojson")
+        object Config : Commands("config", "view", "-ojson")
+        object CurrentContext : Commands("config", "current-context")
+        class SwitchContext(name: String) : Commands("config", "use-context", name)
+
         object CheckLogin : Commands("whoami")
 
         sealed class Project(name: String = "") : Commands("project", "-q", name) {
@@ -83,8 +89,41 @@ object OC {
         }
     }
 
+    suspend fun currentContext() = withContext(Dispatchers.IO) {
+        val process = process(Commands.CurrentContext)
+
+        val text = process.readStdout()
+        val error = process.readError()
+        logger.debug(error)
+        process.let {
+            OcResult.CurrentContext((if (text.isNotBlank()) text else error).replace("\n",""), it.result())
+        }
+    }
+
+    suspend fun listContext() = withContext(Dispatchers.IO) {
+        val process = process(Commands.Config)
+
+        val text = process.readStdout()
+        val error = process.readError()
+        logger.debug(error)
+        process.let {
+            OcResult.Context(parseContext(text), it.result())
+        }
+    }
+
+    suspend fun switchContext(name: String) = withContext(Dispatchers.IO) {
+        val process = process(Commands.SwitchContext(name))
+
+        val text = process.readStdout()
+        val error = process.readError()
+        logger.debug(error)
+        process.let {
+            OcResult.SwitchContext(if (text.isNotBlank()) text else error, it.result())
+        }
+    }
+
     suspend fun listServer() = withContext(Dispatchers.IO) {
-        val process = process(Commands.ListServer)
+        val process = process(Commands.Config)
 
         val text = process.readStdout()
         val error = process.readError()

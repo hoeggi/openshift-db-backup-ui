@@ -1,10 +1,7 @@
 package io.github.hoeggi.openshiftdb.ui.composables
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
@@ -16,6 +13,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import java.awt.Toolkit
@@ -38,11 +36,13 @@ fun Loading() {
 @Composable
 fun ExpandableText(
     initialState: Boolean = false,
-    header: @Composable ((Boolean) -> Unit),
+    header: @Composable (RowScope.(Boolean) -> Unit),
     content: @Composable (() -> Unit),
 ) {
     val expanded = remember { mutableStateOf(initialState) }
-
+    val modifier = Modifier.clickable {
+        expanded.value = !expanded.value
+    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable {
@@ -59,6 +59,7 @@ fun ExpandableText(
 @Composable
 fun ExpandableText(
     text: String,
+    style: TextStyle = MaterialTheme.typography.body1,
     initialState: Boolean = false,
     content: @Composable (() -> Unit),
 ) {
@@ -68,7 +69,7 @@ fun ExpandableText(
             Icon(if (expanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown, "")
             Text(
                 text = text,
-                style = MaterialTheme.typography.body1,
+                style = style,
             )
         },
         content = content,
