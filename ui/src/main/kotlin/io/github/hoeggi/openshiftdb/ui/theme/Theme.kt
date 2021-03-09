@@ -103,10 +103,12 @@ fun Overlays(coroutineScope: CoroutineScope, state: ScaffoldState) {
                 message.throwable
             )
             is ErrorViewer.Warning -> coroutineScope.launch {
-                state.snackbarHostState.showSnackbar(
-                    message = message.message,
-                    duration = if (message.message.length > 50) SnackbarDuration.Long else SnackbarDuration.Short
-                )
+                if (state.snackbarHostState.currentSnackbarData == null) {
+                    state.snackbarHostState.showSnackbar(
+                        message = message.message,
+                        duration = if (message.message.length > 50) SnackbarDuration.Long else SnackbarDuration.Short
+                    )
+                }
                 viewModel.showWarning(viewModel.empty())
             }
             is CustomOverlay -> message.overlay()
