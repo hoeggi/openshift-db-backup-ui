@@ -17,7 +17,6 @@ repositories {
 }
 
 dependencies {
-//    testImplementation(kotlin("test-junit"))
     implementation(compose.desktop.currentOs)
     implementation(compose.materialIconsExtended)
     implementation(compose.animation)
@@ -30,5 +29,5 @@ dependencies {
     compileOnly(Dependencies.slf4j_api)
     implementation(Dependencies.guava)
     implementation(Dependencies.okio)
-    implementation("net.rubygrapefruit:ansi-control-sequence-util:0.2")
+    implementation(Dependencies.ansi_sequence)
 }

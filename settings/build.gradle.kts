@@ -16,7 +16,6 @@ buildConfig {
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
