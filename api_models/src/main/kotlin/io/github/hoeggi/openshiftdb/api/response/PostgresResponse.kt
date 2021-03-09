@@ -4,6 +4,55 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class RestoreRequestAPI (
+    val database: String,
+    val exists: Boolean,
+    val path: String,
+)
+
+@Serializable
+sealed class DatabaseRestoreMessage {
+
+    companion object {
+        fun unspecified(): DatabaseRestoreMessage = Unspecified
+        fun start(): DatabaseRestoreMessage = StartMessage
+        fun requestConfirm(message: String): DatabaseRestoreMessage = RequestConfirmation(message)
+        fun confirm(): DatabaseRestoreMessage = ConfirmRestore
+        fun finish(): DatabaseRestoreMessage = FinishMessage
+        fun error(message: String): DatabaseRestoreMessage = ErrorMessage(message)
+        fun inprogress(message: String): DatabaseRestoreMessage = InProgressMessage(message)
+    }
+
+    @Serializable
+    @SerialName("unspecified")
+    object Unspecified : DatabaseRestoreMessage()
+
+    @Serializable
+    @SerialName("start")
+    object StartMessage : DatabaseRestoreMessage()
+
+    @Serializable
+    @SerialName("confirm-restore")
+    object ConfirmRestore : DatabaseRestoreMessage()
+
+    @Serializable
+    @SerialName("request-confirmation")
+    data class RequestConfirmation(val message: String) : DatabaseRestoreMessage()
+
+    @Serializable
+    @SerialName("error")
+    data class ErrorMessage(val message: String) : DatabaseRestoreMessage()
+
+    @Serializable
+    @SerialName("inprogress")
+    data class InProgressMessage(val message: String) : DatabaseRestoreMessage()
+
+    @Serializable
+    @SerialName("finish")
+    object FinishMessage : DatabaseRestoreMessage()
+}
+
+@Serializable
 sealed class DatabaseDownloadMessage {
     abstract val message: String
 

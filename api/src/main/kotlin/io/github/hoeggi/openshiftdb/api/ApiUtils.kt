@@ -44,12 +44,16 @@ internal fun HttpUrl.toGetRequest(credentials: String? = null) = Request.Builder
     }
     .build()
 
-internal inline fun <reified U> HttpUrl.toPostRequest(body: U) = Request.Builder()
+internal inline fun <reified U> HttpUrl.toPostRequest(body: U, credentials: String? = null) = Request.Builder()
     .post(
         Json.encodeToString(body)
             .toRequestBody("application/json".toMediaType())
     )
-    .url(this).build()
+    .url(this)
+    .apply {
+        if (credentials != null) header("Authorization", credentials)
+    }
+    .build()
 
 internal inline fun <reified T> Response.get(): Result<T> = if (isSuccessful && body != null) {
     val data = Json.decodeFromString<ApiResponse<T>>(body!!.string()).data

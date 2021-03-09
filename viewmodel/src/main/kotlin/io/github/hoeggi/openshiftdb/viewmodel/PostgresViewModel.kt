@@ -9,6 +9,8 @@ import io.github.hoeggi.openshiftdb.api.response.*
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +20,7 @@ import kotlinx.coroutines.launch
 class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
     BaseViewModel(port, coroutineScope, errorViewer) {
     private val downloadQueue = EvictingQueue.create<DatabaseDownloadMessage.InProgressMessage>(150)
+    private val restoreQueue = EvictingQueue.create<DatabaseRestoreMessage.InProgressMessage>(300)
 
     private val _dumpPath = MutableStateFlow(System.getProperty("user.home"))
     private val _password = MutableStateFlow("")
@@ -39,6 +42,11 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
         MutableStateFlow(listOf())
     private val _downloadState: MutableStateFlow<DatabaseDownloadMessage> =
         MutableStateFlow(DatabaseDownloadMessage.unspecified())
+
+    private val _restoreState: MutableStateFlow<DatabaseRestoreMessage> =
+        MutableStateFlow(DatabaseRestoreMessage.unspecified())
+    private val _restoreProgress: MutableStateFlow<List<DatabaseRestoreMessage.InProgressMessage>> =
+        MutableStateFlow(listOf())
 
     fun update() {
         version()
@@ -177,5 +185,41 @@ class PostgresViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: 
         restoreCommand.onSuccess {
             _restoreCommand.value = it
         }.onFailure(showWarning)
+    }
+
+    private var confirmationChannel = Channel<Boolean>()
+    fun cancelRestore() = coroutineScope.launch {
+        if (!confirmationChannel.isClosedForSend) confirmationChannel.send(false)
+    }
+
+    fun confirmeRestore() = coroutineScope.launch {
+        if (!confirmationChannel.isClosedForSend) confirmationChannel.send(true)
+    }
+
+    val restoreState: StateFlow<DatabaseRestoreMessage> = _restoreState.asStateFlow()
+    val restoreProgress: StateFlow<List<DatabaseRestoreMessage.InProgressMessage>> = _restoreProgress.asStateFlow()
+    fun restoreDatabase() {
+        coroutineScope.launch(Dispatchers.IO) {
+            val dumpDatabases =
+                postgresApi.restoreDatabase(userName.value,
+                    password.value,
+                    restorePath.value,
+                    restoreCommand.value.database,
+                    restoreCommand.value.existing,
+                    confirmationChannel)
+            dumpDatabases.collect {
+                when (it) {
+                    is DatabaseRestoreMessage.InProgressMessage -> {
+                        restoreQueue.add(it)
+                        _restoreProgress.value = restoreQueue.toList()
+                        _restoreState.value = it
+                    }
+                    else -> {
+                        restoreQueue.clear()
+                        _restoreState.value = it
+                    }
+                }
+            }
+        }
     }
 }

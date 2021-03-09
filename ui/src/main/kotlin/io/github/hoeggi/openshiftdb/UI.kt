@@ -22,6 +22,7 @@ import androidx.compose.ui.window.KeyStroke
 import androidx.compose.ui.window.Menu
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.MenuItem
+import io.github.hoeggi.openshiftdb.ui.composables.Loading
 import io.github.hoeggi.openshiftdb.ui.composables.SecretsChooser
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.Screen
@@ -149,17 +150,17 @@ class UI {
         }
     }
 
-    @Composable
-    private fun Loading() {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(15.dp),
-        ) {
-            CircularProgressIndicator(modifier = Modifier.padding(10.dp))
-        }
-    }
+//    @Composable
+//    private fun Loading() {
+//        Box(
+//            contentAlignment = Alignment.Center,
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(15.dp),
+//        ) {
+//            CircularProgressIndicator(modifier = Modifier.padding(10.dp))
+//        }
+//    }
 
     @Composable
     private fun MainScreen(
