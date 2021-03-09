@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -44,16 +45,6 @@ interface OcApi {
 private class OcApiImpl(url: BasePath) : OcApi {
 
     private val client = OkHttpClient.Builder()
-        .build() + url
-    private val webSocketClient = OkHttpClient.Builder()
-        .addNetworkInterceptor {
-            it.proceed(
-                it.request().newBuilder()
-                    .header("Connection", "Upgrade")
-                    .header("Upgrade", "websocket")
-                    .build()
-            )
-        }
         .build() + url
 
     override suspend fun version(): Result<VersionApi> =
@@ -112,56 +103,20 @@ private class OcApiImpl(url: BasePath) : OcApi {
 
     override suspend fun portForward(project: String, svc: String, port: Int) =
         callbackFlow {
-            val request = webSocketClient.second.withPath("port-forward")
+            val request = client.second.withPath("port-forward")
                 .withQuery(
                     "project" to project,
                     "svc" to svc,
                     "port" to "$port"
                 ).toGetRequest()
-
-            val listener: WebSocketListener = createListener(this@callbackFlow)
-            val webSocket = webSocketClient.first.newWebSocket(request, listener)
+            val serializer = PortForwardMessage.serializer()
+            val listener: WebSocketListener = createListener(this, serializer)
+            val webSocket = client.first.newWebSocket(request, listener)
             awaitClose {
                 logger.debug("closing flow")
                 webSocket.close(1000, Json.encodeToString(PortForwardMessage.close("closing")))
             }
         }.shareIn(CoroutineScope(coroutineContext), SharingStarted.Eagerly)
-
-
-    private fun createListener(producer: ProducerScope<PortForwardMessage>): WebSocketListener {
-        return object : WebSocketListener() {
-
-            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                logger.debug("onClosed - $code - $reason")
-                val message = Json.decodeFromString<PortForwardMessage>(reason)
-                if (!producer.isClosedForSend) producer.sendBlocking(message)
-                logger.debug("onClosed emit result: $message")
-            }
-
-            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                logger.debug("onClosing - $code - $reason")
-            }
-
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                logger.error("websocket failed", t)
-            }
-
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                logger.debug("onMessage - $text")
-                val message = Json.decodeFromString<PortForwardMessage>(text)
-                if (!producer.isClosedForSend) producer.sendBlocking(message)
-                logger.debug("onMessage emit result: $message")
-            }
-
-            override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-                logger.debug("recived bytes instead of text - ${bytes.utf8()}")
-            }
-
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                logger.debug("onOpen")
-            }
-        }
-    }
 
     companion object {
         val logger = LoggerFactory.getLogger(OcApiImpl::class.java)

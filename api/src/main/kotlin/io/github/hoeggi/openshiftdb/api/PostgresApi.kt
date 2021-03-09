@@ -4,20 +4,25 @@ import io.github.hoeggi.openshiftdb.api.response.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import okhttp3.*
 import okio.ByteString
 import org.slf4j.LoggerFactory
 import kotlin.coroutines.coroutineContext
+import kotlin.reflect.KClass
 
 interface PostgresApi {
 
@@ -27,6 +32,15 @@ interface PostgresApi {
 
     suspend fun restoreInfo(path: String): Result<RestoreInfoApi>
     suspend fun restoreCommand(user: String, password: String, path: String): Result<RestoreCommandApi>
+    suspend fun restoreDatabase(
+        username: String,
+        password: String,
+        path: String,
+        database: String,
+        exists: Boolean,
+        confirmationChannel: ReceiveChannel<Boolean>,
+    ): Flow<DatabaseRestoreMessage>
+
     suspend fun toolsVersion(): Result<ToolsVersionApi>
     suspend fun databaseVersion(username: String, password: String): Result<DatabaseVersionApi>
     suspend fun databases(
@@ -57,17 +71,6 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
     private val client = OkHttpClient.Builder()
         .build() + url
 
-    private val webSocketClient = OkHttpClient.Builder()
-        .addNetworkInterceptor {
-            it.proceed(
-                it.request().newBuilder()
-                    .header("Connection", "Upgrade")
-                    .header("Upgrade", "websocket")
-                    .build()
-            )
-        }
-        .build() + url
-
     override suspend fun restoreInfo(path: String): Result<RestoreInfoApi> =
         withContext(Dispatchers.IO) {
             client.first.newCall(
@@ -85,6 +88,38 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
                     .toGetRequest(Credentials.basic(user, password))
             ).execute().get()
         }
+
+    override suspend fun restoreDatabase(
+        username: String,
+        password: String,
+        path: String,
+        database: String,
+        exists: Boolean,
+        confirmationChannel: ReceiveChannel<Boolean>,
+    ): Flow<DatabaseRestoreMessage> = callbackFlow {
+        val request = client.second.withPath("restore")
+            .withQuery(
+                "database" to database,
+                "exists" to "$exists",
+                "path" to path
+            )
+            .toGetRequest(Credentials.basic(username, password))
+        val serializer = DatabaseRestoreMessage.serializer()
+        val listener: WebSocketListener = createListener(this, serializer)
+        val webSocket = client.first.newWebSocket(request, listener)
+
+        launch {
+            logger.debug("awaiting restore confirmation")
+            val receive = confirmationChannel.receive()
+            logger.debug("received restore confirmation: $receive")
+            if (receive) webSocket.send(Json.encodeToString(DatabaseRestoreMessage.confirm()))
+            else webSocket.close(1000, Json.encodeToString(DatabaseRestoreMessage.finish()))
+        }
+        awaitClose {
+            logger.debug("closing flow")
+            webSocket.close(1000, Json.encodeToString(DatabaseRestoreMessage.finish()))
+        }
+    }.shareIn(CoroutineScope(coroutineContext), SharingStarted.Eagerly)
 
     override suspend fun toolsVersion(): Result<ToolsVersionApi> =
         withContext(Dispatchers.IO) { client.get("version/tools") }
@@ -127,58 +162,21 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
         path: String,
         format: String,
     ): Flow<DatabaseDownloadMessage> = callbackFlow {
-        val request = webSocketClient.second.withPath("databases/dump")
+        val request = client.second.withPath("databases/dump")
             .withQuery(
                 "database" to database,
                 "path" to path,
                 "format" to format
             ).toGetRequest(Credentials.basic(username, password))
-
-        val listener: WebSocketListener = createListener(this@callbackFlow)
-        val webSocket = webSocketClient.first.newWebSocket(request, listener)
+        val serializer = DatabaseDownloadMessage.serializer()
+        val listener: WebSocketListener = createListener(this, serializer)
+        val webSocket = client.first.newWebSocket(request, listener)
         awaitClose {
             logger.debug("closing flow")
             webSocket.close(1000, Json.encodeToString(DatabaseDownloadMessage.finish("closing")))
         }
     }.shareIn(CoroutineScope(coroutineContext), SharingStarted.Eagerly)
 
-    private fun createListener(producer: ProducerScope<DatabaseDownloadMessage>): WebSocketListener {
-        return object : WebSocketListener() {
-
-            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                logger.debug("onClosed - $code - $reason")
-                val message = Json.decodeFromString<DatabaseDownloadMessage>(reason)
-                if (!producer.isClosedForSend) producer.sendBlocking(message)
-                logger.debug("onClosed emit result: $message")
-            }
-
-            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                logger.debug("onClosed - $code - $reason")
-                val message = Json.decodeFromString<DatabaseDownloadMessage>(reason)
-                if (!producer.isClosedForSend) producer.sendBlocking(message)
-                logger.debug("onClosed emit result: $message")
-            }
-
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                logger.error("websocket failed, $response", t)
-            }
-
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                logger.debug("onMessage - $text")
-                val message = Json.decodeFromString<DatabaseDownloadMessage>(text)
-                if (!producer.isClosedForSend) producer.sendBlocking(message)
-                logger.debug("onMessage emit result: $message")
-            }
-
-            override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-                logger.debug("recived bytes instead of text - ${bytes.utf8()}")
-            }
-
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                logger.debug("onOpen")
-            }
-        }
-    }
 
     companion object {
         val logger = LoggerFactory.getLogger(PostgresApiImpl::class.java)

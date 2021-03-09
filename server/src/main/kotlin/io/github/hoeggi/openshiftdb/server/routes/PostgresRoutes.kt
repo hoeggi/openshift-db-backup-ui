@@ -30,6 +30,7 @@ fun Route.postgres() {
             get("/info", RestoreInfo())
             authenticate("postgres") {
                 get("/command", RestoreCommand())
+                webSocket("", null, RestoreDatabase())
             }
         }
     }

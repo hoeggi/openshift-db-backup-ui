@@ -5,12 +5,14 @@ import io.github.hoeggi.openshiftdb.commons.bufferError
 import io.github.hoeggi.openshiftdb.commons.messageAndResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okio.BufferedSource
 import okio.buffer
 import okio.sink
 import org.slf4j.LoggerFactory
 import java.io.Closeable
 import java.io.File
 import java.io.IOException
+import java.lang.IllegalStateException
 import java.time.LocalDateTime
 
 object Postgres {
@@ -18,6 +20,33 @@ object Postgres {
     const val DEFAULT_DB = "postgres"
 
     sealed class PostgresResult {
+        class Restore(
+            private val processBuilder: ProcessBuilder,
+            val backup: String,
+            val database: String,
+            val command: String,
+        ) : PostgresResult(), Closeable {
+
+            private var process: Process? = null
+            fun start() = processBuilder.start().also { process = it }
+
+            val buffer by lazy { process?.buffer() ?: throw IllegalStateException("must call start first") }
+            val bufferError by lazy { process?.bufferError() ?: throw IllegalStateException("must call start first") }
+
+            val exitCode
+                @Throws(IllegalThreadStateException::class)
+                get() = process?.exitValue() ?: throw IllegalStateException("must call start first")
+
+            override fun close() {
+                try {
+                    process?.inputStream?.close()
+                    process?.errorStream?.close()
+                } catch (ex: IOException) {
+                    logger.error("error closing postgres restore", ex)
+                }
+            }
+        }
+
         class DumpPlain(private val process: Process, path: File) : PostgresResult(), Closeable {
             val buffer = process.buffer()
             val bufferError = process.bufferError()
@@ -49,7 +78,7 @@ object Postgres {
             fun await() = process.await().exitValue()
         }
 
-        sealed class RestoreCommand(private val command: String, private val password: String) {
+        sealed class RestoreCommand(val command: String, private val password: String) {
             fun command() = "PGPASSWORD='$password' $command"
             class Existing(command: String, password: String) : RestoreCommand(command, password)
             class New(command: String, password: String) : RestoreCommand(command, password)
@@ -156,7 +185,12 @@ object Postgres {
             .messageAndResult()
     }
 
-    fun restoreCommand(user: String, password: String, path: String, database: String? = null): PostgresResult.RestoreCommand {
+    fun restoreCommand(
+        user: String,
+        password: String,
+        path: String,
+        database: String? = null,
+    ): PostgresResult.RestoreCommand {
         return if (database == null) {
             PostgresResult.RestoreCommand.New(
                 Commands.PgRestore.RestoreNew(user, path).commands.joinToString(" "),
@@ -168,6 +202,32 @@ object Postgres {
                 password
             )
         }
+    }
+
+
+    private fun restoreCommandRaw(
+        user: String,
+        path: String,
+        database: String? = null,
+    ) = if (database == null) {
+        Commands.PgRestore.RestoreNew(user, path)
+    } else {
+        Commands.PgRestore.RestoreExisting(user, database, path)
+    }
+
+    fun restoreDatabase(
+        username: String,
+        password: String,
+        path: String,
+        database: String,
+        exists: Boolean,
+    ): PostgresResult.Restore {
+        val rawCommand = restoreCommandRaw(username, path, if (exists) database else null)
+        val command = restoreCommand(username, password, path, if (exists) database else null)
+        return PostgresResult.Restore(
+            ProcessBuilder(rawCommand.commands).withPassword(password),
+            path, database, command.command()
+        )
     }
 
     suspend fun restoreInfo(path: String) = withContext(Dispatchers.IO) {

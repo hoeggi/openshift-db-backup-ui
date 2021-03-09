@@ -55,7 +55,7 @@ fun PostgresDump(): suspend DefaultWebSocketServerSession.() -> Unit = {
     } catch (e: ClosedReceiveChannelException) {
         logger.debug("ClosedReceiveChannelException ${closeReason.await()}", e)
     } catch (e: Throwable) {
-        logger.error("Throwable ${closeReason.await()}", e)
+        logger.error("unexpected error", e)
     }
 }
 

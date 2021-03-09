@@ -1,14 +1,20 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 plugins {
     kotlin("jvm") version Versions.kotlin
     id("org.jetbrains.compose") version Versions.compose
+    id("com.github.ben-manes.versions") version "0.38.0"
 }
 
 group = "io.github.hoeggi"
 version = "1.0.0"
+
+tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
+    revision = "release"
+}
 
 repositories {
     mavenCentral()
