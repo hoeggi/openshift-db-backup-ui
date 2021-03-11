@@ -21,7 +21,7 @@ import io.github.hoeggi.openshiftdb.outsideClickable
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-fun BoxScope.Drawer(open: Boolean, coroutineScope: CoroutineScope, onOutsideClick: () -> Unit) {
+fun BoxScope.Drawer(modifier: Modifier, open: Boolean, coroutineScope: CoroutineScope, onOutsideClick: () -> Unit) {
 
     val updateTransition = updateTransition(targetState = rememberUpdatedState(open))
     val animateColor by updateTransition.animateColor {
@@ -48,7 +48,7 @@ fun BoxScope.Drawer(open: Boolean, coroutineScope: CoroutineScope, onOutsideClic
     ) {
         LocalAppWindow.current.width.dp / 4
         Surface(
-            modifier = Modifier.align(Alignment.CenterEnd)
+            modifier = modifier.align(Alignment.CenterEnd)
                 .fillMaxHeight()
                 .width((LocalAppWindow.current.width / 4).dp)
                 .outsideClickable(),

@@ -6,13 +6,16 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.GlobalState
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import io.github.hoeggi.openshiftdb.settings.Theme
@@ -71,8 +74,10 @@ fun ColorMuskTheme(
                 isFloatingActionButtonDocked = true,
             ) {
                 Box {
-                    content()
-                    Drawer(settings, coroutineScope) {
+                    Box(modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 48.dp)) {
+                        content()
+                    }
+                    Drawer(Modifier.padding(bottom = 48.dp), settings, coroutineScope) {
                         globalState.hideDrawer()
                     }
                     Overlays(coroutineScope, state)
