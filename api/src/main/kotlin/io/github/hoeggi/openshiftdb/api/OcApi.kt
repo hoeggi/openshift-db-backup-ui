@@ -58,7 +58,9 @@ private class OcApiImpl(url: BasePath) : OcApi {
         withContext(Dispatchers.IO) { client.get("server") }
 
     override suspend fun projects(): Result<List<ProjectApi>> =
-        withContext(Dispatchers.IO) { client.get("projects") }
+        withContext(Dispatchers.IO) {
+            client.get("projects")
+        }
 
     override suspend fun switchContext(context: SwitchContextApi): Result<SwitchContextApi> =
         withContext(Dispatchers.IO) { client.post("context", context) }
@@ -106,7 +108,7 @@ private class OcApiImpl(url: BasePath) : OcApi {
         val result = client.first.newCall(request).execute()
         when (result.code) {
             204 -> Result.success(Unit)
-            else -> Result.failure<Unit>(RuntimeException("Unauthorized"))
+            else -> Result.failure(RuntimeException("Unauthorized"))
         }
     } catch (ex: IOException) {
         logger.error("unable to reach api", ex)

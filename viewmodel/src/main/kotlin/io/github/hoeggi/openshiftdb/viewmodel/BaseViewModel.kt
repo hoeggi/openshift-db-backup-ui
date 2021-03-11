@@ -6,7 +6,6 @@ import io.github.hoeggi.openshiftdb.api.PostgresApi
 import io.github.hoeggi.openshiftdb.errorhandler.CoroutineExceptionHandler
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.plus
 import org.slf4j.LoggerFactory
 
@@ -33,7 +32,7 @@ abstract class BaseViewModel(port: Int, private val scope: CoroutineScope, priva
         get() = api
 
     val coroutineScope
-        get() = scope + Job() + coroutineExceptionHandler
+        get() = scope + coroutineExceptionHandler
 
     val showWarning: (Throwable) -> Unit = {
         logger.warn("warning", it)

@@ -47,7 +47,6 @@ fun RestoreView() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 48.dp),
     ) {
         BackupPicker()
         Divider()

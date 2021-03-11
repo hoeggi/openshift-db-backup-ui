@@ -4,6 +4,7 @@ import io.github.hoeggi.openshiftdb.errorhandler.ExceptionHandler
 import io.github.hoeggi.openshiftdb.server.Server
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
 import org.slf4j.LoggerFactory
+import java.awt.Toolkit
 import java.io.IOException
 import java.net.ServerSocket
 import java.util.concurrent.Executors
@@ -19,7 +20,6 @@ private fun port(): Int {
 
 private val logger = LoggerFactory.getLogger(UI::class.java)
 fun main() {
-
     logger.info("initializing")
     val port = port()
     val globalState = GlobalState()

@@ -45,6 +45,7 @@ fun SecretsChooser(modifier: Modifier = Modifier, viewModel: PostgresViewModel) 
                 shape = RoundedCornerShape(6.dp),
                 modifier = modifier
                     .fillMaxWidth(0.5f)
+                    .align(Alignment.Center)
                     .wrapContentHeight()
                     .padding(16.dp)
                     .outsideClickable(),
