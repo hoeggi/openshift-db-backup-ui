@@ -16,24 +16,32 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.GlobalState
+import io.github.hoeggi.openshiftdb.*
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import io.github.hoeggi.openshiftdb.settings.Theme
 import io.github.hoeggi.openshiftdb.ui.composables.ErrorView
+import io.github.hoeggi.openshiftdb.ui.composables.Loading
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.BottomNav
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.Drawer
+import io.github.hoeggi.openshiftdb.viewmodel.LoginState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
 @ExperimentalAnimationApi
 @Composable
-fun ColorMuskTheme(
+fun Theme(
     coroutineScope: CoroutineScope,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val globalState = GlobalState.current
+    val ocViewModel = OcViewModel.current
+    val postgresViewModel = PostgresViewModel.current
+    val loginState by ocViewModel.collectAsState(ocViewModel.loginState)
     val dark by globalState.theme.collectAsState(coroutineScope.coroutineContext)
+
+    ocViewModel.checkLoginState()
+
     val colors = when (dark) {
         Theme.Dark -> darkColors(
             primary = Color(0xFF3C5EE6),
@@ -57,9 +65,11 @@ fun ColorMuskTheme(
             Scaffold(
                 scaffoldState = state,
                 bottomBar = {
-                    BottomNav(
-                        coroutineScope = coroutineScope
-                    )
+                    if (loginState == LoginState.LOGGEDIN) {
+                        BottomNav(
+                            coroutineScope = coroutineScope
+                        )
+                    }
                 },
                 floatingActionButton = {
                     FloatingActionButton(
@@ -74,10 +84,20 @@ fun ColorMuskTheme(
                 isFloatingActionButtonDocked = true,
             ) {
                 Box {
-                    Box(modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 48.dp)) {
-                        content()
+                    when (loginState) {
+                        LoginState.LOGGEDIN -> {
+                            ocViewModel.update()
+                            postgresViewModel.update()
+                            Box(modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 48.dp)) {
+                                content()
+                            }
+                        }
+                        LoginState.NOT_LOGGEDIN -> LoginScreen()
+                        LoginState.UNCHECKED -> Loading()
                     }
-                    Drawer(Modifier.padding(bottom = 48.dp), settings, coroutineScope) {
+
+                    val padding = if (loginState == LoginState.LOGGEDIN) 48.dp else 0.dp
+                    Drawer(Modifier.padding(bottom = padding), settings, coroutineScope) {
                         globalState.hideDrawer()
                     }
                     Overlays(coroutineScope, state)
