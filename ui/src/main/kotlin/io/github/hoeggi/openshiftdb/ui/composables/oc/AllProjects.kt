@@ -20,7 +20,7 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PROJECT_ALL_LABEL
 @Composable
 fun AllProjects() {
     val viewModel = OcViewModel.current
-    val projects: List<ProjectApi> by viewModel.collectAsState(viewModel.projects)
+    val projects: List<String> by viewModel.collectAsState(viewModel.projects)
 
     Column(
         modifier = Modifier
@@ -36,7 +36,7 @@ fun AllProjects() {
         LazyColumn {
             items(projects) {
                 Project(
-                    name = it.name,
+                    name = it,
                     onProjectClicked = {
                         viewModel.switchProject(it)
                     }

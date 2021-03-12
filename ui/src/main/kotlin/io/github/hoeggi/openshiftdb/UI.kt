@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.ui.MenuBar
-import io.github.hoeggi.openshiftdb.ui.composables.Loading
 import io.github.hoeggi.openshiftdb.ui.composables.PanelState
 import io.github.hoeggi.openshiftdb.ui.composables.SecretsChooser
 import io.github.hoeggi.openshiftdb.ui.composables.VerticalSplittable
@@ -22,8 +21,7 @@ import io.github.hoeggi.openshiftdb.ui.composables.navigation.Screen
 import io.github.hoeggi.openshiftdb.ui.composables.oc.OcPane
 import io.github.hoeggi.openshiftdb.ui.composables.postgres.PostgresPane
 import io.github.hoeggi.openshiftdb.ui.composables.restore.RestoreView
-import io.github.hoeggi.openshiftdb.ui.theme.ColorMuskTheme
-import io.github.hoeggi.openshiftdb.viewmodel.LoginState
+import io.github.hoeggi.openshiftdb.ui.theme.Theme
 import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 import io.github.hoeggi.openshiftdb.viewmodel.PostgresViewModel
 import io.github.hoeggi.openshiftdb.viewmodel.viewModels
@@ -72,10 +70,6 @@ class UI {
             val scope = rememberCoroutineScope() + SupervisorJob()
             val (ocViewModel, postgresViewModel) = viewModels(port, scope, globalState)
 
-//            val loginState by ocViewModel.collectAsState(ocViewModel.loginState)
-            ocViewModel.checkLoginState()
-
-//            val initialLoginState by remember { mutableStateOf(loginState) }
 
             CompositionLocalProvider(
                 UIScope provides scope,
@@ -83,29 +77,18 @@ class UI {
                 OcViewModel provides ocViewModel,
                 PostgresViewModel provides postgresViewModel,
             ) {
-                ColorMuskTheme(scope) {
+                Theme(scope) {
                     val navigationState = GlobalState.current
                     val screen by navigationState.screen.collectAsState(scope.coroutineContext)
-                    val loginState by ocViewModel.collectAsState(ocViewModel.loginState)
                     when (screen) {
                         is Screen.Detail -> {
                             Log()
                         }
                         is Screen.Main -> {
-                            when (loginState) {
-                                LoginState.LOGGEDIN -> {
-                                    ocViewModel.update()
-                                    postgresViewModel.update()
-                                    MainScreen(
-                                        ocViewModel = ocViewModel,
-                                        postgresViewModel = postgresViewModel,
-                                    )
-                                }
-                                LoginState.NOT_LOGGEDIN -> LoginScreen(
-                                    ocViewModel = ocViewModel
-                                )
-                                LoginState.UNCHECKED -> Loading()
-                            }
+                            MainScreen(
+                                ocViewModel = ocViewModel,
+                                postgresViewModel = postgresViewModel,
+                            )
                         }
                         is Screen.Restore -> {
                             RestoreView()
@@ -149,10 +132,6 @@ private fun MainScreen(
         OcPane(modifier = Modifier.width(animatedSize))
         PostgresPane()
     }
-//    Row {
-//        OcPane()
-//        PostgresPane()
-//    }
     SecretsChooser(viewModel = postgresViewModel)
 }
 

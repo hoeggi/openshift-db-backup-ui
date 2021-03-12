@@ -18,8 +18,9 @@ import io.github.hoeggi.openshiftdb.ui.composables.navigation.ClusterContext
 import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 
 @Composable
-fun LoginScreen(ocViewModel: OcViewModel) {
+fun LoginScreen() {
 
+    val ocViewModel = OcViewModel.current
     val server: List<ClusterApi> by ocViewModel.collectAsState(ocViewModel.server)
 
     var token by remember { mutableStateOf(TextFieldValue("")) }

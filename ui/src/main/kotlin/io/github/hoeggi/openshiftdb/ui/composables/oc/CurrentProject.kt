@@ -34,7 +34,7 @@ fun CurrentProject() {
             modifier = Modifier.height(10.dp)
         )
         Text(
-            text = currentProject.name,
+            text = currentProject,
             style = MaterialTheme.typography.caption
         )
     }

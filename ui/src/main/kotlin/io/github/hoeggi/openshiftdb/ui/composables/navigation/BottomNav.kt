@@ -1,6 +1,5 @@
 package io.github.hoeggi.openshiftdb.ui.composables.navigation
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -30,7 +29,6 @@ fun BottomNav(
         modifier = modifier
     ) {
         BottomNavigationItem(
-            modifier = Modifier.fillMaxWidth(),
             selected = screen == Screen.Main,
             onClick = {
                 viewModel.main()
@@ -38,7 +36,6 @@ fun BottomNav(
             icon = { Icon(Icons.Outlined.Home, "") }
         )
         BottomNavigationItem(
-            modifier = Modifier.fillMaxWidth(),
             selected = screen == Screen.Detail,
             onClick = {
                 viewModel.restore()
@@ -46,7 +43,6 @@ fun BottomNav(
             icon = { Icon(Icons.Outlined.Restore, "") }
         )
         BottomNavigationItem(
-            modifier = Modifier.fillMaxWidth(),
             selected = screen == Screen.Detail,
             onClick = {
                 viewModel.detail()

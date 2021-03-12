@@ -6,7 +6,10 @@ import io.github.hoeggi.openshiftdb.api.onSuccess
 import io.github.hoeggi.openshiftdb.api.response.*
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 
 enum class LoginState {
     UNCHECKED, LOGGEDIN, NOT_LOGGEDIN
@@ -14,13 +17,31 @@ enum class LoginState {
 
 data class PortForwardTarget(val project: String, val svc: String, val port: Int)
 
-class OcViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
+//interface PortForwardMessage {
+//    val message: String
+//
+//    inline class Message(override val message: String) : PortForwardMessage
+//    inline class Close(override val message: String) : PortForwardMessage
+//    inline class Error(override val message: String) : PortForwardMessage
+//
+//    companion object {
+//        fun portForwardMessage(from: io.github.hoeggi.openshiftdb.api.response.PortForwardMessage): PortForwardMessage =
+//            when (from) {
+//                is io.github.hoeggi.openshiftdb.api.response.PortForwardMessage.CloseMessage -> Close(from.message)
+//                is io.github.hoeggi.openshiftdb.api.response.PortForwardMessage.ErrorMessage -> Error(from.message)
+//                is io.github.hoeggi.openshiftdb.api.response.PortForwardMessage.Message -> Message(from.message)
+//            }
+//    }
+//}
+
+
+class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
     BaseViewModel(port, coroutineScope, errorViewer) {
 
-    private val _projects: MutableStateFlow<List<ProjectApi>> =
+    private val _projects: MutableStateFlow<List<String>> =
         MutableStateFlow(listOf())
-    private val _currentProject: MutableStateFlow<ProjectApi> =
-        MutableStateFlow(ProjectApi())
+    private val _currentProject: MutableStateFlow<String> =
+        MutableStateFlow("")
     private val _version: MutableStateFlow<VersionApi> =
         MutableStateFlow(VersionApi())
     private val _services: MutableStateFlow<List<ServicesApi>> =
@@ -97,27 +118,28 @@ class OcViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorV
 
         _currentProject.value = switchProject.onFailure {
             showWarning(it)
-        }.getOrDefault(ProjectApi())
+        }.getOrDefault(ProjectApi()).name
 
         if (switchProject.isSuccess) {
             services()
         }
     }
 
-    val projects: StateFlow<List<ProjectApi>> = _projects.asStateFlow()
+    val projects: StateFlow<List<String>> = _projects.asStateFlow()
     private fun projects() = coroutineScope.launch {
         val projects = ocApi.projects()
         _projects.value = projects.onFailure {
             showWarning(it)
         }.getOrDefault(listOf())
             .filterNot { it.name.startsWith("openshift") or it.name.startsWith("kube") }
+            .map { it.name }
     }
 
-    val currentProject: StateFlow<ProjectApi> = _currentProject.asStateFlow()
+    val currentProject: StateFlow<String> = _currentProject.asStateFlow()
     private fun currentProject() = coroutineScope.launch {
         _currentProject.value = ocApi.currentProject().onFailure {
             showWarning(it)
-        }.getOrDefault(ProjectApi())
+        }.getOrDefault(ProjectApi()).name
     }
 
     val version: StateFlow<VersionApi> = _version.asStateFlow()
@@ -135,21 +157,22 @@ class OcViewModel(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorV
     }
 
     private val openPortForwars = mutableMapOf<PortForwardTarget, Job>()
-    val portForward: StateFlow<Map<PortForwardTarget, List<PortForwardMessage>>> = _portForward.asStateFlow()
+    val portForward = _portForward.asStateFlow()
+
     fun portForward(svc: String, port: Int) {
-        portForward(PortForwardTarget(currentProject.value.name, svc, port))
+        portForward(PortForwardTarget(currentProject.value, svc, port))
     }
 
     fun portForward(target: PortForwardTarget) {
         val launch = coroutineScope.launch(Dispatchers.IO) {
-            val flow: Flow<PortForwardMessage> = ocApi.portForward(target.project, target.svc, target.port)
+            val flow = ocApi.portForward(target.project, target.svc, target.port)
             flow.collect {
                 ensureActive()
                 logger.debug("message from port-forward: $it")
                 val map = _portForward.value.toMutableMap()
-                val list = map.getOrDefault(target, listOf()).toMutableList()
-                list.add(it)
-                map[target] = list
+                map[target] = map.getOrDefault(target, listOf()).toMutableList().apply {
+                    add(it)
+                }
                 _portForward.value = map
             }
         }
