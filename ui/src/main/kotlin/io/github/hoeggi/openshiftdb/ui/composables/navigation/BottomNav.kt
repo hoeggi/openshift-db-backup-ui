@@ -36,7 +36,7 @@ fun BottomNav(
             icon = { Icon(Icons.Outlined.Home, "") }
         )
         BottomNavigationItem(
-            selected = screen == Screen.Detail,
+            selected = screen == Screen.Restore,
             onClick = {
                 viewModel.restore()
             },

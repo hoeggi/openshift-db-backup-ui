@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":errorhandler"))
     implementation(project(":api"))
     api(project(":api_models"))
+//    implementation(project(":api_models"))
     implementation(Dependencies.Kotlin.coroutines)
     implementation(Dependencies.guava)
     compileOnly(Dependencies.slf4j_api)

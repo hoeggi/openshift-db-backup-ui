@@ -29,11 +29,9 @@ fun PortForward() {
     val viewModel = OcViewModel.current
     val portForwards by viewModel.collectAsState(viewModel.portForward)
     LazyColumn {
-        items(portForwards.entries.map {
-            it.key to it.value
-        }) { it ->
-            val target = it.first
-            val messages = it.second
+        items(portForwards) { it ->
+            val target = it.target
+            val messages = it.messages
             Column(
                 modifier = Modifier
                     .padding(10.dp)

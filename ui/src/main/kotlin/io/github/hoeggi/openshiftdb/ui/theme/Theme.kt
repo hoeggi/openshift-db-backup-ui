@@ -2,6 +2,7 @@
 
 package io.github.hoeggi.openshiftdb.ui.theme
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,7 +25,7 @@ import io.github.hoeggi.openshiftdb.ui.composables.ErrorView
 import io.github.hoeggi.openshiftdb.ui.composables.Loading
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.BottomNav
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.Drawer
-import io.github.hoeggi.openshiftdb.viewmodel.LoginState
+import io.github.hoeggi.openshiftdb.viewmodel.models.LoginState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -77,7 +79,14 @@ fun Theme(
                             globalState.toggleDrawer()
                         },
                     ) {
-                        Icon(Icons.Outlined.Settings, "")
+                        Crossfade(targetState = settings) {
+                            val icon = when {
+                                settings -> Icons.Outlined.ArrowForward
+                                else -> Icons.Outlined.Settings
+                            }
+                            Icon(icon, "")
+                        }
+
                     }
                 },
                 floatingActionButtonPosition = FabPosition.End,

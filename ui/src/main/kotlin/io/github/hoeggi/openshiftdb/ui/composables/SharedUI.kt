@@ -1,5 +1,7 @@
 package io.github.hoeggi.openshiftdb.ui.composables
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -40,9 +42,6 @@ fun ExpandableText(
     content: @Composable (() -> Unit),
 ) {
     val expanded = remember { mutableStateOf(initialState) }
-    val modifier = Modifier.clickable {
-        expanded.value = !expanded.value
-    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable {
@@ -66,7 +65,10 @@ fun ExpandableText(
     ExpandableText(
         initialState = initialState,
         header = { expanded ->
-            Icon(if (expanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown, "")
+            Crossfade(targetState = expanded) { expanded ->
+                if (expanded) Icon(Icons.Outlined.KeyboardArrowUp, "")
+                else Icon(Icons.Outlined.KeyboardArrowDown, "")
+            }
             Text(
                 text = text,
                 style = style,

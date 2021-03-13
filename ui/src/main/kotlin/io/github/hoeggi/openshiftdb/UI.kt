@@ -1,5 +1,6 @@
 package io.github.hoeggi.openshiftdb
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateDpAsState
@@ -80,18 +81,20 @@ class UI {
                 Theme(scope) {
                     val navigationState = GlobalState.current
                     val screen by navigationState.screen.collectAsState(scope.coroutineContext)
-                    when (screen) {
-                        is Screen.Detail -> {
-                            Log()
-                        }
-                        is Screen.Main -> {
-                            MainScreen(
-                                ocViewModel = ocViewModel,
-                                postgresViewModel = postgresViewModel,
-                            )
-                        }
-                        is Screen.Restore -> {
-                            RestoreView()
+                    Crossfade(targetState = screen) {
+                        when (it) {
+                            is Screen.Detail -> {
+                                Log()
+                            }
+                            is Screen.Main -> {
+                                MainScreen(
+                                    ocViewModel = ocViewModel,
+                                    postgresViewModel = postgresViewModel,
+                                )
+                            }
+                            is Screen.Restore -> {
+                                RestoreView()
+                            }
                         }
                     }
                 }

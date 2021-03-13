@@ -12,10 +12,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.OcViewModel
-import io.github.hoeggi.openshiftdb.api.response.ServicesApi
 import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_SERVICE_AVAILABLE
+import io.github.hoeggi.openshiftdb.viewmodel.models.Service
 
 @Composable
 fun Service() {
@@ -40,7 +40,7 @@ fun Service() {
                 Service(
                     service = item,
                     onServiceClicked = { service, port ->
-                        viewModel.portForward(service.name, port)
+                        viewModel.portForward(service, port)
                     }
                 )
             }
@@ -50,8 +50,8 @@ fun Service() {
 
 @Composable
 fun Service(
-    service: ServicesApi,
-    onServiceClicked: (ServicesApi, Int) -> Unit,
+    service: Service,
+    onServiceClicked: (String, Int) -> Unit,
 ) {
     Column {
         Text(
@@ -61,11 +61,11 @@ fun Service(
         )
         service.ports.forEach {
             Text(
-                text = "* ${it.port}:${it.targetPort}/${it.protocol}",
+                text = "* ${it.display}",
                 modifier = Modifier.fillMaxSize()
                     .padding(2.dp)
                     .clickable {
-                        onServiceClicked(service, it.port)
+                        onServiceClicked(service.name, it.port)
                     },
                 style = MaterialTheme.typography.caption
             )

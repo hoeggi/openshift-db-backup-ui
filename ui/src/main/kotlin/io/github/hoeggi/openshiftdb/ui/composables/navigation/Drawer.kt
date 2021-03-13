@@ -2,6 +2,8 @@ package io.github.hoeggi.openshiftdb.ui.composables.navigation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally

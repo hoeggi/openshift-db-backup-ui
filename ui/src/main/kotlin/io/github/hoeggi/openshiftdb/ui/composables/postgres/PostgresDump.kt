@@ -42,9 +42,12 @@ fun PostgresDump() {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(10.dp)
     ) {
-        Button(onClick = {
-            viewModel.dumpDatabase(databases[selectedDatabase], globalState.exportFormat.value.format)
-        }) {
+        Button(
+            enabled = resultState !is DatabaseDownloadMessage.InProgressMessage &&
+                    resultState !is DatabaseDownloadMessage.StartMessage,
+            onClick = {
+                viewModel.dumpDatabase(databases[selectedDatabase], globalState.exportFormat.value.format)
+            }) {
             Text(text = MessageProvider.message(POSTGRES_DUMP_LABEL))
         }
         when (resultState) {

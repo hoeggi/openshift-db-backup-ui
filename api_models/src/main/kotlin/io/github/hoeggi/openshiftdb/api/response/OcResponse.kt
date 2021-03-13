@@ -77,10 +77,7 @@ data class ServicesPortApi(
     val port: Int = -1,
     val targetPort: String = "",
     val protocol: String = "",
-) {
-    @Transient
-    val display = "$port:$targetPort/$protocol"
-}
+)
 
 @Serializable
 data class ProjectApi(
