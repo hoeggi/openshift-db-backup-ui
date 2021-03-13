@@ -13,7 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.GlobalState
+import io.github.hoeggi.openshiftdb.AppSettings
 import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
 import io.github.hoeggi.openshiftdb.collectAsState
@@ -27,12 +27,12 @@ import java.io.File
 
 
 @Composable
-fun PostgresDump() {
+internal fun PostgresDump() {
 
     val logger = LoggerFactory.getLogger("io.github.hoeggi.openshiftdb.ui.composables.postgres.PostgresDump")
 
     val viewModel = PostgresViewModel.current
-    val globalState = GlobalState.current
+    val settings = AppSettings.current
 
     val selectedDatabase by viewModel.collectAsState(viewModel.selectedDatabase)
     val resultState by viewModel.collectAsState(viewModel.downloadState)
@@ -46,7 +46,7 @@ fun PostgresDump() {
             enabled = resultState !is DatabaseDownloadMessage.InProgressMessage &&
                     resultState !is DatabaseDownloadMessage.StartMessage,
             onClick = {
-                viewModel.dumpDatabase(databases[selectedDatabase], globalState.exportFormat.value.format)
+                viewModel.dumpDatabase(databases[selectedDatabase], settings.exportFormat.value.format)
             }) {
             Text(text = MessageProvider.message(POSTGRES_DUMP_LABEL))
         }

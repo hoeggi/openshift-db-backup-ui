@@ -23,7 +23,7 @@ import io.github.hoeggi.openshiftdb.outsideClickable
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-fun BoxScope.Drawer(modifier: Modifier, open: Boolean, coroutineScope: CoroutineScope, onOutsideClick: () -> Unit) {
+internal fun BoxScope.Drawer(modifier: Modifier, open: Boolean, coroutineScope: CoroutineScope, onOutsideClick: () -> Unit) {
 
     val updateTransition = updateTransition(targetState = rememberUpdatedState(open))
     val animateColor by updateTransition.animateColor {

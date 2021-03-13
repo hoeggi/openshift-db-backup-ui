@@ -6,7 +6,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.micrometer.prometheus.PrometheusMeterRegistry
 
-fun Route.default(appMicrometerRegistry: PrometheusMeterRegistry) {
+internal fun Route.default(appMicrometerRegistry: PrometheusMeterRegistry) {
     get("/metrics") {
         call.respond(appMicrometerRegistry.scrape())
     }

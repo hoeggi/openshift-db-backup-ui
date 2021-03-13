@@ -5,7 +5,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import com.google.common.collect.EvictingQueue
 import io.github.hoeggi.openshiftdb.ui.composables.ColorMapping
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.LogLinesProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import net.rubygrapefruit.ansi.AnsiParser
@@ -19,14 +19,15 @@ import java.io.PrintStream
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
-class Logger(private val globalState: GlobalState) {
+object Logger {
 
+    private val log = LogLinesProvider.instance()
     private val stdout: InterceptingStream = InterceptingStream(System.out)
     private val stderr: InterceptingStream = InterceptingStream(System.err)
     private val queue = EvictingQueue.create<AnnotatedString>(250)
     private val running = AtomicBoolean(true)
 
-    init {
+    fun start() {
         System.setOut(stdout)
         forwardStdout()
         System.setErr(stderr)
@@ -45,7 +46,7 @@ class Logger(private val globalState: GlobalState) {
                 val line = stdout.source.readUtf8Line()
                 if (line != null) {
                     val parsed = parseLine(line)
-                    globalState.updateSyslog(queue.apply {
+                    log.updateSyslog(queue.apply {
                         add(parsed)
                     }.toList())
                 }
@@ -58,7 +59,7 @@ class Logger(private val globalState: GlobalState) {
             while (running.get()) {
                 val line = stderr.source.readUtf8Line()
                 if (line != null) {
-                    globalState.updateSyslog(queue.apply {
+                    log.updateSyslog(queue.apply {
                         val parseLine = parseLine(line)
                         val result = AnnotatedString.Builder()
                             .apply {
@@ -74,7 +75,7 @@ class Logger(private val globalState: GlobalState) {
         }
     }
 
-    fun parseLine(line: String): AnnotatedString {
+    private fun parseLine(line: String): AnnotatedString {
         return runBlocking {
             val rendezvousChannel = Channel<AnnotatedString>()
             val builder = AnnotatedString.Builder()

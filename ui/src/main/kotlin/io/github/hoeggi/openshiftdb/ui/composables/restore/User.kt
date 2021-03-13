@@ -15,7 +15,7 @@ import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 
 @Composable
-fun User() {
+internal fun User() {
 
     val postgresViewModel = PostgresViewModel.current
     val username by postgresViewModel.collectAsState(postgresViewModel.userName)

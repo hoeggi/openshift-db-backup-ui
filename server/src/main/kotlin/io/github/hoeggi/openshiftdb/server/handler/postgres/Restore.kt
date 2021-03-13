@@ -13,7 +13,7 @@ import io.ktor.util.pipeline.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
-fun RestoreCommand(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
+internal fun RestoreCommand(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
     val path = call.request.queryParameters["path"]
     val principal = call.principal<PostgresPrincibal>()
     val username = principal?.username
@@ -51,7 +51,7 @@ fun RestoreCommand(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> U
     }
 }
 
-fun RestoreInfo(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
+internal fun RestoreInfo(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
     val path = call.request.queryParameters["path"]
     if (path.isNullOrBlank()) {
         call.respond(HttpStatusCode.BadRequest, "missing path")

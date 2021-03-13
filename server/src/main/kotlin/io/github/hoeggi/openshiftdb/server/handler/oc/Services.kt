@@ -9,7 +9,7 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
 
-fun Services(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun Services(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val services = OC.services()
         if (services.services.isEmpty()) {

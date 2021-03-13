@@ -6,21 +6,17 @@ plugins {
 group = "io.github.hoeggi"
 version = "1.0.0-alpha01"
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
     implementation(project(":oc"))
-    implementation(project(":api"))
+    implementation(project(":api_models"))
     implementation(project(":postgres"))
+    implementation(project(":postgres-auth"))
+
 
     implementation(Dependencies.metrics_jmx)
     implementation(Dependencies.micrometer_registry_prometheus)
-    implementation(Dependencies.okio)
-
     implementation(Dependencies.ktor.core)
     implementation(Dependencies.ktor.server)
     implementation(Dependencies.ktor.logging)
@@ -29,4 +25,6 @@ dependencies {
     implementation(Dependencies.ktor.serialization)
     implementation(Dependencies.ktor.metrics)
     implementation(Dependencies.ktor.metrics_micrometer)
+
+    compileOnly(Dependencies.slf4j_api)
 }

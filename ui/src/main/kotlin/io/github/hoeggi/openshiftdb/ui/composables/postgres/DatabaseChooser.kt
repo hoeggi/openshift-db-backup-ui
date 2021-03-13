@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import javax.swing.JFileChooser
 
 @Composable
-fun DatabaseChooser() {
+internal fun DatabaseChooser() {
     val viewModel = PostgresViewModel.current
     val selectedDatabase by viewModel.collectAsState(viewModel.selectedDatabase)
     val databases by viewModel.collectAsState(viewModel.databasesLines)

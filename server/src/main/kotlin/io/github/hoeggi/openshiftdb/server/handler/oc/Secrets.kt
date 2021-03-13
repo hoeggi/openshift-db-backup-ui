@@ -8,7 +8,7 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
 
-fun Password(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun Password(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val username = call.request.queryParameters["username"]
         if (username == null) {
@@ -23,14 +23,13 @@ fun Password(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
         }
     }
 
-fun Secrets(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun Secrets(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val secrets = OC.secrets()
         if (secrets.secrets.isNullOrEmpty()) {
             call.respond(HttpStatusCode.NotFound)
         } else {
             call.respond(ApiResponse(secrets.secrets.map {
-                val data = it.data
                 SecretsApi(it.metadata.name, it.data.filter { it.value != null } as Map<String, String>)
             }, secrets.result))
         }

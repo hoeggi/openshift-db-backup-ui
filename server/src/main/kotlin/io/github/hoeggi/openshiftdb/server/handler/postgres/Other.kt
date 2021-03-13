@@ -10,7 +10,7 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
-fun Tools(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
+internal fun Tools(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
     val awaitAll = awaitAll(
         async { Postgres.psqlVersion() },
         async { Postgres.pqDumpVersion() }

@@ -1,10 +1,7 @@
 package io.github.hoeggi.openshiftdb
 
 import com.formdev.flatlaf.FlatDarculaLaf
-import com.formdev.flatlaf.FlatDarkLaf
-import io.github.hoeggi.openshiftdb.errorhandler.ExceptionHandler
 import io.github.hoeggi.openshiftdb.server.Server
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.ServerSocket
@@ -23,21 +20,25 @@ private val logger = LoggerFactory.getLogger(UI::class.java)
 fun main() {
     logger.info("initializing")
     val port = port()
-    val globalState = GlobalState()
-    val logDelegate = Logger(globalState)
-
-    FlatDarculaLaf.install()
-    UIManager.setLookAndFeel(FlatDarculaLaf())//UIManager.getSystemLookAndFeelClassName())
-    Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(globalState))
+    Logger.start()
+    Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler())
+    UIManager.setLookAndFeel(FlatDarculaLaf())
     logger.info("starting server")
     Executors.newSingleThreadExecutor().execute(Server(port))
     logger.info("starting ui")
-    UI().show(port, globalState) {
+    UI().show(port) {
         ProcessHandle.current()
             .children()
             .forEach {
                 it.destroy()
             }
-        logDelegate.stop()
+        Logger.stop()
+    }
+}
+
+private class ExceptionHandler : Thread.UncaughtExceptionHandler {
+    private val logger = LoggerFactory.getLogger(ExceptionHandler::class.java)
+    override fun uncaughtException(t: Thread?, e: Throwable?) {
+        logger.error("$t", e)
     }
 }

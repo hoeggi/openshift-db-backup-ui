@@ -10,11 +10,11 @@ import io.github.hoeggi.openshiftdb.viewmodel.BaseViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-inline fun <T> BaseViewModel.collectAsState(flow: StateFlow<T>) =
+internal inline fun <T> BaseViewModel.collectAsState(flow: StateFlow<T>) =
     flow.collectAsState(coroutineScope.coroutineContext)
 
 @Composable
-inline fun Modifier.outsideClickable(crossinline onClick: () -> Unit = {}) = clickable(
+internal inline fun Modifier.outsideClickable(crossinline onClick: () -> Unit = {}) = clickable(
     indication = null,
     interactionSource = remember { MutableInteractionSource() },
 ) { onClick() }

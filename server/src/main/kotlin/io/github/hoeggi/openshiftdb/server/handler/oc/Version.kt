@@ -8,7 +8,7 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
 
-fun Version(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun Version(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val version = OC.version()
         version.version?.run {

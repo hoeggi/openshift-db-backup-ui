@@ -23,7 +23,7 @@ import io.github.hoeggi.openshiftdb.ui.composables.ExpandableText
 import io.github.hoeggi.openshiftdb.ui.composables.StatefulEditTextField
 
 @Composable
-fun PsqlVersion() {
+internal fun PsqlVersion() {
 
     val viewModel = PostgresViewModel.current
     val version by viewModel.collectAsState(viewModel.version)

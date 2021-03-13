@@ -13,7 +13,7 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_CONNECT_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_TABLE_LABEL
 
 @Composable
-fun ConnectButtons() {
+internal fun ConnectButtons() {
     val viewModel = PostgresViewModel.current
     Row(
         modifier = Modifier

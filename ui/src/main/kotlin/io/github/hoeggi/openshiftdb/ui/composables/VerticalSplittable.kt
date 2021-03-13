@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import java.awt.Cursor
 
 
-fun Modifier.cursorForHorizontalResize(onChange: (Boolean) -> Unit): Modifier = composed {
+internal fun Modifier.cursorForHorizontalResize(onChange: (Boolean) -> Unit): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
 
     if (isHover) {
@@ -50,7 +50,7 @@ fun Modifier.cursorForHorizontalResize(onChange: (Boolean) -> Unit): Modifier = 
 
 
 @Composable
-fun VerticalSplittable(
+internal fun VerticalSplittable(
     modifier: Modifier,
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
@@ -79,20 +79,20 @@ fun VerticalSplittable(
     }
 })
 
-class PanelState(expandedSize: Dp = 300.dp) {
+internal class PanelState(expandedSize: Dp = 300.dp) {
     var expandedSize by mutableStateOf(expandedSize)
     val expandedSizeMin = 90.dp
     val splitter = SplitterState()
 }
 
-class SplitterState {
+internal class SplitterState {
     var isResizing by mutableStateOf(false)
     var isResizeEnabled by mutableStateOf(true)
     var isActive by mutableStateOf(false)
 }
 
 @Composable
-fun VerticalSplitter(
+internal fun VerticalSplitter(
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
     color: Color = MaterialTheme.colors.onSurface,

@@ -31,19 +31,7 @@ class ServicePort(val port: Int, targetPort: String, protocol: String) {
 }
 
 data class PortForwardTarget(val project: String, val svc: String, val port: Int)
-class OpenPortForward(val target: PortForwardTarget, val messages: List<PortForwardMessage>) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        other as OpenPortForward
-        if (target != other.target) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return target.hashCode()
-    }
-}
+class OpenPortForward(val target: PortForwardTarget, val messages: List<PortForwardMessage>)
 
 interface PortForwardMessage {
     val message: String

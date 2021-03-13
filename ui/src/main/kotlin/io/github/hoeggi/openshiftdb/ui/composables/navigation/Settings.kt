@@ -15,7 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.GlobalState
+import io.github.hoeggi.openshiftdb.AppLog
+import io.github.hoeggi.openshiftdb.AppSettings
 import io.github.hoeggi.openshiftdb.OcViewModel
 import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
@@ -33,7 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 
 
 @Composable
-fun ClusterContext() {
+internal fun ClusterContext() {
     val ocViewModel = OcViewModel.current
     val context by ocViewModel.collectAsState(ocViewModel.context)
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
@@ -84,9 +85,9 @@ fun ClusterContext() {
 }
 
 @Composable
-fun LogLevelChooser(coroutineScope: CoroutineScope) {
-    val globalState = GlobalState.current
-    val level by globalState.logLevel.collectAsState(coroutineScope.coroutineContext)
+internal fun LogLevelChooser(coroutineScope: CoroutineScope) {
+    val settings = AppSettings.current
+    val level by settings.logLevel.collectAsState(coroutineScope.coroutineContext)
 
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
         Text(
@@ -97,7 +98,7 @@ fun LogLevelChooser(coroutineScope: CoroutineScope) {
             items(LogLevels) {
                 Row(
                     modifier = Modifier.clickable {
-                        globalState.updateLogLevel(it)
+                        settings.updateLogLevel(it)
                     }
                 ) {
                     RadioButton(
@@ -117,9 +118,9 @@ fun LogLevelChooser(coroutineScope: CoroutineScope) {
 }
 
 @Composable
-fun ThemeChooser(coroutineScope: CoroutineScope) {
-    val globalState = GlobalState.current
-    val dark by globalState.theme.collectAsState(coroutineScope.coroutineContext)
+internal fun ThemeChooser(coroutineScope: CoroutineScope) {
+    val settings = AppSettings.current
+    val dark by settings.theme.collectAsState(coroutineScope.coroutineContext)
 
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
         Text(
@@ -128,7 +129,7 @@ fun ThemeChooser(coroutineScope: CoroutineScope) {
         )
         Row(
             modifier = Modifier.clickable {
-                globalState.themeDark()
+                settings.themeDark()
             }
         ) {
             RadioButton(
@@ -144,7 +145,7 @@ fun ThemeChooser(coroutineScope: CoroutineScope) {
         }
         Row(
             modifier = Modifier.clickable {
-                globalState.themeLight()
+                settings.themeLight()
             }
         ) {
             RadioButton(
@@ -162,9 +163,9 @@ fun ThemeChooser(coroutineScope: CoroutineScope) {
 }
 
 @Composable
-fun ExportFormatChooser(coroutineScope: CoroutineScope) {
-    val globalState = GlobalState.current
-    val format by globalState.exportFormat.collectAsState(coroutineScope.coroutineContext)
+internal fun ExportFormatChooser(coroutineScope: CoroutineScope) {
+    val settings = AppSettings.current
+    val format by settings.exportFormat.collectAsState(coroutineScope.coroutineContext)
 
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
         Text(
@@ -173,7 +174,7 @@ fun ExportFormatChooser(coroutineScope: CoroutineScope) {
         )
         Row(
             modifier = Modifier.clickable {
-                globalState.updateExportFormat(ExportFormat.Custom)
+                settings.updateExportFormat(ExportFormat.Custom)
             }
         ) {
             RadioButton(
@@ -189,7 +190,7 @@ fun ExportFormatChooser(coroutineScope: CoroutineScope) {
         }
         Row(
             modifier = Modifier.clickable {
-                globalState.updateExportFormat(ExportFormat.Plain)
+                settings.updateExportFormat(ExportFormat.Plain)
             }
         ) {
             RadioButton(

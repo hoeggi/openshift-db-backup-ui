@@ -29,7 +29,7 @@ data class VersionDetail(
 )
 
 internal fun parseVersion(version: String) = try {
-    if (version.isNullOrBlank()) null
+    if (version.isBlank()) null
     else jsonParser.decodeFromString<OcVersion>(version)
 } catch (ex: Exception) {
     logger.error("unable to parse version", ex)

@@ -2,13 +2,8 @@ package io.github.hoeggi.openshiftdb
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.ILoggingEvent
-import ch.qos.logback.core.AppenderBase
-import io.github.hoeggi.openshiftdb.MemoryAppenderInstance.instance
-import java.util.ArrayList
 import ch.qos.logback.core.pattern.color.ANSIConstants
-
 import ch.qos.logback.core.pattern.color.ForegroundCompositeConverterBase
-
 
 class HighlightingCompositeConverterEx : ForegroundCompositeConverterBase<ILoggingEvent>() {
     override fun getForegroundColorCode(event: ILoggingEvent): String {
@@ -22,49 +17,49 @@ class HighlightingCompositeConverterEx : ForegroundCompositeConverterBase<ILoggi
         }
     }
 }
-
-object MemoryAppenderAccess {
-    fun asText(): String {
-        val instance = instance ?: return ""
-        val sb = StringBuilder()
-        for (e in instance.getEvents()) {
-            sb.append(e)
-            sb.append('\n')
-        }
-        return sb.toString()
-    }
-}
-
-object MemoryAppenderInstance {
-    var instance: MemoryAppender? = null
-}
-
-class MemoryAppender : AppenderBase<ILoggingEvent>() {
-    var limit = 150
-    private val events: MutableList<ILoggingEvent> = ArrayList()
-    override fun start() {
-        super.start()
-        instance = this
-    }
-
-    override fun stop() {
-        instance = null
-        super.stop()
-        events.clear()
-    }
-
-    override fun append(e: ILoggingEvent) {
-        synchronized(events) {
-            events.add(e)
-            if (events.size > limit && limit > 0) {
-                events.removeAt(0)
-            }
-        }
-    }
-
-    fun getEvents(): List<ILoggingEvent> {
-        val retVal: MutableList<ILoggingEvent> = ArrayList()
-        synchronized(events) { retVal.addAll(events) }
-        return retVal
-    }
-}
+//
+//object MemoryAppenderAccess {
+//    fun asText(): String {
+//        val instance = instance ?: return ""
+//        val sb = StringBuilder()
+//        for (e in instance.getEvents()) {
+//            sb.append(e)
+//            sb.append('\n')
+//        }
+//        return sb.toString()
+//    }
+//}
+//
+//object MemoryAppenderInstance {
+//    var instance: MemoryAppender? = null
+//}
+//
+//class MemoryAppender : AppenderBase<ILoggingEvent>() {
+//    var limit = 150
+//    private val events: MutableList<ILoggingEvent> = ArrayList()
+//    override fun start() {
+//        super.start()
+//        instance = this
+//    }
+//
+//    override fun stop() {
+//        instance = null
+//        super.stop()
+//        events.clear()
+//    }
+//
+//    override fun append(e: ILoggingEvent) {
+//        synchronized(events) {
+//            events.add(e)
+//            if (events.size > limit && limit > 0) {
+//                events.removeAt(0)
+//            }
+//        }
+//    }
+//
+//    fun getEvents(): List<ILoggingEvent> {
+//        val retVal: MutableList<ILoggingEvent> = ArrayList()
+//        synchronized(events) { retVal.addAll(events) }
+//        return retVal
+//    }
+//}

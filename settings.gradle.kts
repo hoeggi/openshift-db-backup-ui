@@ -1,6 +1,5 @@
 pluginManagement {
     repositories {
-        mavenLocal()
         gradlePluginPortal()
         mavenCentral()
         maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
@@ -14,6 +13,7 @@ include(
     ":oc",
     ":server",
     ":postgres",
+    "postgres-auth",
     ":api",
     ":viewmodel",
     ":api_models",

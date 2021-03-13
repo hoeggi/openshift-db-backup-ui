@@ -9,7 +9,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 
-typealias ApiClient = Pair<OkHttpClient, BasePath>
+internal typealias ApiClient = Pair<OkHttpClient, BasePath>
 typealias BasePath = String
 
 
@@ -22,7 +22,7 @@ interface Api : OcApi, PostgresApi
 private class ApiImp(val oc: OcApi, val postgres: PostgresApi) : Api, OcApi by oc, PostgresApi by postgres
 
 
-operator fun OkHttpClient.plus(baseUrl: BasePath): ApiClient = this to baseUrl
+internal operator fun OkHttpClient.plus(baseUrl: BasePath): ApiClient = this to baseUrl
 
 internal fun String.withPath(path: BasePath) =
     toHttpUrl().newBuilder().addEncodedPathSegments(path).build()

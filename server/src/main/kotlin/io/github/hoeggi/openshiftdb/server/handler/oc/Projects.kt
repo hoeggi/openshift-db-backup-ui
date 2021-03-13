@@ -8,7 +8,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
 
-fun SwitchProject(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun SwitchProject(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val project = call.receiveOrNull<ProjectApi>()
         val projectName = project?.name
@@ -20,13 +20,13 @@ fun SwitchProject(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Un
         }
     }
 
-fun Project(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun Project(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val projects = OC.project()
         authorized(ProjectApi(projects.text), projects.result)
     }
 
-fun Projects(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun Projects(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val projects = OC.projects()
         authorized(projects.projects.map { ProjectApi(it) }, projects.result)

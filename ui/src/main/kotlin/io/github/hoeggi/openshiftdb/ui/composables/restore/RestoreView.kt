@@ -19,22 +19,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.GlobalState
-import io.github.hoeggi.openshiftdb.PostgresViewModel
+import io.github.hoeggi.openshiftdb.*
 import io.github.hoeggi.openshiftdb.api.response.DatabaseRestoreMessage
-import io.github.hoeggi.openshiftdb.collectAsState
-import io.github.hoeggi.openshiftdb.outsideClickable
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.ErrorViewProvider
 import io.github.hoeggi.openshiftdb.ui.composables.oc.CurrentProject
 import io.github.hoeggi.openshiftdb.ui.composables.oc.PortForward
-import io.github.hoeggi.openshiftdb.ui.theme.customOverlay
-import io.github.hoeggi.openshiftdb.viewmodel.PostgresViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @Composable
-fun RestoreView() {
-    val globalState = GlobalState.current
+internal fun RestoreView() {
+    val globalState = AppMenuControl.current
     val postgresViewModel = PostgresViewModel.current
     val path by postgresViewModel.collectAsState(postgresViewModel.restorePath)
 
@@ -50,12 +45,12 @@ fun RestoreView() {
     ) {
         BackupPicker()
         Divider()
-        if (!path.isNullOrBlank()) {
+        if (path.isNotBlank()) {
             Row {
                 Column(Modifier.fillMaxWidth(0.7f)) {
                     RestoreData()
                     Divider()
-                    RestoreLog(globalState, postgresViewModel)
+                    RestoreLog()
                 }
                 Column {
                     User()
@@ -68,23 +63,25 @@ fun RestoreView() {
 }
 
 @Composable
-fun RestoreLog(globalState: GlobalState, postgresViewModel: PostgresViewModel) {
+internal fun RestoreLog() {
+    val postgresViewModel = PostgresViewModel.current
+    val errorViewer = AppErrorViewer.current
     val restoreState by postgresViewModel.collectAsState(postgresViewModel.restoreState)
     val restoreProgress by postgresViewModel.collectAsState(postgresViewModel.restoreProgress)
     val listState = rememberLazyListState(restoreProgress.size, 0)
 
     when (restoreState) {
         is DatabaseRestoreMessage.RequestConfirmation -> {
-            globalState.showOverlay(customOverlay {
+            errorViewer.showOverlay(ErrorViewProvider.customOverlay {
                 RestoreWarning(
                     (restoreState as DatabaseRestoreMessage.RequestConfirmation).message,
                     onCancel = {
                         postgresViewModel.cancelRestore()
-                        globalState.resetOverlay()
+                        errorViewer.resetOverlay()
                     },
                     onConfirm = {
                         postgresViewModel.confirmeRestore()
-                        globalState.resetOverlay()
+                        errorViewer.resetOverlay()
                     }
                 )
             })
@@ -114,7 +111,7 @@ fun RestoreLog(globalState: GlobalState, postgresViewModel: PostgresViewModel) {
 }
 
 @Composable
-fun RestoreWarning(
+internal fun RestoreWarning(
     command: String, onCancel: () -> Unit, onConfirm: () -> Unit,
 ) {
     Box(

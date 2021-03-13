@@ -18,7 +18,7 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_SERVICE_AVAILABLE
 import io.github.hoeggi.openshiftdb.viewmodel.models.Service
 
 @Composable
-fun Service() {
+internal fun Service() {
 
     val viewModel = OcViewModel.current
     val services by viewModel.collectAsState(viewModel.services)
@@ -49,7 +49,7 @@ fun Service() {
 }
 
 @Composable
-fun Service(
+internal fun Service(
     service: Service,
     onServiceClicked: (String, Int) -> Unit,
 ) {

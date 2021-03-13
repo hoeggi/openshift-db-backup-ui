@@ -22,7 +22,7 @@ private suspend fun WebSocketSession.close(code: CloseReason.Codes, message: Por
     close(CloseReason(code, Json.encodeToString(message)))
 }
 
-fun PortForward(): suspend DefaultWebSocketServerSession.() -> Unit = {
+internal fun PortForward(): suspend DefaultWebSocketServerSession.() -> Unit = {
     val logger = LoggerFactory.getLogger(this::class.java)
     var portForward: PortForward? = null
     try {

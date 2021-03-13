@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.GlobalState
+import io.github.hoeggi.openshiftdb.AppErrorViewer
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_EXIT
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_OK
@@ -19,13 +19,13 @@ import io.github.hoeggi.openshiftdb.outsideClickable
 
 
 @Composable
-fun ErrorView(t: Thread?, th: Throwable?) {
+internal fun ErrorView(t: Thread?, th: Throwable?) {
     Box(
         modifier = Modifier.fillMaxSize().background(
             color = MaterialTheme.colors.background.copy(alpha = 0.7f),
         ).outsideClickable()
     ) {
-        val globalState = GlobalState.current
+        val globalState = AppErrorViewer.current
         Surface(
             elevation = 8.dp,
             shape = RoundedCornerShape(6.dp),
