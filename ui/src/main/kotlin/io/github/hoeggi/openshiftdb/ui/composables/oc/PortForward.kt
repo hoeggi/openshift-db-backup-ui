@@ -22,10 +22,10 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_PORT
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_PROJECT
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_SERVICE
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_STREAM_LABEL
+import org.slf4j.LoggerFactory
 
 @Composable
-fun PortForward() {
-
+internal fun PortForward() {
     val viewModel = OcViewModel.current
     val portForwards by viewModel.collectAsState(viewModel.portForward)
     LazyColumn {

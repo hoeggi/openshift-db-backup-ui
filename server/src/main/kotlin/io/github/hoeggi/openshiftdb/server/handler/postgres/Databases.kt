@@ -12,7 +12,7 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
 
-fun DefaultDatabase(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
+internal fun DefaultDatabase(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
     val principal = call.principal<PostgresPrincibal>()
     if (principal == null) {
         call.respond(HttpStatusCode.Unauthorized)
@@ -22,7 +22,7 @@ fun DefaultDatabase(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> 
     }
 }
 
-fun Databases(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
+internal fun Databases(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
     val format = call.request.queryParameters["format"]
     val principal = call.principal<PostgresPrincibal>()
     if (principal == null) {
@@ -50,7 +50,7 @@ fun Databases(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     }
 }
 
-fun DatabaseVersion(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
+internal fun DatabaseVersion(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
     val principal = call.principal<PostgresPrincibal>()
     if (principal == null) {
         call.respond(HttpStatusCode.Unauthorized)

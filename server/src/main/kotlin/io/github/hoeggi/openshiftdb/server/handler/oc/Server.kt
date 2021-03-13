@@ -8,7 +8,7 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
 
-fun Cluster(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun Cluster(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val listServer = OC.listServer()
         if (listServer.server.isEmpty()) {

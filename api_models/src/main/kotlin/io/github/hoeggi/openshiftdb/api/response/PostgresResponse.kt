@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RestoreRequestAPI (
+data class RestoreRequestAPI(
     val database: String,
     val exists: Boolean,
     val path: String,
@@ -115,6 +115,9 @@ data class DatabaseVersionApi(
     val database: String = "",
 )
 
+//@Serializable
+//inline class StringList(val databases: List<String>)
+
 @Serializable
 sealed class DatabasesApi {
 
@@ -130,5 +133,6 @@ sealed class DatabasesApi {
 
     @Serializable
     @SerialName("list")
+
     data class List(val databases: Array<String> = arrayOf()) : DatabasesApi()
 }

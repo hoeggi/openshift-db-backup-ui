@@ -8,6 +8,8 @@ version = "1.0.0-alpha01"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    testImplementation(kotlin("test-junit"))
+    implementation(Dependencies.Kotlin.coroutines)
+    api(Dependencies.ktor.auth)
     implementation(Dependencies.Kotlin.serialization)
+    compileOnly(Dependencies.slf4j_api)
 }

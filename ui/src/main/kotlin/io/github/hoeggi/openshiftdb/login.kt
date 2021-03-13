@@ -19,7 +19,7 @@ import io.github.hoeggi.openshiftdb.ui.composables.StatefulEditTextField
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.ClusterContext
 
 @Composable
-fun LoginScreen() {
+internal fun LoginScreen() {
 
     val ocViewModel = OcViewModel.current
     val server by ocViewModel.collectAsState(ocViewModel.server)

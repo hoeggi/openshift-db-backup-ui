@@ -10,7 +10,7 @@ import io.ktor.util.pipeline.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
-fun SwitchContext(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun SwitchContext(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val context = call.receiveOrNull<SwitchContextApi>()
         if (context == null) {
@@ -26,7 +26,7 @@ fun SwitchContext(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Un
         }
     }
 
-fun Context(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun Context(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val allJob = async { OC.listContext() }
         val currentJob = async { OC.currentContext() }

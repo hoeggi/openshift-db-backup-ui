@@ -24,6 +24,7 @@ import io.github.hoeggi.openshiftdb.settings.Theme
 import io.github.hoeggi.openshiftdb.ui.composables.ErrorView
 import io.github.hoeggi.openshiftdb.ui.composables.Loading
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.BottomNav
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.CustomErrorViewer
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.Drawer
 import io.github.hoeggi.openshiftdb.viewmodel.models.LoginState
 import kotlinx.coroutines.CoroutineScope
@@ -32,15 +33,16 @@ import kotlinx.coroutines.launch
 
 @ExperimentalAnimationApi
 @Composable
-fun Theme(
+internal fun Theme(
     coroutineScope: CoroutineScope,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val globalState = GlobalState.current
+    val appSettings = AppSettings.current
+    val navigator = AppNavigator.current
     val ocViewModel = OcViewModel.current
     val postgresViewModel = PostgresViewModel.current
     val loginState by ocViewModel.collectAsState(ocViewModel.loginState)
-    val dark by globalState.theme.collectAsState(coroutineScope.coroutineContext)
+    val dark by appSettings.theme.collectAsState(coroutineScope.coroutineContext)
 
     ocViewModel.checkLoginState()
 
@@ -63,7 +65,7 @@ fun Theme(
     ) {
         Surface {
             val state = rememberScaffoldState()
-            val settings by globalState.showDrawer.collectAsState(coroutineScope.coroutineContext)
+            val settings by navigator.showDrawer.collectAsState(coroutineScope.coroutineContext)
             Scaffold(
                 scaffoldState = state,
                 bottomBar = {
@@ -76,7 +78,7 @@ fun Theme(
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = {
-                            globalState.toggleDrawer()
+                            navigator.toggleDrawer()
                         },
                     ) {
                         Crossfade(targetState = settings) {
@@ -107,7 +109,7 @@ fun Theme(
 
                     val padding = if (loginState == LoginState.LOGGEDIN) 48.dp else 0.dp
                     Drawer(Modifier.padding(bottom = padding), settings, coroutineScope) {
-                        globalState.hideDrawer()
+                        navigator.hideDrawer()
                     }
                     Overlays(coroutineScope, state)
                 }
@@ -116,18 +118,9 @@ fun Theme(
     }
 }
 
-fun customOverlay(overlay: @Composable () -> Unit) = object : CustomOverlay {
-    override val overlay = overlay
-    override val fired = true
-}
-
-interface CustomOverlay : ErrorViewer.Message {
-    val overlay: @Composable () -> Unit
-}
-
 @Composable
-fun Overlays(coroutineScope: CoroutineScope, state: ScaffoldState) {
-    val viewModel = GlobalState.current
+internal fun Overlays(coroutineScope: CoroutineScope, state: ScaffoldState) {
+    val viewModel = AppErrorViewer.current
     val error by viewModel.errors.collectAsState(coroutineScope.coroutineContext)
 
     if (error.fired) {
@@ -145,7 +138,7 @@ fun Overlays(coroutineScope: CoroutineScope, state: ScaffoldState) {
                 }
                 viewModel.showWarning(viewModel.empty())
             }
-            is CustomOverlay -> message.overlay()
+            is CustomErrorViewer.CustomOverlay -> message.overlay()
         }
     }
 }

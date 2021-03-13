@@ -14,13 +14,10 @@ buildConfig {
     buildConfigField("String", "APP_NAME", "\"${rootProject.name}\"")
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
-    implementation(Dependencies.ktor.serialization)
+    implementation(Dependencies.Kotlin.serialization)
+    implementation(Dependencies.Kotlin.coroutines)
     implementation(Dependencies.okio)
 }

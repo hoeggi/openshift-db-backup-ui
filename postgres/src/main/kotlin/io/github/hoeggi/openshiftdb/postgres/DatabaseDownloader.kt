@@ -1,3 +1,12 @@
+@file:Suppress("BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
+    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
+    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
+    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
+    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
+    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
+    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
+    "BlockingMethodInNonBlockingContext")
+
 package io.github.hoeggi.openshiftdb.postgres
 
 import kotlinx.coroutines.Dispatchers

@@ -7,7 +7,7 @@ import io.github.hoeggi.openshiftdb.PostgresViewModel
 import io.github.hoeggi.openshiftdb.collectAsState
 
 @Composable
-fun PostgresPane() {
+internal fun PostgresPane() {
     val viewModel = PostgresViewModel.current
 
     val selectedDatabase by viewModel.collectAsState(viewModel.selectedDatabase)

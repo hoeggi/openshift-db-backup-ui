@@ -24,7 +24,7 @@ import io.github.hoeggi.openshiftdb.outsideClickable
 import io.github.hoeggi.openshiftdb.viewmodel.PostgresViewModel
 
 @Composable
-fun SecretsChooser(modifier: Modifier = Modifier, viewModel: PostgresViewModel) {
+internal fun SecretsChooser(modifier: Modifier = Modifier, viewModel: PostgresViewModel) {
 
     val secrets by viewModel.collectAsState(viewModel.secrets)
     val updateTransition = updateTransition(targetState = rememberUpdatedState(secrets.isNotEmpty()))

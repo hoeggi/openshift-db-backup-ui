@@ -13,11 +13,11 @@
         </encoder>
     </appender>
 
-    <appender name="MEMORY" class="io.github.hoeggi.openshiftdb.MemoryAppender">
-        <encoder>
-            <pattern>%highlight(%-5level %d{HH:mm:ss.SSS} [%file:%line] %msg%n %rEx)</pattern>
-        </encoder>
-    </appender>
+<!--    <appender name="MEMORY" class="io.github.hoeggi.openshiftdb.MemoryAppender">-->
+<!--        <encoder>-->
+<!--            <pattern>%highlight(%-5level %d{HH:mm:ss.SSS} [%file:%line] %msg%n %rEx)</pattern>-->
+<!--        </encoder>-->
+<!--    </appender>-->
 
 
 

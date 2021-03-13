@@ -29,13 +29,13 @@ import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
 import io.github.hoeggi.openshiftdb.collectAsState
 
 @Composable
-fun ConsoleOutput() {
+internal fun ConsoleOutput() {
     val viewModel = PostgresViewModel.current
     val text by viewModel.collectAsState(viewModel.databases)
     val downloadProgress by viewModel.collectAsState(viewModel.downloadProgress)
     val resultState by viewModel.collectAsState(viewModel.downloadState)
 
-    if (!downloadProgress.isNullOrEmpty() || !text.isNullOrBlank())
+    if (!downloadProgress.isNullOrEmpty() || text.isNotBlank())
         Surface(
             shape = RoundedCornerShape(6.dp),
             border = BorderStroke(Dp.Hairline, MaterialTheme.colors.onSurface),
@@ -43,7 +43,7 @@ fun ConsoleOutput() {
             modifier = Modifier.padding(10.dp).fillMaxSize()
         ) {
             Column {
-                if (!text.isNullOrBlank()) {
+                if (text.isNotBlank()) {
                     Box {
                         Text(
                             text = text,

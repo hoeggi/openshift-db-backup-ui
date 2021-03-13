@@ -8,7 +8,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.websocket.*
 
-fun Route.postgres() {
+internal fun Route.postgres() {
     route("/postgres") {
         get {
             call.respond(HttpStatusCode.OK, "/postgres")

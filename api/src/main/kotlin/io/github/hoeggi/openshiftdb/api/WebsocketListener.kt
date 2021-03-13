@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("io.github.hoeggi.openshiftdb.api.WebsocketListener")
 
-fun <T> createListener(producer: ProducerScope<T>, serializer: KSerializer<T>): WebSocketListener {
+internal fun <T> createListener(producer: ProducerScope<T>, serializer: KSerializer<T>): WebSocketListener {
     return object : WebSocketListener() {
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {

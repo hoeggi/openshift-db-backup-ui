@@ -1,10 +1,9 @@
 package io.github.hoeggi.openshiftdb.ui.composables
 
-import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import net.rubygrapefruit.ansi.TextColor
 
-object ColorMapping {
+internal object ColorMapping {
     val colors = mapOf(
         TextColor.BLACK to Color(0, 0, 0),
         TextColor.RED to Color(219, 84, 81),

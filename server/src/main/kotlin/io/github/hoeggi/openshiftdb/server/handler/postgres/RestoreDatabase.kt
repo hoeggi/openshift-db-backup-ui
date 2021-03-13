@@ -42,7 +42,7 @@ private suspend fun WebSocketSession.close(code: CloseReason.Codes, message: Dat
 
 private val logger = LoggerFactory.getLogger("io.github.hoeggi.openshiftdb.server.handler.postgres.RestoreDatabase")
 
-fun RestoreDatabase(): suspend DefaultWebSocketServerSession.() -> Unit = {
+internal fun RestoreDatabase(): suspend DefaultWebSocketServerSession.() -> Unit = {
 
     try {
         val principal = call.principal<PostgresPrincibal>()
@@ -69,7 +69,7 @@ fun RestoreDatabase(): suspend DefaultWebSocketServerSession.() -> Unit = {
     }
 }
 
-suspend fun restore(
+private suspend fun restore(
     restore: Postgres.PostgresResult.Restore,
     session: DefaultWebSocketSession,
 ) {

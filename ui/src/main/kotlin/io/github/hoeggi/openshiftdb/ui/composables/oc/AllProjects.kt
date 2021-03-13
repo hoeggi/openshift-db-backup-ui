@@ -18,7 +18,7 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PROJECT_ALL_LABEL
 
 @Composable
-fun AllProjects() {
+internal fun AllProjects() {
     val viewModel = OcViewModel.current
     val projects: List<String> by viewModel.collectAsState(viewModel.projects)
 
@@ -47,7 +47,7 @@ fun AllProjects() {
 }
 
 @Composable
-fun Project(
+private fun Project(
     name: String,
     onProjectClicked: (String) -> Unit,
 ) {

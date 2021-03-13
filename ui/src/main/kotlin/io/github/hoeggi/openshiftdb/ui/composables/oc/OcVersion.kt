@@ -18,7 +18,7 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_VERSION_TEXT
 import io.github.hoeggi.openshiftdb.ui.composables.ExpandableText
 
 @Composable
-fun OcVersion() {
+internal fun OcVersion() {
 
     val ocViewModel = OcViewModel.current
     val version by ocViewModel.collectAsState(ocViewModel.version)

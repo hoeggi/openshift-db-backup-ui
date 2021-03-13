@@ -9,11 +9,11 @@ import io.ktor.response.*
 import io.ktor.util.pipeline.*
 import org.slf4j.LoggerFactory
 
-class LoginLogger
+internal class LoginLogger
 
 private val logger = LoggerFactory.getLogger(LoginLogger::class.java)
 
-fun CheckLogin(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun CheckLogin(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         logger.debug("checking login state")
         when (val result = OC.checkLogin()) {
@@ -25,7 +25,7 @@ fun CheckLogin(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit 
         }
     }
 
-fun Login(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
+internal fun Login(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val login = call.receiveOrNull<LoginApi>()
         if (login == null) {

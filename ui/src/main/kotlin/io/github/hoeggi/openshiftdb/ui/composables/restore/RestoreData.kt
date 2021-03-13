@@ -25,7 +25,7 @@ import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 
 @Composable
-fun RestoreData(modifier: Modifier = Modifier) {
+internal fun RestoreData(modifier: Modifier = Modifier) {
 
     val postgresViewModel = PostgresViewModel.current
     val info by postgresViewModel.collectAsState(postgresViewModel.restoreInfo)

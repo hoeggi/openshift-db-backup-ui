@@ -22,7 +22,7 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_PASSWORD_LABEL
 import io.github.hoeggi.openshiftdb.ui.composables.EditTextField
 
 @Composable
-fun PostgresPassword() {
+internal fun PostgresPassword() {
     val viewModel = PostgresViewModel.current
     val password by viewModel.collectAsState(viewModel.password)
     var internalPassword by remember { mutableStateOf(TextFieldValue("")) }

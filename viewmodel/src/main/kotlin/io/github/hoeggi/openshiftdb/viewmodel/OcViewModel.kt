@@ -137,7 +137,7 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
         }.getOrDefault(listOf()).map { it.toService() }
     }
 
-    private val openPortForwars = mutableMapOf<PortForwardTarget, Job>()
+    private val openPortForwards = mutableMapOf<PortForwardTarget, Job>()
     val portForward = _portForward.asStateFlow()
 
     fun portForward(svc: String, port: Int) {
@@ -149,24 +149,25 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
             val flow = ocApi.portForward(target.project, target.svc, target.port)
             flow.collect { message ->
                 ensureActive()
-                logger.debug("message from port-forward: $message")
                 portForwardData[target] = portForwardData.getOrDefault(target, mutableListOf()).apply {
                     add(portForwardMessage(message))
                 }
-                _portForward.value = portForwardData.map { OpenPortForward(it.key, it.value) }
+                _portForward.value = portForwardData.map {
+                    OpenPortForward(it.key, it.value)
+                }
             }
         }
-        openPortForwars.put(target, launch)
+        openPortForwards[target] = launch
     }
 
     fun closePortForward(target: PortForwardTarget) {
-        openPortForwars.remove(target)?.cancel()
+        openPortForwards.remove(target)?.cancel()
         portForwardData.remove(target)
         _portForward.value = portForwardData.map { OpenPortForward(it.key, it.value) }
     }
 
     fun closeAllPortForward() {
-        openPortForwars.onEach {
+        openPortForwards.onEach {
             it.value.cancel()
         }.clear()
         portForwardData.clear()

@@ -17,13 +17,14 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.SYSLOG_LABEL
 
 @Composable
-fun Log(
+internal fun Log(
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = UIScope.current
-    val viewModel = GlobalState.current
-    val logLines by viewModel.syslog.collectAsState(coroutineScope.coroutineContext)
-    val logLevel by viewModel.logLevel.collectAsState(coroutineScope.coroutineContext)
+    val logs = AppLog.current
+    val settings = AppSettings.current
+    val logLines by logs.syslog.collectAsState(coroutineScope.coroutineContext)
+    val logLevel by settings.logLevel.collectAsState(coroutineScope.coroutineContext)
 
     val filteredLines = logLines.filter { logLevel.predicate(it) }
     val listState = rememberLazyListState(filteredLines.size, 0)

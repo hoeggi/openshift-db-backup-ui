@@ -9,7 +9,7 @@ import io.ktor.websocket.*
 import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger(Route::class.java)
-fun Route.oc() {
+internal fun Route.oc() {
     route("/oc") {
         get {
             call.respond(HttpStatusCode.OK, "/oc")

@@ -22,18 +22,32 @@ private val settingsPath = if (System.getenv("XDG_CONFIG_HOME") != null) {
     }
 }
 
-private val DefaultSettings = Settings(Theme.Dark, ExportFormat.Custom, LogLevel.Debug)
+private val DefaultSetting = Setting(Theme.Dark, ExportFormat.Custom, LogLevel.Debug)
 
-fun Settings.save() {
+internal fun Setting.save() {
     val encodeToString = Json.encodeToString(this)
     settingsPath.sink().buffer().use {
         it.writeUtf8(encodeToString)
     }
 }
 
-fun loadSettings(): Settings {
+internal fun Setting.update(
+    theme: Theme? = null,
+    format: ExportFormat? = null,
+    logLevel: LogLevel? = null,
+): Setting {
+    return copy(
+        theme = theme ?: this.theme,
+        format = format ?: this.format,
+        logLevel = logLevel ?: this.logLevel
+    ).also {
+        it.save()
+    }
+}
+
+internal fun loadSettings(): Setting {
     if (!settingsPath.exists()) {
-        DefaultSettings.save()
+        DefaultSetting.save()
     }
     val readUtf8 = settingsPath.source().buffer().readUtf8()
     return try {
@@ -41,8 +55,8 @@ fun loadSettings(): Settings {
             ignoreUnknownKeys = true
         }.decodeFromString(readUtf8)
     } catch (ex: SerializationException) {
-        DefaultSettings.save()
-        DefaultSettings
+        DefaultSetting.save()
+        DefaultSetting
     }
 }
 
@@ -96,7 +110,7 @@ sealed class ExportFormat(val format: String) {
 }
 
 @Serializable
-data class Settings(
+data class Setting(
     val theme: Theme = Theme.Dark,
     val format: ExportFormat = ExportFormat.Custom,
     val logLevel: LogLevel = LogLevel.Debug,

@@ -30,7 +30,7 @@ private suspend fun WebSocketSession.close(code: CloseReason.Codes, message: Dat
 
 private val logger = LoggerFactory.getLogger("io.github.hoeggi.openshiftdb.server.handler.postgres.PostgresDump")
 
-fun PostgresDump(): suspend DefaultWebSocketServerSession.() -> Unit = {
+internal fun PostgresDump(): suspend DefaultWebSocketServerSession.() -> Unit = {
 
     try {
         val principal = call.principal<PostgresPrincibal>()
@@ -59,7 +59,7 @@ fun PostgresDump(): suspend DefaultWebSocketServerSession.() -> Unit = {
     }
 }
 
-suspend fun downloadPlain(
+private suspend fun downloadPlain(
     database: String,
     path: String,
     username: String,
@@ -110,7 +110,7 @@ suspend fun downloadPlain(
     logger.debug("channel closed ${session.closeReason.await()}")
 }
 
-suspend fun downloadCustom(
+private suspend fun downloadCustom(
     database: String,
     path: String,
     username: String,

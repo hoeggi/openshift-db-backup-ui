@@ -1,6 +1,5 @@
 package io.github.hoeggi.openshiftdb.ui.composables
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,7 +23,7 @@ import java.awt.datatransfer.StringSelection
 import java.awt.event.KeyEvent
 
 @Composable
-fun Loading() {
+internal fun Loading() {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -36,7 +35,7 @@ fun Loading() {
 }
 
 @Composable
-fun ExpandableText(
+internal fun ExpandableText(
     initialState: Boolean = false,
     header: @Composable (RowScope.(Boolean) -> Unit),
     content: @Composable (() -> Unit),
@@ -56,7 +55,7 @@ fun ExpandableText(
 }
 
 @Composable
-fun ExpandableText(
+internal fun ExpandableText(
     text: String,
     style: TextStyle = MaterialTheme.typography.body1,
     initialState: Boolean = false,
@@ -65,8 +64,8 @@ fun ExpandableText(
     ExpandableText(
         initialState = initialState,
         header = { expanded ->
-            Crossfade(targetState = expanded) { expanded ->
-                if (expanded) Icon(Icons.Outlined.KeyboardArrowUp, "")
+            Crossfade(targetState = expanded) {
+                if (it) Icon(Icons.Outlined.KeyboardArrowUp, "")
                 else Icon(Icons.Outlined.KeyboardArrowDown, "")
             }
             Text(
@@ -92,7 +91,7 @@ fun ExpandableText(
 //            )
 
 @Composable
-fun EditTextField(
+internal fun EditTextField(
     value: TextFieldValue,
     label: String,
     modifier: Modifier = Modifier,
@@ -133,7 +132,7 @@ fun EditTextField(
                         selected.start.coerceAtMost(selected.end),
                         selected.start.coerceAtLeast(selected.end)
                     )
-                    if (text.isNullOrEmpty().not()) Toolkit.getDefaultToolkit()
+                    if (text.isNotEmpty()) Toolkit.getDefaultToolkit()
                         .systemClipboard.setContents(StringSelection(text), null)
                 }
                 on(Key.Delete) {
@@ -179,7 +178,7 @@ fun EditTextField(
 
 
 @Composable
-fun StatefulEditTextField(
+internal fun StatefulEditTextField(
     initialValue: TextFieldValue,
     label: String,
     modifier: Modifier = Modifier,

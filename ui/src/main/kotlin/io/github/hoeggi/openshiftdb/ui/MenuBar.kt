@@ -5,14 +5,14 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.window.KeyStroke
 import androidx.compose.ui.window.Menu
 import androidx.compose.ui.window.MenuItem
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.MenuControl
 import kotlinx.coroutines.GlobalScope
 
-fun MenuBar(globalState: GlobalState) = androidx.compose.ui.window.MenuBar(
+internal fun MenuBar(menuControl: MenuControl) = androidx.compose.ui.window.MenuBar(
     Menu("File",
         MenuItem(
             name = "Settings",
-            onClick = { globalState.toggleDrawer() },
+            onClick = { menuControl.toggleDrawer() },
             shortcut = KeyStroke(Key.S)
         ),
         MenuItem(
@@ -24,17 +24,17 @@ fun MenuBar(globalState: GlobalState) = androidx.compose.ui.window.MenuBar(
     Menu("View",
         MenuItem(
             name = "Main",
-            onClick = { globalState.main() },
+            onClick = { menuControl.main() },
             shortcut = KeyStroke(Key.M)
         ),
         MenuItem(
             name = "Restore",
-            onClick = { globalState.restore() },
+            onClick = { menuControl.restore() },
             shortcut = KeyStroke(Key.R)
         ),
         MenuItem(
             name = "Log",
-            onClick = { globalState.detail() },
+            onClick = { menuControl.detail() },
             shortcut = KeyStroke(Key.L)
         )
     ),
@@ -42,7 +42,7 @@ fun MenuBar(globalState: GlobalState) = androidx.compose.ui.window.MenuBar(
         MenuItem(
             name = "Reload",
             onClick = {
-                val refresh = globalState.refresh(GlobalScope)
+                menuControl.refresh(GlobalScope)
             },
             shortcut = KeyStroke(Key.U)
         )
