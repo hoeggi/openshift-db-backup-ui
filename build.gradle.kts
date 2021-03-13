@@ -42,6 +42,7 @@ dependencies {
     implementation(project(":errorhandler"))
     compileOnly(Dependencies.slf4j_api)
     implementation(Dependencies.logback)
+    implementation("com.formdev:flatlaf:1.0")
 }
 
 allprojects {

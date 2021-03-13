@@ -1,10 +1,11 @@
 package io.github.hoeggi.openshiftdb
 
+import com.formdev.flatlaf.FlatDarculaLaf
+import com.formdev.flatlaf.FlatDarkLaf
 import io.github.hoeggi.openshiftdb.errorhandler.ExceptionHandler
 import io.github.hoeggi.openshiftdb.server.Server
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.GlobalState
 import org.slf4j.LoggerFactory
-import java.awt.Toolkit
 import java.io.IOException
 import java.net.ServerSocket
 import java.util.concurrent.Executors
@@ -24,7 +25,9 @@ fun main() {
     val port = port()
     val globalState = GlobalState()
     val logDelegate = Logger(globalState)
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+
+    FlatDarculaLaf.install()
+    UIManager.setLookAndFeel(FlatDarculaLaf())//UIManager.getSystemLookAndFeelClassName())
     Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(globalState))
     logger.info("starting server")
     Executors.newSingleThreadExecutor().execute(Server(port))

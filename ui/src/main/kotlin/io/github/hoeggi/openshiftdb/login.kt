@@ -3,25 +3,26 @@ package io.github.hoeggi.openshiftdb
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RadioButton
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.api.response.ClusterApi
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.LOGIN_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.LOGIN_TOKEN_HINT
 import io.github.hoeggi.openshiftdb.ui.composables.StatefulEditTextField
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.ClusterContext
-import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 
 @Composable
 fun LoginScreen() {
 
     val ocViewModel = OcViewModel.current
-    val server: List<ClusterApi> by ocViewModel.collectAsState(ocViewModel.server)
+    val server by ocViewModel.collectAsState(ocViewModel.server)
 
     var token by remember { mutableStateOf(TextFieldValue("")) }
     var selected by remember { mutableStateOf(-1) }

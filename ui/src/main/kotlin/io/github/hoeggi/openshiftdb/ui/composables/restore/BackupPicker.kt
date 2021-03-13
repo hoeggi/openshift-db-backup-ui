@@ -1,7 +1,6 @@
 package io.github.hoeggi.openshiftdb.ui.composables.restore
 
 import androidx.compose.desktop.LocalAppWindow
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -14,18 +13,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
+import io.github.hoeggi.openshiftdb.UIScope
 import io.github.hoeggi.openshiftdb.api.response.DatabaseRestoreMessage
 import io.github.hoeggi.openshiftdb.collectAsState
-import io.github.hoeggi.openshiftdb.ui.composables.Loading
+import java.awt.FileDialog
 import javax.swing.JFileChooser
+
 
 @Composable
 fun BackupPicker() {
     val postgresViewModel = PostgresViewModel.current
+    val scope = UIScope.current
     val window = LocalAppWindow.current.window
+
     val path by postgresViewModel.collectAsState(postgresViewModel.restorePath)
     val restoreState by postgresViewModel.collectAsState(postgresViewModel.restoreState)
 
@@ -42,10 +44,11 @@ fun BackupPicker() {
             ) {
                 Text("Restore Database")
             }
+            val fileDialog = FileDialog(LocalAppWindow.current.window, "Choose a file", FileDialog.LOAD)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.clickable {
-                    val chooser = JFileChooser().apply {
+                    val chooser = JFileChooser(path).apply {
                         fileSelectionMode = JFileChooser.FILES_ONLY
                     }
                     val returnVal = chooser.showOpenDialog(window)

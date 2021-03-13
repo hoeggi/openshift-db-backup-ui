@@ -58,7 +58,7 @@ fun DatabaseChooser() {
             val window = LocalAppWindow.current.window
             Row(
                 modifier = Modifier.padding(10.dp).clickable {
-                    val chooser = JFileChooser().apply {
+                    val chooser = JFileChooser(dumpPath).apply {
                         fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
                     }
                     val returnVal = chooser.showOpenDialog(window)
