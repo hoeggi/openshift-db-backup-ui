@@ -8,8 +8,12 @@ plugins {
     id("com.github.ben-manes.versions") version "0.38.0"
     id("com.autonomousapps.dependency-analysis") version "0.71.0"
     id("me.tylerbwong.gradle.metalava") version "0.1.6"
+    id("com.savvasdalkitsis.module-dependency-graph") version "0.9"
 }
 
+apply {
+    from("https://raw.githubusercontent.com/JakeWharton/SdkSearch/master/gradle/projectDependencyGraph.gradle")
+}
 group = "io.github.hoeggi"
 version = "1.0.0"
 
@@ -64,6 +68,8 @@ compose.desktop {
 }
 
 allprojects {
+    apply(plugin = "me.tylerbwong.gradle.metalava")
+
     repositories {
         mavenCentral()
         maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
@@ -93,6 +99,7 @@ allprojects {
             "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi",
             "-Xuse-experimental=androidx.compose.animation.ExperimentalAnimationApi",
             "-Xinline-classes"
+//            "-Xexplicit-api=strict"
         )
     }
     configurations.all {

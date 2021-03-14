@@ -11,7 +11,7 @@ version = "1.0.0-alpha01"
 
 dependencies {
     implementation(compose.desktop.currentOs)
-//    implementation(compose.materialIconsExtended)
+    implementation(compose.materialIconsExtended)
     implementation(kotlin("stdlib-jdk8"))
     implementation(project(":viewmodel"))
     implementation(project(":i18n"))

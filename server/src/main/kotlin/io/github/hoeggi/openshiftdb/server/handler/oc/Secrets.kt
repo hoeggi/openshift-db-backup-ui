@@ -23,6 +23,7 @@ internal fun Password(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -
         }
     }
 
+@Suppress("UNCHECKED_CAST")
 internal fun Secrets(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {
         val secrets = OC.secrets()

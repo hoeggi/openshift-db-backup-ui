@@ -9,7 +9,7 @@ version = "1.0.0-alpha01"
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
-    api(project(":process"))
+    implementation(project(":process"))
     implementation(Dependencies.Kotlin.coroutines)
     implementation(Dependencies.Kotlin.serialization)
     api(Dependencies.okio)
