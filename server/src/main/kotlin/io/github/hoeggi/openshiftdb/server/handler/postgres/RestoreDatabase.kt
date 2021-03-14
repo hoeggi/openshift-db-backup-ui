@@ -1,8 +1,6 @@
 package io.github.hoeggi.openshiftdb.server.handler.postgres
 
 import io.github.hoeggi.openshiftdb.api.response.DatabaseRestoreMessage
-import io.github.hoeggi.openshiftdb.api.response.ProjectApi
-import io.github.hoeggi.openshiftdb.api.response.RestoreRequestAPI
 import io.github.hoeggi.openshiftdb.postgres.DatabaseRestore
 import io.github.hoeggi.openshiftdb.postgres.Postgres
 import io.github.hoeggi.openshiftdb.postgres.PostgresPrincibal
@@ -13,7 +11,6 @@ import io.ktor.http.cio.websocket.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel

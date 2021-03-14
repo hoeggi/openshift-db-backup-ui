@@ -1,6 +1,9 @@
 package io.github.hoeggi.openshiftdb.viewmodel.models
 
-import io.github.hoeggi.openshiftdb.api.response.*
+import io.github.hoeggi.openshiftdb.api.response.ContextApi
+import io.github.hoeggi.openshiftdb.api.response.ContextDetailApi
+import io.github.hoeggi.openshiftdb.api.response.ContextsApi
+import io.github.hoeggi.openshiftdb.api.response.ServicesApi
 
 internal fun ContextApi.toContext(): Context {
     return Context(current, contexts.map { it.toContexts() })

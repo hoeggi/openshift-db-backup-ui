@@ -5,14 +5,12 @@ import io.github.hoeggi.openshiftdb.commons.bufferError
 import io.github.hoeggi.openshiftdb.commons.messageAndResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okio.BufferedSource
 import okio.buffer
 import okio.sink
 import org.slf4j.LoggerFactory
 import java.io.Closeable
 import java.io.File
 import java.io.IOException
-import java.lang.IllegalStateException
 import java.time.LocalDateTime
 
 object Postgres {

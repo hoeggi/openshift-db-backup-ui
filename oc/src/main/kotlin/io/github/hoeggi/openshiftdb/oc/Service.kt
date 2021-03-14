@@ -18,14 +18,14 @@ private val jsonParser = Json {
 data class OcVersion(
     val releaseClientVersion: String,
     val openshiftVersion: String = "",
-    val serverVersion: VersionDetail
+    val serverVersion: VersionDetail,
 )
 
 @Serializable
 data class VersionDetail(
     val major: String,
     val minor: String,
-    val gitVersion: String
+    val gitVersion: String,
 )
 
 internal fun parseVersion(version: String) = try {

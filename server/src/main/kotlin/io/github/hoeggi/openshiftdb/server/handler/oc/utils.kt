@@ -8,7 +8,7 @@ import io.ktor.util.pipeline.*
 
 internal suspend inline fun <reified T> PipelineContext<Unit, ApplicationCall>.authorized(
     result: T,
-    code: Int
+    code: Int,
 ) {
     if (code == 1) {
         call.respond(HttpStatusCode.Unauthorized)

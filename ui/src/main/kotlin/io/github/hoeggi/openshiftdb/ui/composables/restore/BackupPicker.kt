@@ -15,10 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.PostgresViewModel
-import io.github.hoeggi.openshiftdb.UIScope
 import io.github.hoeggi.openshiftdb.api.response.DatabaseRestoreMessage
 import io.github.hoeggi.openshiftdb.collectAsState
-import java.awt.FileDialog
 import javax.swing.JFileChooser
 
 

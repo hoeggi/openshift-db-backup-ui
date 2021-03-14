@@ -2,7 +2,6 @@ package io.github.hoeggi.openshiftdb.postgres
 
 import io.github.hoeggi.openshiftdb.commons.Command
 import java.io.File
-import java.time.LocalDateTime
 
 internal sealed class Commands(override val commands: List<String>) : Command {
 
