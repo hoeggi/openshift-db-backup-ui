@@ -9,6 +9,8 @@ class PortForward(
     private val onNewErrorLine: suspend (String) -> Unit,
     private val onClosed: suspend (String) -> Unit,
 ) {
+    private val logger = LoggerFactory.getLogger(PortForward::class.java)
+
     private val oc = OC
     private var portForward: OC.PortForward? = null
 
@@ -48,9 +50,5 @@ class PortForward(
             portForward?.stop()
             onClosed(portForward?.exitMessage ?: "closed for unknown reason")
         }
-    }
-
-    companion object {
-        val logger = LoggerFactory.getLogger(PortForward::class.java)
     }
 }

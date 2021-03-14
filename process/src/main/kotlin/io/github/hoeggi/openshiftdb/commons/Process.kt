@@ -11,8 +11,12 @@ interface Command {
     val commands: List<String>
 }
 
+//interface ProcessResult {
+//    val code: Int
+//}
+//inline class Ok(override val code: Int = 0) : ProcessResult
+//inline class Error(override val code: Int = 0) : ProcessResult
 sealed class ProcessResult(val code: Int = -1) {
-    object Unset : ProcessResult()
     object Ok : ProcessResult(0)
     class Error(result: Int) : ProcessResult(result)
 }

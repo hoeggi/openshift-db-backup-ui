@@ -6,34 +6,31 @@ import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 
 object OC {
-    val logger = LoggerFactory.getLogger(OC::class.java)
+    private val logger = LoggerFactory.getLogger(OC::class.java)
 
-    sealed class OcResult(private val _result: ProcessResult) {
-        val result: Int
-            get() = _result.code
+    sealed class OcResult(val result: Int) {
 
-        object Unset : OcResult(ProcessResult.Ok)
-        class Version(val version: OcVersion?, result: ProcessResult) : OcResult(result)
-        class Project(val text: String, result: ProcessResult) : OcResult(result)
-        class Projects(val projects: List<String>, result: ProcessResult) : OcResult(result)
-        class Services(val services: List<Service>, result: ProcessResult) : OcResult(result)
-        class Secret(val password: String?, result: ProcessResult) : OcResult(result)
-        class Secrets(val secrets: List<SecretItem>, result: ProcessResult) : OcResult(result)
-        class Server(val server: List<Cluster>, result: ProcessResult) : OcResult(result)
-        class CurrentContext(val context: String, result: ProcessResult) : OcResult(result)
-        class Context(val contexts: List<NamedContext>, result: ProcessResult) : OcResult(result)
-        class SwitchContext(val newContext: String, result: ProcessResult) : OcResult(result)
+        class Version internal constructor(val version: OcVersion?, result: ProcessResult) : OcResult(result.code)
+        class Project internal constructor(val text: String, result: ProcessResult) : OcResult(result.code)
+        class Projects internal constructor(val projects: List<String>, result: ProcessResult) : OcResult(result.code)
+        class Services internal constructor(val services: List<Service>, result: ProcessResult) : OcResult(result.code)
+        class Secret internal constructor(val password: String?, result: ProcessResult) : OcResult(result.code)
+        class Secrets internal constructor(val secrets: List<SecretItem>, result: ProcessResult) : OcResult(result.code)
+        class Server internal constructor(val server: List<Cluster>, result: ProcessResult) : OcResult(result.code)
+        class CurrentContext internal constructor(val context: String, result: ProcessResult) : OcResult(result.code)
+        class Context internal constructor(val contexts: List<NamedContext>, result: ProcessResult) :
+            OcResult(result.code)
 
-        sealed class LoginState(result: ProcessResult = ProcessResult.Ok) : OcResult(result) {
-            object LoggedIn : LoginState()
-            class NotLogedIn(result: ProcessResult) : LoginState(result)
+        class SwitchContext internal constructor(val newContext: String, result: ProcessResult) : OcResult(result.code)
+
+        sealed class LoginState(result: Int) : OcResult(result) {
+            object LoggedIn : LoginState(ProcessResult.Ok.code)
+            class NotLogedIn internal constructor(result: ProcessResult) : LoginState(result.code)
         }
     }
 
     data class PortForwardTarget(val projectName: String, val serviceName: String, val port: String)
-    class PortForward(private val process: Process, val target: PortForwardTarget) {
-        val isAlive
-            get() = process.isAlive
+    class PortForward internal constructor(private val process: Process) {
 
         val exitMessage: String
             get() = process.run {
@@ -96,7 +93,7 @@ object OC {
         val error = process.readError()
         logger.debug(error)
         process.let {
-            OcResult.CurrentContext((if (text.isNotBlank()) text else error).replace("\n",""), it.result())
+            OcResult.CurrentContext((if (text.isNotBlank()) text else error).replace("\n", ""), it.result())
         }
     }
 
@@ -141,7 +138,7 @@ object OC {
             }
         }
         logger.debug("opened port forward: ${process.pid()}")
-        return PortForward(process, PortForwardTarget(projectName, serviceName, port))
+        return PortForward(process)
     }
 
     suspend fun services(): OcResult.Services = withContext(Dispatchers.IO) {

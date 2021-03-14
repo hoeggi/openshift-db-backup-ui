@@ -75,7 +75,7 @@ object TransitivDependencies {
     val dependencies = arrayOf(
         *kotlinx,
         *ktor,
-//        *compose,
+        *compose,
         "io.micrometer:micrometer-core",
         "io.dropwizard.metrics:metrics-core"
     )
