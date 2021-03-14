@@ -3,11 +3,7 @@ import org.jetbrains.compose.compose
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose")
-    id("me.tylerbwong.gradle.metalava")
 }
-
-group = "io.github.hoeggi"
-version = "1.0.0-alpha01"
 
 dependencies {
     implementation(compose.desktop.currentOs)
