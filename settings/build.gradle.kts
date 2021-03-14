@@ -4,10 +4,6 @@ plugins {
     id("com.github.gmazzo.buildconfig") version "3.0.0"
 }
 
-group = "io.github.hoeggi"
-version = "1.0.0-alpha01"
-
-
 buildConfig {
     className("BuildConfig")
     useKotlinOutput()

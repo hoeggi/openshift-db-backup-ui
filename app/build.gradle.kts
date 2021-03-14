@@ -1,6 +1,4 @@
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
@@ -24,7 +22,7 @@ compose.desktop {
     application {
         mainClass = "io.github.hoeggi.openshiftdb.MainKt"
         nativeDistributions {
-            targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb, org.jetbrains.compose.desktop.application.dsl.TargetFormat.Rpm)
+            targetFormats(TargetFormat.Deb, TargetFormat.Rpm)
             packageName = rootProject.name
             modules("java.logging", "java.naming", "java.management")
         }

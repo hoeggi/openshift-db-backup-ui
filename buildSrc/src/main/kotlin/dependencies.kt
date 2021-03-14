@@ -15,6 +15,15 @@ object Versions {
     val flatlaf = "1.0"
 }
 
+object Plugins {
+    val compose = "org.jetbrains.compose:compose-gradle-plugin:${Versions.compose}"
+    val gradle_versions = "com.github.ben-manes:gradle-versions-plugin:0.38.0"
+    val dependency_analysis = "com.autonomousapps:dependency-analysis-gradle-plugin:0.71.0"
+    val module_dependency_graph = "com.savvasdalkitsis:module-dependency-graph:0.9"
+    val metalava = "me.tylerbwong.gradle:metalava-gradle:0.1.6"
+    val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
+}
+
 object Dependencies {
     object Kotlin {
         val version = Versions.kotlin

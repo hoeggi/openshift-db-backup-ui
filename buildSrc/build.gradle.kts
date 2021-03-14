@@ -1,16 +1,9 @@
-//repositories {
-//    mavenCentral()
-//}
-//
-//plugins {
-//    `kotlin-dsl`
-//}
-
 repositories {
     gradlePluginPortal()
 }
 
 plugins {
+    kotlin("jvm") version "1.4.31"
     `kotlin-dsl`
 }
 

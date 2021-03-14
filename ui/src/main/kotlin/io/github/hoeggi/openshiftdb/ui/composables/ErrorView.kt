@@ -17,7 +17,6 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_EXIT
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_OK
 import io.github.hoeggi.openshiftdb.outsideClickable
 
-
 @Composable
 internal fun ErrorView(t: Thread?, th: Throwable?) {
     Box(
