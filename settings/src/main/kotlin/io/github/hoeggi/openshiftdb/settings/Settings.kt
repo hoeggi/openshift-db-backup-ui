@@ -7,9 +7,7 @@ import okio.buffer
 import okio.sink
 import okio.source
 import java.io.File
-import kotlin.io.path.*
 
-@ExperimentalPathApi
 private val settingsPath = if (System.getenv("XDG_CONFIG_HOME") != null) {
     File(System.getenv("XDG_CONFIG_HOME"))
 } else {

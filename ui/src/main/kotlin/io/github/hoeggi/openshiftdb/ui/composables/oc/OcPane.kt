@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 internal fun OcPane(
-    modifier: Modifier = Modifier.fillMaxWidth(0.5f)
+    modifier: Modifier = Modifier.fillMaxWidth(0.5f),
 ) {
 
     Column(

@@ -1,11 +1,10 @@
 package io.github.hoeggi.openshiftdb.ext
 
-import java.io.File
 import java.awt.Desktop
-import java.lang.IllegalThreadStateException
+import java.io.File
 import java.io.IOException
 import java.net.URI
-import java.util.ArrayList
+import java.util.*
 
 object DesktopApi {
     fun browse(uri: URI): Boolean {

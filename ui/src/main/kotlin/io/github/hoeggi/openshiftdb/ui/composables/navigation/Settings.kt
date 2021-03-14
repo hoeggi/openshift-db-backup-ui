@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.AppLog
 import io.github.hoeggi.openshiftdb.AppSettings
 import io.github.hoeggi.openshiftdb.OcViewModel
 import io.github.hoeggi.openshiftdb.collectAsState

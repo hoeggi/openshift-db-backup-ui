@@ -1,9 +1,42 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-
-subprojects {
+allprojects {
     group = "io.github.hoeggi"
     version = "1.0.0"
+
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            when {
+                requested.name.startsWith("kotlinx-serialization") -> {
+                    if (requested.version != Versions.kotlinx_serialization) {
+                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.kotlinx_serialization}")
+                        useVersion(Versions.kotlinx_serialization)
+                    }
+                }
+                requested.name.startsWith("kotlinx-coroutines") -> {
+                    if (requested.version != Versions.kotlinx_coroutines) {
+                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.kotlinx_coroutines}")
+                        useVersion(Versions.kotlinx_coroutines)
+                    }
+                }
+                requested.name.startsWith("kotlin-") -> {
+                    if (requested.group == "org.jetbrains.kotlin" && requested.version != Versions.kotlin) {
+                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.kotlin}")
+                        useVersion(Versions.kotlin)
+                    }
+                }
+                requested.name.startsWith("okio") -> {
+                    if (requested.version != Versions.okio) {
+                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.okio}")
+                        useVersion(Versions.okio)
+                    }
+                }
+            }
+        }
+    }
+}
+
+subprojects {
 
     apply(plugin = "me.tylerbwong.gradle.metalava")
     repositories {
@@ -37,35 +70,5 @@ subprojects {
             "-Xinline-classes"
 //            "-Xexplicit-api=strict"
         )
-    }
-    configurations.all {
-        resolutionStrategy.eachDependency {
-            when {
-                requested.name.startsWith("kotlinx-serialization") -> {
-                    if (requested.version != Versions.kotlinx_serialization) {
-                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.kotlinx_serialization}")
-                        useVersion(Versions.kotlinx_serialization)
-                    }
-                }
-                requested.name.startsWith("kotlinx-coroutines") -> {
-                    if (requested.version != Versions.kotlinx_coroutines) {
-                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.kotlinx_coroutines}")
-                        useVersion(Versions.kotlinx_coroutines)
-                    }
-                }
-                requested.name.startsWith("kotlin-") -> {
-                    if (requested.group == "org.jetbrains.kotlin" && requested.version != Versions.kotlin) {
-                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.kotlin}")
-                        useVersion(Versions.kotlin)
-                    }
-                }
-                requested.name.startsWith("okio") -> {
-                    if (requested.version != Versions.okio) {
-                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.okio}")
-                        useVersion(Versions.okio)
-                    }
-                }
-            }
-        }
     }
 }

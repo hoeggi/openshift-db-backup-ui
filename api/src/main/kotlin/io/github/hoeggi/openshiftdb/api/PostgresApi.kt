@@ -3,26 +3,21 @@ package io.github.hoeggi.openshiftdb.api
 import io.github.hoeggi.openshiftdb.api.response.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
-import okhttp3.*
-import okio.ByteString
+import okhttp3.Credentials
+import okhttp3.OkHttpClient
+import okhttp3.WebSocketListener
 import org.slf4j.LoggerFactory
 import kotlin.coroutines.coroutineContext
-import kotlin.reflect.KClass
 
 interface PostgresApi {
 

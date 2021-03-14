@@ -2,7 +2,6 @@ package io.github.hoeggi.openshiftdb.api.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 typealias FullContext = String
 

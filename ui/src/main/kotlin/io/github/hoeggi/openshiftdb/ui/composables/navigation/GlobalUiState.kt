@@ -30,6 +30,7 @@ internal interface CustomErrorViewer : ErrorViewer {
 
     fun showOverlay(overlay: CustomOverlay)
     val errors: StateFlow<ErrorViewer.Message>
+
     interface CustomOverlay : ErrorViewer.Message {
         val overlay: @Composable () -> Unit
     }
@@ -52,9 +53,11 @@ internal interface MenuControl : Navigator {
 internal object MenuControlProvider {
     fun instance(): MenuControl = GlobalUiState
 }
+
 internal object NavigatorProvider {
     fun instance(): Navigator = GlobalUiState
 }
+
 internal object LogLinesProvider {
     fun instance(): LogLines = GlobalUiState
 }

@@ -6,7 +6,6 @@ import io.github.hoeggi.openshiftdb.postgres.Postgres
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
-import io.ktor.websocket.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 

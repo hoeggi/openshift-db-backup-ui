@@ -64,7 +64,7 @@ private suspend fun downloadPlain(
     path: String,
     username: String,
     password: String,
-    session: DefaultWebSocketSession
+    session: DefaultWebSocketSession,
 ) {
     val outgoing = session.outgoing
     val incoming = session.incoming
@@ -115,7 +115,7 @@ private suspend fun downloadCustom(
     path: String,
     username: String,
     password: String,
-    session: DefaultWebSocketSession
+    session: DefaultWebSocketSession,
 ) {
     val outgoing = session.outgoing
     val incoming = session.incoming
