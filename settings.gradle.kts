@@ -9,6 +9,7 @@ pluginManagement {
 rootProject.name = "openshift-db-gui"
 
 include(
+    ":app",
     ":process",
     ":oc",
     ":server",

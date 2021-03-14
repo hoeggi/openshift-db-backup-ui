@@ -3,11 +3,11 @@
 package io.github.hoeggi.openshiftdb.ui.theme
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowForward
@@ -17,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.*
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
@@ -31,7 +32,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
-@ExperimentalAnimationApi
 @Composable
 internal fun Theme(
     coroutineScope: CoroutineScope,
@@ -48,16 +48,16 @@ internal fun Theme(
 
     val colors = when (dark) {
         Theme.Dark -> darkColors(
-            primary = Color(0xFF3C5EE6),
-            secondary = Color(0xFF1b3394),
+            primary = Color(0xFFFF3C5EE6),
+            secondary = Color(0xFFFF1b3394),
             background = Color(0xFF242424),
             surface = Color(0xFF242424),
         )
         Theme.Light -> lightColors(
-            primary = Color(0xFF3C5EE6),
-            secondary = Color(0xFF1b3394),
+            primary = Color(0xFFFF3C5EE6),
+            secondary = Color(0xFFFF1b3394),
             background = Color(0xFFF2F2F2),
-            surface = Color(0xFFF2F2F2)
+            surface = Color(0xFFF2F2F2),
         )
     }
     DesktopMaterialTheme(

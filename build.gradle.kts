@@ -1,5 +1,4 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -14,8 +13,7 @@ plugins {
 apply {
     from("https://raw.githubusercontent.com/JakeWharton/SdkSearch/master/gradle/projectDependencyGraph.gradle")
 }
-group = "io.github.hoeggi"
-version = "1.0.0"
+
 
 fun isNonStable(version: String): Boolean {
     val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
@@ -40,34 +38,10 @@ dependencyAnalysis {
     }
 }
 
-
-dependencies {
-    testImplementation(kotlin("test-junit"))
-    implementation(compose.desktop.currentOs)
-    implementation(kotlin("stdlib-jdk8"))
-    implementation(project(":server"))
-    implementation(project(":ui"))
-    implementation(Dependencies.logback)
-    implementation(Dependencies.flatlaf)
-    compileOnly(Dependencies.slf4j_api)
-}
-
-tasks.test {
-    useJUnit()
-}
-
-compose.desktop {
-    application {
-        mainClass = "io.github.hoeggi.openshiftdb.MainKt"
-        nativeDistributions {
-            targetFormats(TargetFormat.Deb, TargetFormat.Rpm)
-            packageName = rootProject.name
-            modules("java.logging", "java.naming", "java.management")
-        }
-    }
-}
-
 allprojects {
+    group = "io.github.hoeggi"
+    version = "1.0.0"
+
     apply(plugin = "me.tylerbwong.gradle.metalava")
 
     repositories {
