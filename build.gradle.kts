@@ -3,7 +3,7 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 buildscript {
     repositories {
-        mavenCentral()
+//        mavenCentral()
         maven("https://plugins.gradle.org/m2/")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
@@ -32,11 +32,11 @@ fun isNonStable(version: String): Boolean {
     return isStable.not()
 }
 
-tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
-    rejectVersionIf {
-        isNonStable(candidate.version) && !isNonStable(currentVersion)
-    }
-}
+//tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
+//    rejectVersionIf {
+//        isNonStable(candidate.version) && !isNonStable(currentVersion)
+//    }
+//}
 
 extensions.configure<DependencyAnalysisExtension> {
     issues {

@@ -30,12 +30,12 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun RestoreView() {
     val globalState = AppMenuControl.current
-    val postgresViewModel = PostgresViewModel.current
-    val path by postgresViewModel.collectAsState(postgresViewModel.restorePath)
+    val viewModel = PostgresViewModel.current
+    val path by viewModel.collectAsState(viewModel.restorePath)
 
     rememberCoroutineScope().launch {
         globalState.refreshTrigger.collect {
-            postgresViewModel.updateRestorePath(path)
+            viewModel.updateRestorePath(path)
         }
     }
 
@@ -64,10 +64,10 @@ internal fun RestoreView() {
 
 @Composable
 internal fun RestoreLog() {
-    val postgresViewModel = PostgresViewModel.current
+    val viewModel = PostgresViewModel.current
     val errorViewer = AppErrorViewer.current
-    val restoreState by postgresViewModel.collectAsState(postgresViewModel.restoreState)
-    val restoreProgress by postgresViewModel.collectAsState(postgresViewModel.restoreProgress)
+    val restoreState by viewModel.collectAsState(viewModel.restoreState)
+    val restoreProgress by viewModel.collectAsState(viewModel.restoreProgress)
     val listState = rememberLazyListState(restoreProgress.size, 0)
 
     when (restoreState) {
@@ -76,11 +76,11 @@ internal fun RestoreLog() {
                 RestoreWarning(
                     (restoreState as DatabaseRestoreMessage.RequestConfirmation).message,
                     onCancel = {
-                        postgresViewModel.cancelRestore()
+                        viewModel.cancelRestore()
                         errorViewer.resetOverlay()
                     },
                     onConfirm = {
-                        postgresViewModel.confirmeRestore()
+                        viewModel.confirmeRestore()
                         errorViewer.resetOverlay()
                     }
                 )

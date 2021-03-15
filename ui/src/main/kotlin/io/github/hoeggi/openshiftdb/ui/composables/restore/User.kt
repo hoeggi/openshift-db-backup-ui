@@ -17,9 +17,9 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 @Composable
 internal fun User() {
 
-    val postgresViewModel = PostgresViewModel.current
-    val username by postgresViewModel.collectAsState(postgresViewModel.userName)
-    val password by postgresViewModel.collectAsState(postgresViewModel.password)
+    val viewModel = PostgresViewModel.current
+    val username by viewModel.collectAsState(viewModel.userName)
+    val password by viewModel.collectAsState(viewModel.password)
 
     Column(
         modifier = Modifier

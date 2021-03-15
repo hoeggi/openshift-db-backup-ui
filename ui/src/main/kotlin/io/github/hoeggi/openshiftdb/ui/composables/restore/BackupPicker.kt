@@ -22,11 +22,11 @@ import javax.swing.JFileChooser
 
 @Composable
 internal fun BackupPicker() {
-    val postgresViewModel = PostgresViewModel.current
+    val viewModel = PostgresViewModel.current
     val window = LocalAppWindow.current.window
 
-    val path by postgresViewModel.collectAsState(postgresViewModel.restorePath)
-    val restoreState by postgresViewModel.collectAsState(postgresViewModel.restoreState)
+    val path by viewModel.collectAsState(viewModel.restorePath)
+    val restoreState by viewModel.collectAsState(viewModel.restoreState)
 
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -36,7 +36,7 @@ internal fun BackupPicker() {
             Button(
                 enabled = path.isNotEmpty(),
                 onClick = {
-                    postgresViewModel.restoreDatabase()
+                    viewModel.restoreDatabase()
                 }
             ) {
                 Text("Restore Database")
@@ -50,7 +50,7 @@ internal fun BackupPicker() {
                     }
                     val returnVal = chooser.showOpenDialog(window)
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        postgresViewModel.updateRestorePath(chooser.selectedFile.absolutePath)
+                        viewModel.updateRestorePath(chooser.selectedFile.absolutePath)
                     }
                 }
             ) {

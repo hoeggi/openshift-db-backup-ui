@@ -19,8 +19,8 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PROJECT_CURRENT_LABE
 @Composable
 internal fun CurrentProject() {
 
-    val ocViewModel = OcViewModel.current
-    val currentProject by ocViewModel.collectAsState(ocViewModel.currentProject)
+    val viewModel = OcViewModel.current
+    val currentProject by viewModel.collectAsState(viewModel.currentProject)
 
     Column(
         modifier = Modifier
