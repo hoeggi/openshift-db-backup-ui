@@ -13,10 +13,8 @@ private val settingsPath = if (System.getenv("XDG_CONFIG_HOME") != null) {
 } else {
     File(System.getProperty("user.home"), ".config")
 }.let {
-    File(it, "${BuildConfig.APP_NAME}").apply {
-        mkdirs()
-    }.let {
-        File(it, "${BuildConfig.APP_NAME}.json")
+    File(it, "${BuildConfig.APP_NAME}${File.separator}${BuildConfig.APP_NAME}.json").apply {
+        parentFile.mkdirs()
     }
 }
 

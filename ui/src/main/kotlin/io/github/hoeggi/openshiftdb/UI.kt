@@ -4,11 +4,10 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.desktop.LocalAppWindow
-import androidx.compose.desktop.Window
-import androidx.compose.desktop.WindowEvents
+import androidx.compose.desktop.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
@@ -29,11 +28,8 @@ import io.github.hoeggi.openshiftdb.ui.theme.Theme
 import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 import io.github.hoeggi.openshiftdb.viewmodel.PostgresViewModel
 import io.github.hoeggi.openshiftdb.viewmodel.viewModels
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import org.slf4j.LoggerFactory
 
 const val APP_NAME = "Openshift DB Backup GUI"
@@ -85,7 +81,6 @@ class UI {
 
             val scope = rememberCoroutineScope() + supervisor
             val (ocViewModel, postgresViewModel) = viewModels(port, scope, ErrorViewProvider.instance())
-
 
             CompositionLocalProvider(
                 UIScope provides scope,
@@ -159,6 +154,6 @@ private fun MainScreen(
         OcPane(modifier = Modifier.width(animatedSize))
         PostgresPane()
     }
-    SecretsChooser(viewModel = postgresViewModel)
+    SecretsChooser()
 }
 

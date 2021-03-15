@@ -1,6 +1,6 @@
 package io.github.hoeggi.openshiftdb.api
 
-inline class Result<out T> private constructor(internal val value: Any?) {
+class Result<out T> private constructor(internal val value: Any?) {
 
     companion object {
         fun <T> success(value: T): Result<T> = Result(value)
@@ -12,11 +12,11 @@ inline class Result<out T> private constructor(internal val value: Any?) {
 
     fun exceptionOrNull(): Throwable? =
         when (value) {
-            is Result.Failure -> value.exception
+            is Failure -> value.exception
             else -> null
         }
 
-    private class Failure(val exception: Exception)
+    class Failure(val exception: Exception)
 
 }
 

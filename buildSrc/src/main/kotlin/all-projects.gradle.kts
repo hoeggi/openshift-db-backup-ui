@@ -59,7 +59,7 @@ subprojects {
     }
 
     tasks.withType<KotlinCompile> {
-//        kotlinOptions.useIR = true
+        kotlinOptions.useIR = true
         kotlinOptions.jvmTarget = "15"
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",

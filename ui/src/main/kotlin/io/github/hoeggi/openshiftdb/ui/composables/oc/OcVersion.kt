@@ -20,8 +20,8 @@ import io.github.hoeggi.openshiftdb.ui.composables.ExpandableText
 @Composable
 internal fun OcVersion() {
 
-    val ocViewModel = OcViewModel.current
-    val version by ocViewModel.collectAsState(ocViewModel.version)
+    val viewModel = OcViewModel.current
+    val version by viewModel.collectAsState(viewModel.version)
 
     Column(
         modifier = Modifier

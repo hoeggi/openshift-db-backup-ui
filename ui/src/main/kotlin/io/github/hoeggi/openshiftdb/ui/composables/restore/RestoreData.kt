@@ -27,9 +27,9 @@ import java.awt.datatransfer.StringSelection
 @Composable
 internal fun RestoreData(modifier: Modifier = Modifier) {
 
-    val postgresViewModel = PostgresViewModel.current
-    val info by postgresViewModel.collectAsState(postgresViewModel.restoreInfo)
-    val command by postgresViewModel.collectAsState(postgresViewModel.restoreCommand)
+    val viewModel = PostgresViewModel.current
+    val info by viewModel.collectAsState(viewModel.restoreInfo)
+    val command by viewModel.collectAsState(viewModel.restoreCommand)
 
     Column(modifier = modifier.padding(10.dp)) {
         LazyColumn {
