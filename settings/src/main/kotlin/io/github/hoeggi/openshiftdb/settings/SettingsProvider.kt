@@ -9,6 +9,22 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 object SettingsProvider {
     fun instance(): Settings = SettingsHolder
+
+    val settingsDummy = object : Settings {
+        override val theme: StateFlow<Theme> = MutableStateFlow(Theme.Dark)
+
+        override fun themeDark() {}
+
+        override fun themeLight() {}
+
+        override val logLevel: StateFlow<LogLevel> = MutableStateFlow(LogLevel.Debug)
+
+        override fun updateLogLevel(logLevel: LogLevel) {}
+
+        override val exportFormat: StateFlow<ExportFormat> = MutableStateFlow(ExportFormat.Custom)
+
+        override fun updateExportFormat(exportFormat: ExportFormat) {}
+    }
 }
 
 interface Settings {

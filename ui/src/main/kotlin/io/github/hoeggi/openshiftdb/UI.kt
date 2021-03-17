@@ -4,12 +4,17 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.desktop.*
+import androidx.compose.desktop.LocalAppWindow
+import androidx.compose.desktop.Window
+import androidx.compose.desktop.WindowEvents
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
@@ -17,6 +22,7 @@ import io.github.hoeggi.openshiftdb.errorhandler.ExceptionHandler
 import io.github.hoeggi.openshiftdb.settings.Settings
 import io.github.hoeggi.openshiftdb.settings.SettingsProvider
 import io.github.hoeggi.openshiftdb.ui.MenuBar
+import io.github.hoeggi.openshiftdb.ui.composables.Loading
 import io.github.hoeggi.openshiftdb.ui.composables.PanelState
 import io.github.hoeggi.openshiftdb.ui.composables.SecretsChooser
 import io.github.hoeggi.openshiftdb.ui.composables.VerticalSplittable
@@ -24,9 +30,11 @@ import io.github.hoeggi.openshiftdb.ui.composables.navigation.*
 import io.github.hoeggi.openshiftdb.ui.composables.oc.OcPane
 import io.github.hoeggi.openshiftdb.ui.composables.postgres.PostgresPane
 import io.github.hoeggi.openshiftdb.ui.composables.restore.RestoreView
+import io.github.hoeggi.openshiftdb.ui.theme.BareboneTheme
 import io.github.hoeggi.openshiftdb.ui.theme.Theme
 import io.github.hoeggi.openshiftdb.viewmodel.OcViewModel
 import io.github.hoeggi.openshiftdb.viewmodel.PostgresViewModel
+import io.github.hoeggi.openshiftdb.viewmodel.ViewModels
 import io.github.hoeggi.openshiftdb.viewmodel.viewModels
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -36,9 +44,11 @@ const val APP_NAME = "Openshift DB Backup GUI"
 
 internal val PostgresViewModel = staticCompositionLocalOf<PostgresViewModel> {
     error("unexpected call to PostgresViewModel")
+//    postgresDummy
 }
 internal val OcViewModel = staticCompositionLocalOf<OcViewModel> {
     error("unexpected call to OcViewModel")
+//    ocDummy
 }
 internal val AppErrorViewer = staticCompositionLocalOf<CustomErrorViewer> {
     error("unexpected call to GlobalState")
@@ -54,22 +64,25 @@ internal val AppLog = staticCompositionLocalOf<LogLines> {
 }
 internal val AppSettings = staticCompositionLocalOf<Settings> {
     error("unexpected call to UIScope")
+//    SettingsProvider.settingsDummy
 }
 internal val UIScope = staticCompositionLocalOf<CoroutineScope> {
     error("unexpected call to UIScope")
 }
 
+
 class UI {
     private val logger = LoggerFactory.getLogger(UI::class.java)
-
+    private var viewModels: MutableState<ViewModels?> = mutableStateOf(null)
     fun show(port: Int, onClose: (() -> Unit)) {
         logger.info("starting ui")
         val supervisor = SupervisorJob()
         setExceptionHandler(ErrorViewProvider.instance())
+
         Window(
             title = APP_NAME,
             undecorated = false,
-            size = IntSize(1280, 1024),
+            size = IntSize(300, 300),
             events = WindowEvents(
                 onClose = {
                     supervisor.cancel()
@@ -78,41 +91,107 @@ class UI {
             ),
             menuBar = MenuBar(MenuControlProvider.instance())
         ) {
-
             val scope = rememberCoroutineScope() + supervisor
-            val (ocViewModel, postgresViewModel) = viewModels(port, scope, ErrorViewProvider.instance())
-
-            CompositionLocalProvider(
-                UIScope provides scope,
-                OcViewModel provides ocViewModel,
-                PostgresViewModel provides postgresViewModel,
-                AppErrorViewer provides ErrorViewProvider.instance(),
-                AppNavigator provides NavigatorProvider.instance(),
-                AppMenuControl provides MenuControlProvider.instance(),
-                AppLog provides LogLinesProvider.instance(),
-                AppSettings provides SettingsProvider.instance(),
-            ) {
-                Theme(scope) {
-                    val navigationState = AppNavigator.current
-                    val screen by navigationState.screen.collectAsState(scope.coroutineContext)
-                    Crossfade(targetState = screen) {
-                        when (it) {
-                            is Screen.Detail -> {
-                                Log()
-                            }
-                            is Screen.Main -> {
-                                MainScreen(
-                                    ocViewModel = ocViewModel,
-                                    postgresViewModel = postgresViewModel,
-                                )
-                            }
-                            is Screen.Restore -> {
-                                RestoreView()
+            Crossfade(targetState = viewModels.value){
+                when (viewModels.value) {
+                    null -> {
+//                    BareboneTheme(scope) {
+//                        Loading()
+//                    }
+                        Box {
+                            Spacer(Modifier.fillMaxSize().background(Color.Red))
+                        }
+                        scope.launch {
+                            delay(1000)
+                            ErrorViewProvider.instance()
+                            NavigatorProvider.instance()
+                            MenuControlProvider.instance()
+                            LogLinesProvider.instance()
+                            SettingsProvider.instance()
+                            val vms = viewModels(port, scope, ErrorViewProvider.instance())
+                            viewModels.value = vms
+                        }
+                    }
+                    else -> {
+                        LocalAppWindow.current.setSize(1280, 1024)
+                        LocalAppWindow.current.setWindowCentered()
+                        CompositionLocalProvider(
+                            UIScope provides scope,
+                            OcViewModel provides viewModels.value!!.ocViewModel,
+                            PostgresViewModel provides viewModels.value!!.postgresViewModel,
+                            AppErrorViewer provides ErrorViewProvider.instance(),
+                            AppNavigator provides NavigatorProvider.instance(),
+                            AppMenuControl provides MenuControlProvider.instance(),
+                            AppLog provides LogLinesProvider.instance(),
+                            AppSettings provides SettingsProvider.instance(),
+                        ) {
+                            Theme(scope) {
+                                val navigationState = AppNavigator.current
+                                val screen by navigationState.screen.collectAsState(scope.coroutineContext)
+                                Crossfade(targetState = screen) {
+                                    when (it) {
+                                        is Screen.Detail -> {
+                                            Log()
+                                        }
+                                        is Screen.Main -> {
+                                            MainScreen(
+                                                ocViewModel = viewModels.value!!.ocViewModel,
+                                                postgresViewModel = viewModels.value!!.postgresViewModel,
+                                            )
+                                        }
+                                        is Screen.Restore -> {
+                                            RestoreView()
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
+
+//            if (viewModels.value == null) {
+//                BareboneTheme(scope) {
+//                    Loading()
+//                }
+//                scope.launch {
+//                    delay(5000)
+//                    val vms = viewModels(port, scope, ErrorViewProvider.instance())
+//                    viewModels.value = vms
+//                }
+//            } else {
+//                CompositionLocalProvider(
+//                    UIScope provides scope,
+//                    OcViewModel provides viewModels.value!!.ocViewModel,
+//                    PostgresViewModel provides viewModels.value!!.postgresViewModel,
+//                    AppErrorViewer provides ErrorViewProvider.instance(),
+//                    AppNavigator provides NavigatorProvider.instance(),
+//                    AppMenuControl provides MenuControlProvider.instance(),
+//                    AppLog provides LogLinesProvider.instance(),
+//                    AppSettings provides SettingsProvider.instance(),
+//                ) {
+//                    Theme(scope) {
+//                        val navigationState = AppNavigator.current
+//                        val screen by navigationState.screen.collectAsState(scope.coroutineContext)
+//                        Crossfade(targetState = screen) {
+//                            when (it) {
+//                                is Screen.Detail -> {
+//                                    Log()
+//                                }
+//                                is Screen.Main -> {
+//                                    MainScreen(
+//                                        ocViewModel = viewModels.value!!.ocViewModel,
+//                                        postgresViewModel = viewModels.value!!.postgresViewModel,
+//                                    )
+//                                }
+//                                is Screen.Restore -> {
+//                                    RestoreView()
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 
@@ -121,6 +200,7 @@ class UI {
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(errorViewer, defaultUncaughtExceptionHandler))
     }
 }
+
 
 @Composable
 private fun MainScreen(

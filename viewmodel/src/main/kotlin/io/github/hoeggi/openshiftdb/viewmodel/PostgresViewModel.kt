@@ -9,6 +9,7 @@ import io.github.hoeggi.openshiftdb.api.response.*
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,8 +17,46 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class PostgresViewModel internal constructor(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
-    BaseViewModel(port, coroutineScope, errorViewer) {
+interface PostgresViewModel: ViewModel {
+    val downloadState: StateFlow<DatabaseDownloadMessage>
+    val downloadProgress: StateFlow<List<DatabaseDownloadMessage.InProgressMessage>>
+    val version: StateFlow<ToolsVersionApi>
+    val dumpPath: StateFlow<String>
+    val selectedDatabase: StateFlow<Int>
+    val databasesLines: StateFlow<List<String>>
+    val databases: StateFlow<String>
+    val postgresVersion: StateFlow<String>
+    val userName: StateFlow<String>
+    val password: StateFlow<String>
+    val secrets: StateFlow<List<SecretsApi>>
+    val restoreInfo: StateFlow<List<String>>
+    val restorePath: StateFlow<String>
+    val restoreCommand: StateFlow<RestoreCommandApi>
+    val restoreState: StateFlow<DatabaseRestoreMessage>
+    val restoreProgress: StateFlow<List<DatabaseRestoreMessage.InProgressMessage>>
+    fun update()
+    fun dumpDatabase(database: String, format: String)
+    fun dumpPath(path: String)
+    fun updateSelectedDatabase(index: Int)
+    fun listLines(): Job
+    fun clearDatabaseText()
+    fun listPretty(): Job
+    fun postgresVersion(): Job
+    fun updateUserName(userName: String)
+    fun updatePassword(password: String)
+    fun secrets(): Job
+    fun clearSecrets()
+    fun detectPassword(): Job
+    fun restoreInfo(path: String): Job
+    fun updateRestorePath(path: String)
+    fun restoreCommand(path: String): Job
+    fun cancelRestore(): Job
+    fun confirmeRestore(): Job
+    fun restoreDatabase()
+}
+
+internal class PostgresViewModelImpl internal constructor(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
+    BaseViewModel(port, coroutineScope, errorViewer), PostgresViewModel {
 
     private val downloadQueue = EvictingQueue.create<DatabaseDownloadMessage.InProgressMessage>(150)
     private val restoreQueue = EvictingQueue.create<DatabaseRestoreMessage.InProgressMessage>(300)
@@ -48,13 +87,13 @@ class PostgresViewModel internal constructor(port: Int, coroutineScope: Coroutin
     private val _restoreProgress: MutableStateFlow<List<DatabaseRestoreMessage.InProgressMessage>> =
         MutableStateFlow(listOf())
 
-    fun update() {
+    override fun update() {
         version()
     }
 
-    val downloadState: StateFlow<DatabaseDownloadMessage> = _downloadState.asStateFlow()
-    val downloadProgress: StateFlow<List<DatabaseDownloadMessage.InProgressMessage>> = _downloadProgress.asStateFlow()
-    fun dumpDatabase(database: String, format: String) {
+    override val downloadState: StateFlow<DatabaseDownloadMessage> = _downloadState.asStateFlow()
+    override val downloadProgress: StateFlow<List<DatabaseDownloadMessage.InProgressMessage>> = _downloadProgress.asStateFlow()
+    override fun dumpDatabase(database: String, format: String) {
         if (database.isEmpty()) return
         coroutineScope.launch(Dispatchers.IO) {
             val dumpDatabases =
@@ -75,23 +114,23 @@ class PostgresViewModel internal constructor(port: Int, coroutineScope: Coroutin
         }
     }
 
-    val version = _version.asStateFlow()
+    override val version = _version.asStateFlow()
     private fun version() = coroutineScope.launch {
         _version.value = postgresApi.toolsVersion().getOrDefault(ToolsVersionApi())
     }
 
-    val dumpPath = _dumpPath.asStateFlow()
-    fun dumpPath(path: String) {
+    override val dumpPath = _dumpPath.asStateFlow()
+    override fun dumpPath(path: String) {
         _dumpPath.value = path
     }
 
-    val selectedDatabase = _selectedDatabase.asStateFlow()
-    fun updateSelectedDatabase(index: Int) {
+    override val selectedDatabase = _selectedDatabase.asStateFlow()
+    override fun updateSelectedDatabase(index: Int) {
         _selectedDatabase.value = index
     }
 
-    val databasesLines = _databasesLines.asStateFlow()
-    fun listLines() = coroutineScope.launch {
+    override val databasesLines = _databasesLines.asStateFlow()
+    override fun listLines() = coroutineScope.launch {
         val databases = postgresApi.databases(userName.value, password.value, PostgresApi.DatabaseViewFormat.List)
         databases.onSuccess {
             _databasesLines.value = when (it) {
@@ -102,12 +141,12 @@ class PostgresViewModel internal constructor(port: Int, coroutineScope: Coroutin
         }.onFailure(showWarning)
     }
 
-    val databases = _databases.asStateFlow()
-    fun clearDatabaseText() {
+    override val databases = _databases.asStateFlow()
+    override fun clearDatabaseText() {
         _databases.value = ""
     }
 
-    fun listPretty() = coroutineScope.launch {
+    override fun listPretty() = coroutineScope.launch {
         val databases = postgresApi.databases(userName.value, password.value, PostgresApi.DatabaseViewFormat.Table)
         databases.onSuccess {
             _databases.value = when (it) {
@@ -117,37 +156,37 @@ class PostgresViewModel internal constructor(port: Int, coroutineScope: Coroutin
         }.onFailure(showWarning)
     }
 
-    val postgresVersion = _postgresVersion.asStateFlow()
-    fun postgresVersion() = coroutineScope.launch {
+    override val postgresVersion = _postgresVersion.asStateFlow()
+    override fun postgresVersion() = coroutineScope.launch {
         val databaseVersion = postgresApi.databaseVersion(userName.value, password.value)
         databaseVersion.onSuccess {
             _postgresVersion.value = it.database
         }.onFailure(showWarning)
     }
 
-    val userName = _userName.asStateFlow()
-    fun updateUserName(userName: String) {
+    override val userName = _userName.asStateFlow()
+    override fun updateUserName(userName: String) {
         _userName.value = userName
     }
 
-    val password = _password.asStateFlow()
-    fun updatePassword(password: String) {
+    override val password = _password.asStateFlow()
+    override fun updatePassword(password: String) {
         _password.value = password
     }
 
-    val secrets = _secrets.asStateFlow()
-    fun secrets() = coroutineScope.launch {
+    override val secrets = _secrets.asStateFlow()
+    override fun secrets() = coroutineScope.launch {
         val result = ocApi.secrets()
         result.onSuccess {
             _secrets.value = it
         }.onFailure(showWarning)
     }
 
-    fun clearSecrets() {
+    override fun clearSecrets() {
         _secrets.value = listOf()
     }
 
-    fun detectPassword() = coroutineScope.launch {
+    override fun detectPassword() = coroutineScope.launch {
         val result = ocApi.password(userName.value)
         result.onSuccess {
             _password.value = it
@@ -164,23 +203,23 @@ class PostgresViewModel internal constructor(port: Int, coroutineScope: Coroutin
         }.onFailure(showWarning)
     }
 
-    val restoreInfo = _restoreInfo.asStateFlow()
-    fun restoreInfo(path: String) = coroutineScope.launch {
+    override val restoreInfo = _restoreInfo.asStateFlow()
+    override fun restoreInfo(path: String) = coroutineScope.launch {
         val databases = postgresApi.restoreInfo(path)
         databases.onSuccess {
             _restoreInfo.value = it.info
         }.onFailure(showWarning)
     }
 
-    val restorePath = _restorePath.asStateFlow()
-    fun updateRestorePath(path: String) {
+    override val restorePath = _restorePath.asStateFlow()
+    override fun updateRestorePath(path: String) {
         _restorePath.value = path
         restoreInfo(path)
         restoreCommand(path)
     }
 
-    val restoreCommand = _restoreCommand.asStateFlow()
-    fun restoreCommand(path: String) = coroutineScope.launch {
+    override val restoreCommand = _restoreCommand.asStateFlow()
+    override fun restoreCommand(path: String) = coroutineScope.launch {
         val restoreCommand = postgresApi.restoreCommand(userName.value, password.value, path)
         restoreCommand.onSuccess {
             _restoreCommand.value = it
@@ -188,17 +227,17 @@ class PostgresViewModel internal constructor(port: Int, coroutineScope: Coroutin
     }
 
     private var confirmationChannel = Channel<Boolean>()
-    fun cancelRestore() = coroutineScope.launch {
+    override fun cancelRestore() = coroutineScope.launch {
         if (!confirmationChannel.isClosedForSend) confirmationChannel.send(false)
     }
 
-    fun confirmeRestore() = coroutineScope.launch {
+    override fun confirmeRestore() = coroutineScope.launch {
         if (!confirmationChannel.isClosedForSend) confirmationChannel.send(true)
     }
 
-    val restoreState: StateFlow<DatabaseRestoreMessage> = _restoreState.asStateFlow()
-    val restoreProgress: StateFlow<List<DatabaseRestoreMessage.InProgressMessage>> = _restoreProgress.asStateFlow()
-    fun restoreDatabase() {
+    override val restoreState: StateFlow<DatabaseRestoreMessage> = _restoreState.asStateFlow()
+    override val restoreProgress: StateFlow<List<DatabaseRestoreMessage.InProgressMessage>> = _restoreProgress.asStateFlow()
+    override fun restoreDatabase() {
         coroutineScope.launch(Dispatchers.IO) {
             val dumpDatabases =
                 postgresApi.restoreDatabase(userName.value,

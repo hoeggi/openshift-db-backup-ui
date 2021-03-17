@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.*
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
+import io.github.hoeggi.openshiftdb.settings.Setting
+import io.github.hoeggi.openshiftdb.settings.SettingsProvider
 import io.github.hoeggi.openshiftdb.settings.Theme
 import io.github.hoeggi.openshiftdb.ui.composables.ErrorView
 import io.github.hoeggi.openshiftdb.ui.composables.Loading
@@ -29,6 +31,24 @@ import io.github.hoeggi.openshiftdb.viewmodel.models.LoginState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@Composable
+internal fun BareboneTheme(coroutineScope: CoroutineScope, content: @Composable (BoxScope.() -> Unit)) {
+    val colors = darkColors(
+        primary = Color(0xFFFF3C5EE6),
+        secondary = Color(0xFFFF1b3394),
+        background = Color(0xFF242424),
+        surface = Color(0xFF242424),
+    )
+    DesktopMaterialTheme(
+        colors = colors,
+    ) {
+        Surface {
+            Box {
+                content()
+            }
+        }
+    }
+}
 
 @Composable
 internal fun Theme(

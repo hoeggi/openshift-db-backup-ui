@@ -15,8 +15,30 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 
 
-class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
-    BaseViewModel(port, coroutineScope, errorViewer) {
+interface OcViewModel: ViewModel {
+    val context: StateFlow<Context>
+    val loginState: StateFlow<LoginState>
+    val server: StateFlow<List<ClusterApi>>
+    val projects: StateFlow<List<String>>
+    val currentProject: StateFlow<String>
+    val version: StateFlow<VersionApi>
+    val services: StateFlow<List<Service>>
+    val portForward: StateFlow<List<OpenPortForward>>
+    fun update()
+    fun context(): Job
+    fun switchContext(newContext: FullContext): Job
+    fun checkLoginState(): Job
+    fun login(token: String, server: String): Job
+    fun listServer(): Job
+    fun switchProject(project: String): Job
+    fun portForward(svc: String, port: Int)
+    fun portForward(target: PortForwardTarget)
+    fun closePortForward(target: PortForwardTarget)
+    fun closeAllPortForward()
+}
+
+internal class OcViewModelImpl internal constructor(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
+    BaseViewModel(port, coroutineScope, errorViewer), OcViewModel {
 
     private val _projects: MutableStateFlow<List<String>> =
         MutableStateFlow(listOf())
@@ -38,7 +60,7 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
     private val _context: MutableStateFlow<Context> =
         MutableStateFlow(Context("", listOf()))
 
-    fun update() {
+    override fun update() {
         version()
         projects()
         currentProject()
@@ -46,8 +68,8 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
         context()
     }
 
-    val context: StateFlow<Context> = _context.asStateFlow()
-    fun context() = coroutineScope.launch {
+    override val context: StateFlow<Context> = _context.asStateFlow()
+    override fun context() = coroutineScope.launch {
         val context = ocApi.context()
         context.onSuccess {
             _context.value = it.toContext()
@@ -56,7 +78,7 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
         }
     }
 
-    fun switchContext(newContext: FullContext) = coroutineScope.launch {
+    override fun switchContext(newContext: FullContext) = coroutineScope.launch {
         val currentContext = ocApi.switchContext(SwitchContextApi(newContext))
         if (!newContext.isSameCluster(context.value.current)) closeAllPortForward()
         currentContext.onSuccess {
@@ -66,8 +88,8 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
         }.onFailure(showWarning)
     }
 
-    val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
-    fun checkLoginState() = coroutineScope.launch {
+    override val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
+    override fun checkLoginState() = coroutineScope.launch {
         val checkLogin = ocApi.checkLogin()
         checkLogin.onSuccess {
             _loginState.value = LoginState.LOGGEDIN
@@ -77,7 +99,7 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
         }
     }
 
-    fun login(token: String, server: String) = coroutineScope.launch {
+    override fun login(token: String, server: String) = coroutineScope.launch {
         val login = ocApi.login(token, server)
         login.onSuccess {
             _loginState.value = LoginState.LOGGEDIN
@@ -87,14 +109,14 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
         }
     }
 
-    val server = _server.asStateFlow()
-    fun listServer() = coroutineScope.launch {
+    override val server = _server.asStateFlow()
+    override fun listServer() = coroutineScope.launch {
         _server.value = ocApi.server().onFailure {
             showWarning(it)
         }.getOrDefault(listOf())
     }
 
-    fun switchProject(project: String) = coroutineScope.launch {
+    override fun switchProject(project: String) = coroutineScope.launch {
         val switchProject = ocApi.switchProject(project)
 
         _currentProject.value = switchProject.onFailure {
@@ -106,7 +128,7 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
         }
     }
 
-    val projects: StateFlow<List<String>> = _projects.asStateFlow()
+    override val projects: StateFlow<List<String>> = _projects.asStateFlow()
     private fun projects() = coroutineScope.launch {
         val projects = ocApi.projects()
         _projects.value = projects.onFailure {
@@ -116,21 +138,21 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
             .map { it.name }
     }
 
-    val currentProject: StateFlow<String> = _currentProject.asStateFlow()
+    override val currentProject: StateFlow<String> = _currentProject.asStateFlow()
     private fun currentProject() = coroutineScope.launch {
         _currentProject.value = ocApi.currentProject().onFailure {
             showWarning(it)
         }.getOrDefault(ProjectApi()).name
     }
 
-    val version = _version.asStateFlow()
+    override val version = _version.asStateFlow()
     private fun version() = coroutineScope.launch {
         _version.value = ocApi.version().onFailure {
             showWarning(it)
         }.getOrDefault(VersionApi())
     }
 
-    val services = _services.asStateFlow()
+    override val services = _services.asStateFlow()
     private fun services() = coroutineScope.launch {
         _services.value = ocApi.services().onFailure {
             if (it.message?.startsWith("404") != true) showWarning(it)
@@ -138,13 +160,13 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
     }
 
     private val openPortForwards = mutableMapOf<PortForwardTarget, Job>()
-    val portForward = _portForward.asStateFlow()
+    override val portForward = _portForward.asStateFlow()
 
-    fun portForward(svc: String, port: Int) {
+    override fun portForward(svc: String, port: Int) {
         portForward(PortForwardTarget(currentProject.value, svc, port))
     }
 
-    fun portForward(target: PortForwardTarget) {
+    override fun portForward(target: PortForwardTarget) {
         val launch = coroutineScope.launch(Dispatchers.IO) {
             val flow = ocApi.portForward(target.project, target.svc, target.port)
             flow.collect { message ->
@@ -160,13 +182,13 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
         openPortForwards[target] = launch
     }
 
-    fun closePortForward(target: PortForwardTarget) {
+    override fun closePortForward(target: PortForwardTarget) {
         openPortForwards.remove(target)?.cancel()
         portForwardData.remove(target)
         _portForward.value = portForwardData.map { OpenPortForward(it.key, it.value) }
     }
 
-    fun closeAllPortForward() {
+    override fun closeAllPortForward() {
         openPortForwards.onEach {
             it.value.cancel()
         }.clear()

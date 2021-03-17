@@ -7,10 +7,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import io.github.hoeggi.openshiftdb.viewmodel.BaseViewModel
+import io.github.hoeggi.openshiftdb.viewmodel.ViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-internal inline fun <T> BaseViewModel.collectAsState(flow: StateFlow<T>) =
+internal inline fun <T> ViewModel.collectAsState(flow: StateFlow<T>) =
     flow.collectAsState(coroutineScope.coroutineContext)
 
 @Composable
