@@ -15,5 +15,6 @@ dependencies {
     implementation(Dependencies.okio)
 
     api(project(":api_models"))
+    implementation(project(":routes"))
     compileOnly(Dependencies.slf4j_api)
 }

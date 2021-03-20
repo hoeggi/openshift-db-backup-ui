@@ -1,0 +1,21 @@
+import io.github.hoeggi.openshiftdb.eventlog.EventResult;
+import io.github.hoeggi.openshiftdb.eventlog.EventType;
+import java.time.LocalDateTime;
+
+CREATE TABLE PortForwardEvent (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project TEXT NOT NULL,
+      service TEXT NOT NULL,
+      port INTEGER NOT NULL,
+      startTime TEXT AS LocalDateTime NOT NULL,
+      endTime TEXT AS LocalDateTime NOT NULL,
+      type TEXT AS EventType NOT NULL,
+      result TEXT AS EventResult NOT NULL
+);
+
+insert:
+INSERT INTO PortForwardEvent(project, service, port, startTime, endTime, type, result)
+VALUES (?,?,?,?,?,?,?);
+
+listAll:
+SELECT * FROM PortForwardEvent ORDER BY startTime ASC;

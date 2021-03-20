@@ -1,9 +1,11 @@
 package io.github.hoeggi.openshiftdb.api
 
 import io.github.hoeggi.openshiftdb.api.response.ApiResponse
+import io.github.hoeggi.openshiftdb.server.Routes
+import io.github.hoeggi.openshiftdb.server.asPathSegment
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import io.github.hoeggi.openshiftdb.api.response.Json
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
@@ -18,17 +20,19 @@ typealias BasePath = String
 
 fun Api(port: Int, baseUrl: BasePath = "http://localhost"): Api = ApiImp(
     OcApi.api(port, baseUrl),
-    PostgresApi.api(port, baseUrl)
+    PostgresApi.api(port, baseUrl),
+    EventsApi.api(port, baseUrl)
 )
 
-interface Api : OcApi, PostgresApi
-private class ApiImp(val oc: OcApi, val postgres: PostgresApi) : Api, OcApi by oc, PostgresApi by postgres
+interface Api : OcApi, PostgresApi, EventsApi
+private class ApiImp(val oc: OcApi, val postgres: PostgresApi, val eventsApi: EventsApi) : Api, OcApi by oc,
+    PostgresApi by postgres, EventsApi by eventsApi
 
 
 internal operator fun OkHttpClient.plus(baseUrl: BasePath): ApiClient = this to baseUrl
 
-internal fun String.withPath(path: BasePath) =
-    toHttpUrl().newBuilder().addEncodedPathSegments(path).build()
+internal fun String.withPath(path: Routes) =
+    toHttpUrl().newBuilder().addEncodedPathSegments(path.asPathSegment()).build()
 
 internal fun HttpUrl.withQuery(vararg params: Pair<String, String>) =
     newBuilder().withQuery(*params).build()
@@ -66,24 +70,16 @@ internal inline fun <reified T> Response.get(): Result<T> = if (isSuccessful && 
     Result.failure(RuntimeException("$code - $message - $errorMessage"))
 }
 
-internal inline fun <reified T> ApiClient.get(path: String, credentials: String? = null) = try {
+internal inline fun <reified T> ApiClient.get(path: Routes, credentials: String? = null) = try {
     val request = first.newCall(second.withPath(path).toGetRequest(credentials)).execute()
     request.get<T>()
 } catch (ex: Exception) {
     Result.failure(ex)
 }
 
-internal inline fun <reified T, reified U> ApiClient.post(path: String, body: U) = try {
+internal inline fun <reified T, reified U> ApiClient.post(path: Routes, body: U) = try {
     val request = first.newCall(second.withPath(path).toPostRequest(body)).execute()
     request.get<T>()
 } catch (ex: Exception) {
     Result.failure(ex)
 }
-
-internal inline fun <reified T, reified U> ApiClient.websocket(path: String, vararg params: Pair<String, String>) =
-    try {
-        val request = first.newCall(second.withPath(path).withQuery(*params).toGetRequest()).execute()
-        request.get<T>()
-    } catch (ex: Exception) {
-        Result.failure(ex)
-    }

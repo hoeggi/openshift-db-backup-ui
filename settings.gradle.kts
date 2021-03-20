@@ -9,17 +9,20 @@ pluginManagement {
 rootProject.name = "openshift-db-gui"
 
 include(
-    ":app",
-    ":process",
-    ":oc",
-    ":server",
-    ":postgres",
-    "postgres-auth",
-    ":api",
-    ":viewmodel",
-    ":api_models",
-    ":ui",
-    ":i18n",
-    ":errorhandler",
-    ":settings"
+":app",
+":process",
+":oc",
+":server",
+":postgres",
+"postgres-auth",
+":api",
+":viewmodel",
+":api_models",
+":ui",
+":i18n",
+":errorhandler",
+":settings",
+":transaction-log",
+":build-config"
 )
+include("routes")

@@ -7,14 +7,9 @@ import io.github.hoeggi.openshiftdb.api.onFailure
 import io.github.hoeggi.openshiftdb.api.onSuccess
 import io.github.hoeggi.openshiftdb.api.response.*
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.*
 
 class PostgresViewModel internal constructor(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
     BaseViewModel(port, coroutineScope, errorViewer) {
@@ -59,19 +54,39 @@ class PostgresViewModel internal constructor(port: Int, coroutineScope: Coroutin
         coroutineScope.launch(Dispatchers.IO) {
             val dumpDatabases =
                 postgresApi.dumpDatabases(userName.value, password.value, database, dumpPath.value, format)
-            dumpDatabases.collect {
-                when (it) {
-                    is DatabaseDownloadMessage.InProgressMessage -> {
-                        downloadQueue.add(it)
-                        _downloadProgress.value = downloadQueue.toList()
-                        _downloadState.value = it
-                    }
-                    else -> {
-                        downloadQueue.clear()
-                        _downloadState.value = it
+            val eventTracker = DatabaseEventTracker(dumpPath.value, userName.value, database, format)
+            dumpDatabases
+                .onCompletion {
+                    coroutineScope.launch(Dispatchers.IO) {
+                        val newTransaction = eventsApi.newEvent(eventTracker.transactionMessage())
+                        newTransaction.onSuccess {
+                            logger.debug("tracked new transaction $it")
+                        }.onFailure {
+                            logger.error("error sending transaction", it)
+                        }
                     }
                 }
-            }
+                .collect {
+                    eventTracker.trackMessage(it)
+                    when (it) {
+                        is DatabaseDownloadMessage.InProgressMessage -> {
+                            downloadQueue.add(it)
+                            _downloadProgress.value = downloadQueue.toList()
+                            _downloadState.value = it
+                        }
+                        else -> {
+                            downloadQueue.clear()
+                            _downloadState.value = it
+                        }
+                    }
+                    when (it) {
+                        is DatabaseDownloadMessage.FinishMessage -> {
+                            eventTracker.path = it.message
+                            cancel(it.message)
+                        }
+                        is DatabaseDownloadMessage.ErrorMessage -> cancel(it.message)
+                    }
+                }
         }
     }
 
@@ -207,19 +222,37 @@ class PostgresViewModel internal constructor(port: Int, coroutineScope: Coroutin
                     restoreCommand.value.database,
                     restoreCommand.value.existing,
                     confirmationChannel)
-            dumpDatabases.collect {
-                when (it) {
-                    is DatabaseRestoreMessage.InProgressMessage -> {
-                        restoreQueue.add(it)
-                        _restoreProgress.value = restoreQueue.toList()
-                        _restoreState.value = it
+            val eventTracker =
+                DatabaseEventTracker(userName.value, restorePath.value, restoreCommand.value.database, "custom")
+            dumpDatabases
+                .onCompletion {
+                    coroutineScope.launch(Dispatchers.IO) {
+                        val newTransaction = eventsApi.newEvent(eventTracker.transactionMessage())
+                        newTransaction.onSuccess {
+                            logger.debug("tracked new transaction $it")
+                        }.onFailure {
+                            logger.error("error sending transaction", it)
+                        }
                     }
-                    else -> {
-                        restoreQueue.clear()
-                        _restoreState.value = it
+                }.collect {
+                    eventTracker.trackMessage(it)
+                    when (it) {
+                        is DatabaseRestoreMessage.InProgressMessage -> {
+                            restoreQueue.add(it)
+                            _restoreProgress.value = restoreQueue.toList()
+                            _restoreState.value = it
+                        }
+                        else -> {
+                            restoreQueue.clear()
+                            _restoreState.value = it
+                        }
+                    }
+                    when (it) {
+                        is DatabaseRestoreMessage.FinishMessage,
+                        is DatabaseRestoreMessage.ErrorMessage,
+                        -> cancel("finished, $it")
                     }
                 }
-            }
         }
     }
 }

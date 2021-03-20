@@ -1,40 +1,38 @@
 package io.github.hoeggi.openshiftdb.server.routes
 
+import io.github.hoeggi.openshiftdb.server.*
 import io.github.hoeggi.openshiftdb.server.handler.oc.*
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.websocket.*
-import org.slf4j.LoggerFactory
 
-private val logger = LoggerFactory.getLogger(Route::class.java)
 internal fun Route.oc() {
-    route("/oc") {
+    route(Path.oc()) {
         get {
             call.respond(HttpStatusCode.OK, "/oc")
         }
-        get("/version", Version())
-        get("/server", Cluster())
-        get("/services", Services())
-        get("/context", Context())
-        post("/context", SwitchContext())
+        get(Path.version(), Version())
+        get(Path.server(), Cluster())
+        get(Path.services(), Services())
+        get(Path.context(), Context())
+        post(Path.context(), SwitchContext())
 
-        route("/login") {
+        route(Path.login()) {
             get(CheckLogin())
             post(Login())
         }
 
-        route("/projects") {
-            post("", SwitchProject())
-            get("", Projects())
-            get("/current", Project())
+        route(Path.projects()) {
+            post(SwitchProject())
+            get(Projects())
+            get(Path.current(), Project())
         }
-        route("/secrets") {
-            get("/password", Password())
+        route(Path.secrets()) {
+            get(Path.password(), Password())
             get(Secrets())
         }
-        webSocket("/port-forward", null, PortForward())
+        webSocket(Path.portForward(), PortForward())
     }
 }
 

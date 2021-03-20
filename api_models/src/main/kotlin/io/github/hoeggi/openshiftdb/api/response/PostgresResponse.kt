@@ -2,16 +2,27 @@ package io.github.hoeggi.openshiftdb.api.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.LocalDateTime
+
 
 @Serializable
-data class RestoreRequestAPI(
-    val database: String,
-    val exists: Boolean,
+data class DatabaseEventApi(
+    val dbname: String,
     val path: String,
-)
+    val username: String,
+    val format: String,
+    @Serializable(with = LocalDateTimeSerializer::class)
+    override val startTime: LocalDateTime,
+    @Serializable(with = LocalDateTimeSerializer::class)
+    override val endTime: LocalDateTime,
+    override val eventType: EventTypeApi,
+    override val result: EventResultApi,
+) : EventApi
+
 
 @Serializable
-sealed class DatabaseRestoreMessage {
+sealed class DatabaseRestoreMessage : Trackable {
+    override val eventType = Trackable.Type.Restore
 
     companion object {
         fun unspecified(): DatabaseRestoreMessage = Unspecified
@@ -29,7 +40,7 @@ sealed class DatabaseRestoreMessage {
 
     @Serializable
     @SerialName("start")
-    object StartMessage : DatabaseRestoreMessage()
+    object StartMessage : DatabaseRestoreMessage(), Trackable.Start
 
     @Serializable
     @SerialName("confirm-restore")
@@ -41,7 +52,7 @@ sealed class DatabaseRestoreMessage {
 
     @Serializable
     @SerialName("error")
-    data class ErrorMessage(val message: String) : DatabaseRestoreMessage()
+    data class ErrorMessage(val message: String) : DatabaseRestoreMessage(), Trackable.Error
 
     @Serializable
     @SerialName("inprogress")
@@ -49,11 +60,12 @@ sealed class DatabaseRestoreMessage {
 
     @Serializable
     @SerialName("finish")
-    object FinishMessage : DatabaseRestoreMessage()
+    object FinishMessage : DatabaseRestoreMessage(), Trackable.Finish
 }
 
 @Serializable
-sealed class DatabaseDownloadMessage {
+sealed class DatabaseDownloadMessage : Trackable {
+    override val eventType = Trackable.Type.Dump
     abstract val message: String
 
     companion object {
@@ -70,11 +82,11 @@ sealed class DatabaseDownloadMessage {
 
     @Serializable
     @SerialName("start")
-    data class StartMessage(override val message: String = "start") : DatabaseDownloadMessage()
+    data class StartMessage(override val message: String = "start") : DatabaseDownloadMessage(), Trackable.Start
 
     @Serializable
     @SerialName("error")
-    data class ErrorMessage(override val message: String) : DatabaseDownloadMessage()
+    data class ErrorMessage(override val message: String) : DatabaseDownloadMessage(), Trackable.Error
 
     @Serializable
     @SerialName("inprogress")
@@ -82,7 +94,7 @@ sealed class DatabaseDownloadMessage {
 
     @Serializable
     @SerialName("finish")
-    data class FinishMessage(override val message: String) : DatabaseDownloadMessage()
+    data class FinishMessage(override val message: String) : DatabaseDownloadMessage(), Trackable.Finish
 }
 
 

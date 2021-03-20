@@ -1,36 +1,40 @@
 package io.github.hoeggi.openshiftdb.server.routes
 
+import io.github.hoeggi.openshiftdb.server.*
 import io.github.hoeggi.openshiftdb.server.handler.postgres.*
+import io.github.hoeggi.openshiftdb.server.route
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.routing.Route
+import io.ktor.routing.get
+import io.ktor.routing.post
 import io.ktor.websocket.*
 
 internal fun Route.postgres() {
-    route("/postgres") {
+    route(Path.postgres()) {
         get {
             call.respond(HttpStatusCode.OK, "/postgres")
         }
-        route("/version") {
-            get("/tools", Tools())
+        route(Path.version()) {
+            get(Path.tools(), Tools())
             authenticate("postgres") {
-                get("/database", DatabaseVersion())
+                get(Path.database(), DatabaseVersion())
             }
         }
         authenticate("postgres") {
-            route("/databases") {
+            route(Path.databases()) {
                 get(Databases())
-                get("/default", DefaultDatabase())
-                webSocket("/dump", null, PostgresDump())
+                get(Path.default(), DefaultDatabase())
+                webSocket(Path.dump(), PostgresDump())
             }
         }
-        route("/restore") {
-            get("/info", RestoreInfo())
+        route(Path.restore()) {
+            get(Path.info(), RestoreInfo())
             authenticate("postgres") {
-                get("/command", RestoreCommand())
-                webSocket("", null, RestoreDatabase())
+                get(Path.command(), RestoreCommand())
+                webSocket(handler = RestoreDatabase())
             }
         }
     }

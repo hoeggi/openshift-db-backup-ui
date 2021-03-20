@@ -1,6 +1,6 @@
 package io.github.hoeggi.openshiftdb.settings
 
-import io.github.hoeggi.settings.BuildConfig
+import io.github.hoeggi.openshiftdb.BuildConfig
 import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 import okio.buffer

@@ -8,6 +8,7 @@ buildscript {
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
     dependencies {
+//        classpath("com.squareup.sqldelight:gradle-plugin:1.4.4")
         classpath(Plugins.compose)
         classpath(Plugins.gradle_versions)
         classpath(Plugins.dependency_analysis)
@@ -32,11 +33,11 @@ fun isNonStable(version: String): Boolean {
     return isStable.not()
 }
 
-//tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
-//    rejectVersionIf {
-//        isNonStable(candidate.version) && !isNonStable(currentVersion)
-//    }
-//}
+tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
+    rejectVersionIf {
+        isNonStable(candidate.version) && !isNonStable(currentVersion)
+    }
+}
 
 extensions.configure<DependencyAnalysisExtension> {
     issues {

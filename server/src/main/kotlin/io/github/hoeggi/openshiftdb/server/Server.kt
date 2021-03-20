@@ -1,7 +1,9 @@
 package io.github.hoeggi.openshiftdb.server
 
 import com.codahale.metrics.jmx.JmxReporter
+import io.github.hoeggi.openshiftdb.api.response.SerializersModule
 import io.github.hoeggi.openshiftdb.postgres.Authenticator
+import io.github.hoeggi.openshiftdb.server.handler.postgres.TransactionLogger
 import io.github.hoeggi.openshiftdb.server.routes.default
 import io.github.hoeggi.openshiftdb.server.routes.oc
 import io.github.hoeggi.openshiftdb.server.routes.postgres
@@ -29,7 +31,7 @@ import java.util.concurrent.TimeUnit
 
 
 class Server(private val listeningPort: Int) : Runnable {
-    val logging = LoggerFactory.getLogger(Server::class.java)
+    private val logging = LoggerFactory.getLogger(Server::class.java)
 
     override fun run() {
         logging.info("port used: $listeningPort}")
@@ -44,19 +46,29 @@ class Server(private val listeningPort: Int) : Runnable {
                 port = listeningPort
                 host = "localhost"
             }
-        }).start(true)
+        }).start(false)
 
     }
 
     private fun Application.routes(appMicrometerRegistry: PrometheusMeterRegistry) {
         routing {
             default(appMicrometerRegistry)
-            route("/v1") {
+            route(Path.v1()) {
                 get {
                     call.respond(HttpStatusCode.OK, "/v1")
                 }
                 oc()
                 postgres()
+                route(Path.events()) {
+                    route(Path.database()) {
+                        get(TransactionLogger.transactions)
+                        post(TransactionLogger.newTransaction)
+                    }
+                    route(Path.portForward()) {
+                        get(TransactionLogger.transactions)
+                        post(TransactionLogger.newTransaction)
+                    }
+                }
             }
         }
     }
@@ -69,6 +81,7 @@ class Server(private val listeningPort: Int) : Runnable {
             json(
                 json = Json {
                     useArrayPolymorphism = false
+                    serializersModule = SerializersModule
                 }
             )
         }

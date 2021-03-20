@@ -9,10 +9,7 @@ import io.github.hoeggi.openshiftdb.viewmodel.models.*
 import io.github.hoeggi.openshiftdb.viewmodel.models.PortForwardMessage
 import io.github.hoeggi.openshiftdb.viewmodel.models.PortForwardMessage.Companion.portForwardMessage
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 
 
 class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
@@ -26,7 +23,8 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
         MutableStateFlow(VersionApi())
     private val _services: MutableStateFlow<List<Service>> =
         MutableStateFlow(listOf())
-    private val portForwardData = mutableMapOf<PortForwardTarget, MutableList<PortForwardMessage>>()
+    private val portForwardData =
+        mutableMapOf<PortForwardTarget, MutableList<PortForwardMessage>>()
     private val _portForward: MutableStateFlow<List<OpenPortForward>> =
         MutableStateFlow(listOf())
 
@@ -146,14 +144,30 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
 
     fun portForward(target: PortForwardTarget) {
         val launch = coroutineScope.launch(Dispatchers.IO) {
+            val eventTracker = PortForwardEventTracker(target)
             val flow = ocApi.portForward(target.project, target.svc, target.port)
-            flow.collect { message ->
+            flow.onCompletion {
+                logger.debug("port-forward completed")
+                coroutineScope.launch(Dispatchers.IO) {
+                    eventTracker.stopped()
+                    val newTransaction = eventsApi.newEvent(eventTracker.transactionMessage())
+                    newTransaction.onSuccess {
+                        logger.debug("tracked new transaction $it")
+                    }.onFailure {
+                        logger.error("error sending transaction", it)
+                    }
+                }
+            }.collect { message ->
+                eventTracker.trackMessage(message)
                 ensureActive()
                 portForwardData[target] = portForwardData.getOrDefault(target, mutableListOf()).apply {
                     add(portForwardMessage(message))
                 }
                 _portForward.value = portForwardData.map {
                     OpenPortForward(it.key, it.value)
+                }
+                if (message is io.github.hoeggi.openshiftdb.api.response.PortForwardMessage.CloseMessage) {
+                    cancel("closed")
                 }
             }
         }

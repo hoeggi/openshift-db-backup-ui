@@ -10,7 +10,8 @@ dependencies {
     implementation(project(":api_models"))
     implementation(project(":postgres"))
     implementation(project(":postgres-auth"))
-
+    implementation(project(":transaction-log"))
+    implementation(project(":routes"))
 
     implementation(Dependencies.metrics_jmx)
     implementation(Dependencies.micrometer_registry_prometheus)

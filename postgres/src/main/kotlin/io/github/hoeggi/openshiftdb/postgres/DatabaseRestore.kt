@@ -43,7 +43,8 @@ class DatabaseRestore(
 
             input.await()
             error.await()
-            onSuccess(restore.backup, restore.database)
+            if (restore.exitCode == 0) onSuccess(restore.backup, restore.database)
+            else onError(restore.exitCode, null)
         } catch (ex: Exception) {
             logger.warn("unable to restore database", ex)
             onError(restore.exitCode, ex)

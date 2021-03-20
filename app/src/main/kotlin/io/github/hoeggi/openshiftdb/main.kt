@@ -24,7 +24,7 @@ fun main() {
     Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler())
     UIManager.setLookAndFeel(FlatDarculaLaf())
     logger.info("starting server")
-    Executors.newSingleThreadExecutor().execute(Server(port))
+    Server(port).run()
     logger.info("starting ui")
     UI().show(port) {
         ProcessHandle.current()

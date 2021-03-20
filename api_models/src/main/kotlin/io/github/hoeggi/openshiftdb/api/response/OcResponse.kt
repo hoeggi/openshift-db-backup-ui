@@ -2,6 +2,7 @@ package io.github.hoeggi.openshiftdb.api.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.LocalDateTime
 
 typealias FullContext = String
 
@@ -30,13 +31,28 @@ data class SecretsApi(val name: String, val data: Map<String, String>)
 data class LoginApi(val token: String, val server: String)
 
 @Serializable
-sealed class PortForwardMessage {
+data class PortForwardEventApi(
+    val project: String,
+    val service: String,
+    val port: Int,
+    @Serializable(with = LocalDateTimeSerializer::class)
+    override val startTime: LocalDateTime,
+    @Serializable(with = LocalDateTimeSerializer::class)
+    override val endTime: LocalDateTime,
+    override val eventType: EventTypeApi,
+    override val result: EventResultApi,
+) : EventApi
+
+@Serializable
+sealed class PortForwardMessage : Trackable {
+    override val eventType = Trackable.Type.PortForward
     abstract val message: String
 
     companion object {
         fun close(message: String): PortForwardMessage = CloseMessage(message)
         fun error(message: String): PortForwardMessage = ErrorMessage(message)
         fun message(message: String): PortForwardMessage = Message(message)
+        fun start(message: String): PortForwardMessage = Start(message)
     }
 
     @Serializable
@@ -44,12 +60,16 @@ sealed class PortForwardMessage {
     data class Message(override val message: String) : PortForwardMessage()
 
     @Serializable
+    @SerialName("start")
+    data class Start(override val message: String) : PortForwardMessage(), Trackable.Start
+
+    @Serializable
     @SerialName("error")
-    data class ErrorMessage(override val message: String) : PortForwardMessage()
+    data class ErrorMessage(override val message: String) : PortForwardMessage(), Trackable.Error
 
     @Serializable
     @SerialName("close")
-    data class CloseMessage(override val message: String) : PortForwardMessage()
+    data class CloseMessage(override val message: String) : PortForwardMessage(), Trackable.Finish
 }
 
 @Serializable

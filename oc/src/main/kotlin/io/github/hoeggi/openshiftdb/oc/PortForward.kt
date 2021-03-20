@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 
 
 class PortForward(
+    private val onStart: suspend (String) -> Unit,
     private val onNewLine: suspend (String) -> Unit,
     private val onNewErrorLine: suspend (String) -> Unit,
     private val onClosed: suspend (String) -> Unit,
@@ -24,6 +25,7 @@ class PortForward(
         try {
             portForward = oc.portForward(target.projectName, target.serviceName, target.port)
             logger.info("port-forward: $portForward openend")
+            onStart("Forwarding port ${target.port}")
             val stream = async(
                 Dispatchers.IO + CoroutineName("port-forward-stream")
             ) {

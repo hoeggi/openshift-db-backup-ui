@@ -13,6 +13,8 @@ object Versions {
     val compose = "0.4.0-build173"
     val ansi_sequence = "0.2"
     val flatlaf = "1.0"
+    val sqldelight = "1.4.4"
+    val buildconfig = "3.0.0"
 }
 
 object Plugins {
@@ -52,6 +54,7 @@ object Dependencies {
     val micrometer_registry_prometheus =
         "io.micrometer:micrometer-registry-prometheus:${Versions.micrometer_registry_prometheus}"
     val flatlaf = "com.formdev:flatlaf:${Versions.flatlaf}"
+    val sqldelight_sqlite = "com.squareup.sqldelight:sqlite-driver:${Versions.sqldelight}"
 }
 
 object TransitivDependencies {

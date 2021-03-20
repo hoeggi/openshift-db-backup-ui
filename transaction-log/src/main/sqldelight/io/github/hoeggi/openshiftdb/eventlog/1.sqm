@@ -1,0 +1,16 @@
+import io.github.hoeggi.openshiftdb.eventlog.TransactionType;
+import io.github.hoeggi.openshiftdb.eventlog.TransactionResult;
+import java.time.LocalDateTime;
+
+ALTER TABLE DatabaseTransaction RENAME TO DatabaseEvent;
+
+CREATE TABLE PortForwardEvent (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project TEXT NOT NULL,
+      service TEXT NOT NULL,
+      port INTEGER NOT NULL,
+      startTime TEXT AS LocalDateTime NOT NULL,
+      endTime TEXT AS LocalDateTime NOT NULL,
+      type TEXT AS TransactionType NOT NULL,
+      result TEXT AS TransactionResult NOT NULL
+);

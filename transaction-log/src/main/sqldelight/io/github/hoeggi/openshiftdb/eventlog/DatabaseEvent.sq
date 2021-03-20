@@ -1,0 +1,22 @@
+import io.github.hoeggi.openshiftdb.eventlog.EventResult;
+import io.github.hoeggi.openshiftdb.eventlog.EventType;
+import java.time.LocalDateTime;
+
+CREATE TABLE DatabaseEvent (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      dbname TEXT NOT NULL,
+      path TEXT NOT NULL,
+      username TEXT NOT NULL,
+      format TEXT NOT NULL,
+      startTime TEXT AS LocalDateTime NOT NULL,
+      endTime TEXT AS LocalDateTime NOT NULL,
+      type TEXT AS EventType NOT NULL,
+      result TEXT AS EventResult NOT NULL
+);
+
+insert:
+INSERT INTO DatabaseEvent(dbname, path, username, format, startTime, endTime, type, result)
+VALUES (?,?,?,?,?,?,?,?);
+
+listAll:
+SELECT * FROM DatabaseEvent ORDER BY startTime ASC;

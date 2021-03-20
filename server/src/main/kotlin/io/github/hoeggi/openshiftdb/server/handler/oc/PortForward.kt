@@ -1,5 +1,6 @@
 package io.github.hoeggi.openshiftdb.server.handler.oc
 
+import io.github.hoeggi.openshiftdb.api.response.Json
 import io.github.hoeggi.openshiftdb.api.response.PortForwardMessage
 import io.github.hoeggi.openshiftdb.oc.OC
 import io.github.hoeggi.openshiftdb.oc.PortForward
@@ -11,7 +12,6 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 
 private suspend fun SendChannel<Frame>.sendAsText(message: PortForwardMessage) {
@@ -33,6 +33,11 @@ internal fun PortForward(): suspend DefaultWebSocketServerSession.() -> Unit = {
         if (project != null && svc != null && port != null) {
 
             portForward = PortForward(
+                onStart = {
+                    logger.debug("onStart: $it")
+                    if (outgoing.isClosedForSend.not()) outgoing.sendAsText(PortForwardMessage.start(it))
+                    else portForward?.stop()
+                },
                 onNewLine = {
                     logger.debug("onNewLine: $it")
                     if (outgoing.isClosedForSend.not()) outgoing.sendAsText(PortForwardMessage.message(it))

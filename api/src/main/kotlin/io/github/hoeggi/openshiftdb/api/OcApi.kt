@@ -1,6 +1,7 @@
 package io.github.hoeggi.openshiftdb.api
 
 import io.github.hoeggi.openshiftdb.api.response.*
+import io.github.hoeggi.openshiftdb.server.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import io.github.hoeggi.openshiftdb.api.response.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocketListener
@@ -41,8 +42,10 @@ interface OcApi {
     ): Flow<PortForwardMessage>
 
     companion object {
-        fun api(port: Int, baseUrl: BasePath): OcApi =
-            OcApiImpl("$baseUrl:$port/v1/oc/")
+        fun api(port: Int, baseUrl: BasePath): OcApi {
+            val s = "$baseUrl:$port${Path.v1().oc().path}"
+            return OcApiImpl("$baseUrl:$port${Path.v1().oc().path}")
+        }
     }
 }
 
@@ -52,41 +55,41 @@ private class OcApiImpl(url: BasePath) : OcApi {
         .build() + url
 
     override suspend fun version(): Result<VersionApi> =
-        withContext(Dispatchers.IO) { client.get("version") }
+        withContext(Dispatchers.IO) { client.get(Path.version()) }
 
     override suspend fun server(): Result<List<ClusterApi>> =
-        withContext(Dispatchers.IO) { client.get("server") }
+        withContext(Dispatchers.IO) { client.get(Path.server()) }
 
     override suspend fun projects(): Result<List<ProjectApi>> =
         withContext(Dispatchers.IO) {
-            client.get("projects")
+            client.get(Path.projects())
         }
 
     override suspend fun switchContext(context: SwitchContextApi): Result<SwitchContextApi> =
-        withContext(Dispatchers.IO) { client.post("context", context) }
+        withContext(Dispatchers.IO) { client.post(Path.context(), context) }
 
     override suspend fun context(): Result<ContextApi> =
         withContext(Dispatchers.IO) {
-            client.get("context")
+            client.get(Path.context())
         }
 
     override suspend fun currentProject(): Result<ProjectApi> =
-        withContext(Dispatchers.IO) { client.get("projects/current") }
+        withContext(Dispatchers.IO) { client.get(Path.projects().current()) }
 
     override suspend fun switchProject(project: String) = switchProject(ProjectApi(project))
     override suspend fun switchProject(project: ProjectApi): Result<ProjectApi> =
-        withContext(Dispatchers.IO) { client.post("projects", project) }
+        withContext(Dispatchers.IO) { client.post(Path.projects(), project) }
 
     override suspend fun secrets(): Result<List<SecretsApi>> =
-        withContext(Dispatchers.IO) { client.get("secrets") }
+        withContext(Dispatchers.IO) { client.get(Path.secrets()) }
 
     override suspend fun services(): Result<List<ServicesApi>> =
-        withContext(Dispatchers.IO) { client.get("services") }
+        withContext(Dispatchers.IO) { client.get(Path.services()) }
 
     override suspend fun password(username: String): Result<String> =
         withContext(Dispatchers.IO) {
             client.first.newCall(
-                client.second.withPath("secrets/password")
+                client.second.withPath(Path.secrets().password())
                     .withQuery("username" to username)
                     .toGetRequest()
             ).execute().get()
@@ -103,7 +106,7 @@ private class OcApiImpl(url: BasePath) : OcApi {
         withContext(Dispatchers.IO) { authorize(loginRequest().toGetRequest()) }
 
 
-    private fun loginRequest() = client.second.withPath("login")
+    private fun loginRequest() = client.second.withPath(Path.login())
     private fun authorize(request: Request): Result<Unit> = try {
         val result = client.first.newCall(request).execute()
         when (result.code) {
@@ -117,7 +120,7 @@ private class OcApiImpl(url: BasePath) : OcApi {
 
     override suspend fun portForward(project: String, svc: String, port: Int) =
         callbackFlow {
-            val request = client.second.withPath("port-forward")
+            val request = client.second.withPath(Path.portForward())
                 .withQuery(
                     "project" to project,
                     "svc" to svc,

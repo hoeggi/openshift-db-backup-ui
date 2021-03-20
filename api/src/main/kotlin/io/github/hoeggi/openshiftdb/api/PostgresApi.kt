@@ -1,6 +1,7 @@
 package io.github.hoeggi.openshiftdb.api
 
 import io.github.hoeggi.openshiftdb.api.response.*
+import io.github.hoeggi.openshiftdb.server.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import io.github.hoeggi.openshiftdb.api.response.Json
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.WebSocketListener
@@ -56,7 +57,7 @@ interface PostgresApi {
 
     companion object {
         fun api(port: Int, baseUrl: BasePath): PostgresApi =
-            PostgresApiImpl("$baseUrl:$port/v1/postgres/")
+            PostgresApiImpl("$baseUrl:$port${Path.v1().postgres().path}")
     }
 
 }
@@ -69,7 +70,7 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
     override suspend fun restoreInfo(path: String): Result<RestoreInfoApi> =
         withContext(Dispatchers.IO) {
             client.first.newCall(
-                client.second.withPath("restore/info")
+                client.second.withPath(Path.restore().info())
                     .withQuery("path" to path)
                     .toGetRequest()
             ).execute().get()
@@ -78,7 +79,7 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
     override suspend fun restoreCommand(user: String, password: String, path: String): Result<RestoreCommandApi> =
         withContext(Dispatchers.IO) {
             client.first.newCall(
-                client.second.withPath("restore/command")
+                client.second.withPath(Path.restore().command())
                     .withQuery("path" to path)
                     .toGetRequest(Credentials.basic(user, password))
             ).execute().get()
@@ -92,7 +93,7 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
         exists: Boolean,
         confirmationChannel: ReceiveChannel<Boolean>,
     ): Flow<DatabaseRestoreMessage> = callbackFlow {
-        val request = client.second.withPath("restore")
+        val request = client.second.withPath(Path.restore())
             .withQuery(
                 "database" to database,
                 "exists" to "$exists",
@@ -117,11 +118,11 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
     }.shareIn(CoroutineScope(coroutineContext), SharingStarted.Eagerly)
 
     override suspend fun toolsVersion(): Result<ToolsVersionApi> =
-        withContext(Dispatchers.IO) { client.get("version/tools") }
+        withContext(Dispatchers.IO) { client.get(Path.version().tools()) }
 
     override suspend fun databaseVersion(username: String, password: String): Result<DatabaseVersionApi> =
         withContext(Dispatchers.IO) {
-            client.get("version/database", Credentials.basic(username, password))
+            client.get(Path.version().database(), Credentials.basic(username, password))
         }
 
 
@@ -131,7 +132,7 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
         format: PostgresApi.DatabaseViewFormat?,
     ): Result<DatabasesApi> = withContext(Dispatchers.IO) {
         client.first.newCall(
-            client.second.withPath("databases")
+            client.second.withPath(Path.databases())
                 .newBuilder()
                 .apply {
                     if (format != null) {
@@ -147,7 +148,7 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
         username: String,
         password: String,
     ): Result<DefaultDatabaseApi> = withContext(Dispatchers.IO) {
-        client.get("databases/default", Credentials.basic(username, password))
+        client.get(Path.databases().default(), Credentials.basic(username, password))
     }
 
     override suspend fun dumpDatabases(
@@ -157,7 +158,7 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
         path: String,
         format: String,
     ): Flow<DatabaseDownloadMessage> = callbackFlow {
-        val request = client.second.withPath("databases/dump")
+        val request = client.second.withPath(Path.databases().dump())
             .withQuery(
                 "database" to database,
                 "path" to path,
@@ -166,6 +167,7 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
         val serializer = DatabaseDownloadMessage.serializer()
         val listener: WebSocketListener = createListener(this, serializer)
         val webSocket = client.first.newWebSocket(request, listener)
+
         awaitClose {
             logger.debug("closing flow")
             webSocket.close(1000, Json.encodeToString(DatabaseDownloadMessage.finish("closing")))

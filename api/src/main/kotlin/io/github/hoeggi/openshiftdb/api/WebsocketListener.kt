@@ -1,9 +1,10 @@
 package io.github.hoeggi.openshiftdb.api
 
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.Json
+import io.github.hoeggi.openshiftdb.api.response.Json
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
@@ -19,14 +20,16 @@ internal fun <T> createListener(producer: ProducerScope<T>, serializer: KSeriali
             logger.debug("onClosed - $code - $reason")
             val message = Json.decodeFromString(serializer, reason)
             if (!producer.isClosedForSend) producer.sendBlocking(message)
+            producer.cancel()
             logger.debug("onClosed emit result: $message")
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            logger.debug("onClosed - $code - $reason")
+            logger.debug("onClosing - $code - $reason")
             val message = Json.decodeFromString(serializer, reason)
             if (!producer.isClosedForSend) producer.sendBlocking(message)
-            logger.debug("onClosed emit result: $message")
+            producer.cancel()
+            logger.debug("onClosing emit result: $message")
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {

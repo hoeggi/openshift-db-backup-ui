@@ -20,7 +20,7 @@ import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import io.github.hoeggi.openshiftdb.api.response.Json
 import org.slf4j.LoggerFactory
 
 private suspend fun SendChannel<Frame>.sendAsText(message: DatabaseRestoreMessage) {

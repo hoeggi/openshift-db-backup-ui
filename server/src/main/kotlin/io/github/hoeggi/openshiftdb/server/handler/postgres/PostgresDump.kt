@@ -17,7 +17,7 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import io.github.hoeggi.openshiftdb.api.response.Json
 import org.slf4j.LoggerFactory
 
 private suspend fun SendChannel<Frame>.sendAsText(message: DatabaseDownloadMessage) {
@@ -77,8 +77,10 @@ private suspend fun downloadPlain(
         },
         onSuccess = {
             logger.debug("onSuccessLine: $it")
-            if (outgoing.isClosedForSend.not()) outgoing.sendAsText(DatabaseDownloadMessage.finish(it))
-            else dump.close()
+            session.close(
+                CloseReason.Codes.NORMAL,
+                DatabaseDownloadMessage.finish(it)
+            )
         },
         onError = { code, ex ->
             logger.error("onError: $code", ex)
@@ -123,7 +125,10 @@ private suspend fun downloadCustom(
     val downloader = DatabaseDownloaderCustom(dump,
         onSuccess = {
             logger.debug("onSuccess")
-            if (outgoing.isClosedForSend.not()) outgoing.sendAsText(DatabaseDownloadMessage.finish(dump.output))
+            session.close(
+                CloseReason.Codes.NORMAL,
+                DatabaseDownloadMessage.finish(dump.output)
+            )
         },
         onError = { code, message, ex ->
             logger.error("onError: $code", ex)
