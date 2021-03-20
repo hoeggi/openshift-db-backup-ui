@@ -1,6 +1,7 @@
 package io.github.hoeggi.openshiftdb.server.handler.postgres
 
 import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
+import io.github.hoeggi.openshiftdb.api.response.Json
 import io.github.hoeggi.openshiftdb.postgres.DatabaseDownloaderCustom
 import io.github.hoeggi.openshiftdb.postgres.DatabaseDownloaderPlain
 import io.github.hoeggi.openshiftdb.postgres.Postgres
@@ -17,7 +18,6 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.serialization.encodeToString
-import io.github.hoeggi.openshiftdb.api.response.Json
 import org.slf4j.LoggerFactory
 
 private suspend fun SendChannel<Frame>.sendAsText(message: DatabaseDownloadMessage) {

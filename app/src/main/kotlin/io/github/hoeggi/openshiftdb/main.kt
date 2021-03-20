@@ -5,7 +5,6 @@ import io.github.hoeggi.openshiftdb.server.Server
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.ServerSocket
-import java.util.concurrent.Executors
 import javax.swing.UIManager
 
 

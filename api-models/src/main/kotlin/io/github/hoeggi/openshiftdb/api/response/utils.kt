@@ -16,7 +16,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
-
 val SerializersModule = SerializersModule {
     polymorphic(EventApi::class) {
         subclass(DatabaseEventApi::class)

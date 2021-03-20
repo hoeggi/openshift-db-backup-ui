@@ -32,19 +32,19 @@ class EventsViewModel(port: Int, scope: CoroutineScope, errorViewer: ErrorViewer
         val portForwardEvents = pfe.getCompleted()
         _events.value = portForwardEvents
             .getOrDefault(listOf())
-            .map { pfea ->
-                val portForwarUiEvent = pfea.toUiEvent()
-                return@map if (pfea.port == forwardablePort) {
+            .map { forward ->
+                val portForwardUiEvent = forward.toUiEvent()
+                if (forward.port == forwardablePort) {
                     val map = databaseEvents
                         .getOrDefault(listOf())
                         .filter {
-                            it.startTime.isAfter(pfea.startTime) &&
-                                    it.startTime.isBefore(pfea.endTime ?: LocalDateTime.now())
+                            it.startTime.isAfter(forward.startTime) &&
+                                    it.startTime.isBefore(forward.endTime ?: LocalDateTime.now())
                         }.map {
-                            it.toUiEvent(portForwarUiEvent.color)
+                            it.toUiEvent(portForwardUiEvent.color)
                         }
-                    portForwarUiEvent to map
-                } else portForwarUiEvent to listOf()
+                    portForwardUiEvent to map
+                } else portForwardUiEvent to listOf()
             }.sortedBy {
                 it.first.start
             }.reversed()

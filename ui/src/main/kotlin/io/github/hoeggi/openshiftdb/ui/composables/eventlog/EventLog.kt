@@ -9,7 +9,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Forward
+import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -90,7 +92,7 @@ fun EventItems() {
                     }
                 }
                 with(it.first) {
-                    if (end != null) {
+                    if (isFinished) {
                         Row(
                             modifier = Modifier.height(IntrinsicSize.Min),
                             verticalAlignment = Alignment.CenterVertically
@@ -98,7 +100,7 @@ fun EventItems() {
                             color()
                             closeIcon()
                             Text("closed on $endDate : $endTime",
-                                style = androidx.compose.material.MaterialTheme.typography.body2)
+                                style = MaterialTheme.typography.body2)
                         }
                     }
                 }
@@ -127,12 +129,8 @@ internal fun PortForwardEvent.closeIcon() {
         true -> color.toColor()
         false -> Color.Red
     }
-    val icon = when (isSuccess) {
-        true -> Icons.Outlined.Check
-        false -> Icons.Outlined.Close
-    }
     Icon(
-        icon = icon,
+        icon = Icons.Outlined.Forward,
         tint = tintColor
     )
 }
@@ -151,18 +149,6 @@ internal fun DatabaseEvent.eventIcon(modifier: Modifier = Modifier) {
         icon = icon,
         tint = tintColor,
         modifier = modifier
-    )
-}
-
-@Composable
-internal fun DatabaseEvent.resultIcon() = when (isSuccess) {
-    true -> Icon(
-        icon = Icons.Outlined.Check,
-        tint = Color.Green
-    )
-    false -> Icon(
-        icon = Icons.Outlined.Error,
-        tint = Color.Red
     )
 }
 

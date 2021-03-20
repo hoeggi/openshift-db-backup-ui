@@ -7,9 +7,12 @@ import io.github.hoeggi.openshiftdb.api.onFailure
 import io.github.hoeggi.openshiftdb.api.onSuccess
 import io.github.hoeggi.openshiftdb.api.response.*
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 class PostgresViewModel internal constructor(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
     BaseViewModel(port, coroutineScope, errorViewer) {

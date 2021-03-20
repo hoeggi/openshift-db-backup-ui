@@ -1,10 +1,10 @@
 package io.github.hoeggi.openshiftdb.api
 
+import io.github.hoeggi.openshiftdb.api.response.Json
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.serialization.KSerializer
-import io.github.hoeggi.openshiftdb.api.response.Json
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener

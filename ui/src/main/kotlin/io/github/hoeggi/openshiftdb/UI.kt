@@ -82,9 +82,11 @@ class UI {
         ) {
 
             val scope = rememberCoroutineScope() + supervisor
-            val viewModelProvider = viewModels(port,
+            val viewModelProvider = viewModels(
+                port,
                 scope,
-                ErrorViewProvider.instance())
+                ErrorViewProvider.instance()
+            )
 
             CompositionLocalProvider(
                 UIScope provides scope,

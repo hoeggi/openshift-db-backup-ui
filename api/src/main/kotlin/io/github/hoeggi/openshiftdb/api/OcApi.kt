@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
-import io.github.hoeggi.openshiftdb.api.response.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocketListener

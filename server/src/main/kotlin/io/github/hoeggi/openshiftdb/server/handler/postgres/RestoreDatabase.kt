@@ -1,6 +1,7 @@
 package io.github.hoeggi.openshiftdb.server.handler.postgres
 
 import io.github.hoeggi.openshiftdb.api.response.DatabaseRestoreMessage
+import io.github.hoeggi.openshiftdb.api.response.Json
 import io.github.hoeggi.openshiftdb.postgres.DatabaseRestore
 import io.github.hoeggi.openshiftdb.postgres.Postgres
 import io.github.hoeggi.openshiftdb.postgres.PostgresPrincibal
@@ -20,7 +21,6 @@ import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import io.github.hoeggi.openshiftdb.api.response.Json
 import org.slf4j.LoggerFactory
 
 private suspend fun SendChannel<Frame>.sendAsText(message: DatabaseRestoreMessage) {

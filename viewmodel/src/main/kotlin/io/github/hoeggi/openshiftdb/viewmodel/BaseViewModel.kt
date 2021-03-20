@@ -36,7 +36,6 @@ abstract class BaseViewModel(port: Int, private val scope: CoroutineScope, priva
     private val coroutineExceptionHandler = CoroutineExceptionHandler(errorViewer)
     private val api: Api = Api(port)
 
-
     internal val ocApi: OcApi
         get() = api
     internal val postgresApi: PostgresApi
