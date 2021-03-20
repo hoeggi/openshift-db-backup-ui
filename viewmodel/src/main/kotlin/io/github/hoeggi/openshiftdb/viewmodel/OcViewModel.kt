@@ -150,15 +150,23 @@ class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope
                 logger.debug("port-forward completed")
                 coroutineScope.launch(Dispatchers.IO) {
                     eventTracker.stopped()
-                    val newTransaction = eventsApi.newEvent(eventTracker.transactionMessage())
+                    val newTransaction = eventsApi.newEvent(eventTracker.event())
                     newTransaction.onSuccess {
-                        logger.debug("tracked new transaction $it")
+                        logger.debug("tracked port-forward finished $it")
                     }.onFailure {
-                        logger.error("error sending transaction", it)
+                        logger.error("error trackeing port-forward finished", it)
                     }
                 }
             }.collect { message ->
                 eventTracker.trackMessage(message)
+                if (message is io.github.hoeggi.openshiftdb.api.response.PortForwardMessage.Start) {
+                    val newTransaction = eventsApi.newEvent(eventTracker.event())
+                    newTransaction.onSuccess {
+                        logger.debug("tracked port-forward finished $it")
+                    }.onFailure {
+                        logger.error("error trackeing port-forward finished", it)
+                    }
+                }
                 ensureActive()
                 portForwardData[target] = portForwardData.getOrDefault(target, mutableListOf()).apply {
                     add(portForwardMessage(message))

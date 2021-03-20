@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.OcViewModel
+import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_LABEL
@@ -25,7 +25,7 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PORTFORWARD_STREAM_L
 
 @Composable
 internal fun PortForward() {
-    val viewModel = OcViewModel.current
+    val viewModel = ViewModelProvider.current.ocViewModel
     val portForwards by viewModel.collectAsState(viewModel.portForward)
     LazyColumn {
         items(portForwards) { it ->

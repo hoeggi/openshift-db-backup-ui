@@ -13,7 +13,7 @@ dependencies {
     implementation(project(":i18n"))
     implementation(project(":errorhandler"))
     implementation(project(":settings"))
-    implementation(project(":api_models"))
+    implementation(project(":api-models"))
     implementation(Dependencies.Kotlin.coroutines)
     implementation(Dependencies.guava)
     implementation(Dependencies.okio)

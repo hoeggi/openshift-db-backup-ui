@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.PostgresViewModel
+import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_PASSWORD_DETECT
@@ -23,7 +23,7 @@ import io.github.hoeggi.openshiftdb.ui.composables.EditTextField
 
 @Composable
 internal fun PostgresPassword() {
-    val viewModel = PostgresViewModel.current
+    val viewModel = ViewModelProvider.current.postgresViewModel
     val password by viewModel.collectAsState(viewModel.password)
     var internalPassword by remember { mutableStateOf(TextFieldValue("")) }
     internalPassword = internalPassword.copy(

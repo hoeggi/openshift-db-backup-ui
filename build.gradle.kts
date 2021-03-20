@@ -3,12 +3,10 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 buildscript {
     repositories {
-//        mavenCentral()
         maven("https://plugins.gradle.org/m2/")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
     dependencies {
-//        classpath("com.squareup.sqldelight:gradle-plugin:1.4.4")
         classpath(Plugins.compose)
         classpath(Plugins.gradle_versions)
         classpath(Plugins.dependency_analysis)
@@ -21,9 +19,9 @@ apply(plugin = "com.savvasdalkitsis.module-dependency-graph")
 apply(plugin = "com.autonomousapps.dependency-analysis")
 apply(plugin = "com.github.ben-manes.versions")
 apply(plugin = "all-projects")
-apply {
-    from("https://raw.githubusercontent.com/JakeWharton/SdkSearch/master/gradle/projectDependencyGraph.gradle")
-}
+//apply {
+//    from("https://raw.githubusercontent.com/JakeWharton/SdkSearch/master/gradle/projectDependencyGraph.gradle")
+//}
 
 
 fun isNonStable(version: String): Boolean {

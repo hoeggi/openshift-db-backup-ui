@@ -43,7 +43,6 @@ interface OcApi {
 
     companion object {
         fun api(port: Int, baseUrl: BasePath): OcApi {
-            val s = "$baseUrl:$port${Path.v1().oc().path}"
             return OcApiImpl("$baseUrl:$port${Path.v1().oc().path}")
         }
     }

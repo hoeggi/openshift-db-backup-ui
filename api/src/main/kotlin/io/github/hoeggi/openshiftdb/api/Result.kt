@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package io.github.hoeggi.openshiftdb.api
 
 class Result<out T> private constructor(internal val value: Any?) {

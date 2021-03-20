@@ -17,7 +17,7 @@ include(
 "postgres-auth",
 ":api",
 ":viewmodel",
-":api_models",
+":api-models",
 ":ui",
 ":i18n",
 ":errorhandler",

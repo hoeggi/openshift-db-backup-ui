@@ -1,9 +1,56 @@
 package io.github.hoeggi.openshiftdb.viewmodel
 
+import io.github.hoeggi.openshiftdb.api.getOrDefault
 import io.github.hoeggi.openshiftdb.api.response.*
+import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import io.github.hoeggi.openshiftdb.viewmodel.models.PortForwardTarget
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+
+
+class EventsViewModel(port: Int, scope: CoroutineScope, errorViewer: ErrorViewer) :
+    BaseViewModel(port, scope, errorViewer) {
+    private val forwardablePort = 5432
+
+
+    private val _events = MutableStateFlow(listOf<Pair<PortForwardEvent, List<DatabaseEvent>>>())
+    val events = _events.asStateFlow()
+    fun events() = coroutineScope.launch {
+
+        val dbe = async { eventsApi.databaseEvents() }
+        val pfe = async { eventsApi.portForwardEvents() }
+        awaitAll(dbe, pfe)
+        val databaseEvents = dbe.getCompleted()
+        val portForwardEvents = pfe.getCompleted()
+        _events.value = portForwardEvents
+            .getOrDefault(listOf())
+            .map { pfea ->
+                val portForwarUiEvent = pfea.toUiEvent()
+                return@map if (pfea.port == forwardablePort) {
+                    val map = databaseEvents
+                        .getOrDefault(listOf())
+                        .filter {
+                            it.startTime.isAfter(pfea.startTime) &&
+                                    it.startTime.isBefore(pfea.endTime ?: LocalDateTime.now())
+                        }.map {
+                            it.toUiEvent(portForwarUiEvent.color)
+                        }
+                    portForwarUiEvent to map
+                } else portForwarUiEvent to listOf()
+            }.sortedBy {
+                it.first.start
+            }.reversed()
+    }
+
+}
 
 internal class DatabaseEventTracker(
     var path: String,
@@ -12,7 +59,7 @@ internal class DatabaseEventTracker(
     private val format: String,
 ) : EventTracker() {
 
-    override fun transactionMessage() = DatabaseEventApi(
+    override fun event() = DatabaseEventApi(
         dbname = database,
         path = path,
         username = currentUsername,
@@ -27,21 +74,27 @@ internal class DatabaseEventTracker(
 internal class PortForwardEventTracker(
     private val portForwardTarget: PortForwardTarget,
 ) : EventTracker() {
-
+    private val random by lazy { Random() }
     fun stopped() {
         end = LocalDateTime.now()
         result = EventResultApi.Success
     }
 
-    override fun transactionMessage() = PortForwardEventApi(
+    override fun event() = PortForwardEventApi(
         project = portForwardTarget.project,
         service = portForwardTarget.svc,
         port = portForwardTarget.port,
+        color = randomColor(),
         startTime = start!!,
-        endTime = end!!,
+        endTime = end,
         eventType = type!!,
-        result = result!!,
+        result = result,
     )
+
+    private fun randomColor(): String {
+        val randNum = random.nextInt(0xffffff + 1)
+        return String.format("ff%06x", randNum)
+    }
 }
 
 internal abstract class EventTracker {
@@ -88,5 +141,94 @@ internal abstract class EventTracker {
         }
     }
 
-    abstract fun transactionMessage(): EventApi
+    abstract fun event(): EventApi
 }
+
+
+class Argb(val r: Int, val g: Int, val b: Int, val a: Int = "ff".toInt(16))
+sealed class ColoredEvent(
+    val color: Argb,
+    val start: LocalDateTime,
+    val end: LocalDateTime?,
+    val isSuccess: Boolean,
+) {
+    val startDate = start.format(DateTimeFormatter.ISO_DATE)
+    val startTime = start.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+    val endDate = end?.format(DateTimeFormatter.ISO_DATE) ?: ""
+    val endTime = end?.format(DateTimeFormatter.ofPattern("HH:mm:ss")) ?: ""
+
+    val isFinished = end != null
+}
+
+
+private fun String.rgb() = Argb(
+    a = this.substring(0, 2).toInt(16),
+    r = this.substring(2, 4).toInt(16),
+    g = this.substring(4, 6).toInt(16),
+    b = this.substring(6, 8).toInt(16)
+)
+
+private fun PortForwardEventApi.toUiEvent() = PortForwardEvent(
+    project = project,
+    service = service,
+    port = port,
+    color = color.rgb(),
+    start = startTime,
+    end = endTime,
+    success = when (result) {
+        EventResultApi.Success -> true
+        EventResultApi.Error -> false
+        else -> false
+    },
+)
+
+class PortForwardEvent(
+    val project: String,
+    val service: String,
+    val port: Int,
+    color: Argb,
+    start: LocalDateTime,
+    end: LocalDateTime?,
+    success: Boolean,
+) : ColoredEvent(
+    color,
+    start,
+    end,
+    success,
+)
+
+private fun DatabaseEventApi.toUiEvent(color: Argb) = DatabaseEvent(
+    dbname = dbname,
+    path = path,
+    username = username,
+    format = format,
+    isDownload = when (eventType) {
+        EventTypeApi.Dump -> true
+        EventTypeApi.Restore -> false
+        else -> throw UnsupportedOperationException("only restore and dump supported")
+    },
+    color = color,
+    start = startTime,
+    end = endTime,
+    success = when (result) {
+        EventResultApi.Success -> true
+        EventResultApi.Error -> false
+    },
+)
+
+class DatabaseEvent(
+    val dbname: String,
+    val path: String,
+    val username: String,
+    val format: String,
+    val isDownload: Boolean,
+    color: Argb,
+    start: LocalDateTime,
+    end: LocalDateTime,
+    success: Boolean,
+) : ColoredEvent(
+    color,
+    start,
+    end,
+    success,
+)

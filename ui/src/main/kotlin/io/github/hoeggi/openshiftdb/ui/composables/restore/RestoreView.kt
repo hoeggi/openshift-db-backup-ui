@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun RestoreView() {
     val globalState = AppMenuControl.current
-    val viewModel = PostgresViewModel.current
+    val viewModel = ViewModelProvider.current.postgresViewModel
     val path by viewModel.collectAsState(viewModel.restorePath)
 
     rememberCoroutineScope().launch {
@@ -64,7 +64,7 @@ internal fun RestoreView() {
 
 @Composable
 internal fun RestoreLog() {
-    val viewModel = PostgresViewModel.current
+    val viewModel = ViewModelProvider.current.postgresViewModel
     val errorViewer = AppErrorViewer.current
     val restoreState by viewModel.collectAsState(viewModel.restoreState)
     val restoreProgress by viewModel.collectAsState(viewModel.restoreProgress)

@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.OcViewModel
+import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_SERVICE_AVAILABLE
@@ -20,7 +20,7 @@ import io.github.hoeggi.openshiftdb.viewmodel.models.Service
 @Composable
 internal fun Service() {
 
-    val viewModel = OcViewModel.current
+    val viewModel = ViewModelProvider.current.ocViewModel
     val services by viewModel.collectAsState(viewModel.services)
     Column(
         modifier = Modifier

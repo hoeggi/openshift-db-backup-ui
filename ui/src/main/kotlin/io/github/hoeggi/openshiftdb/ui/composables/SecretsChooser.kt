@@ -17,7 +17,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.PostgresViewModel
+import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.SECRETS_LABEL
@@ -25,7 +25,7 @@ import io.github.hoeggi.openshiftdb.outsideClickable
 
 @Composable
 internal fun SecretsChooser(modifier: Modifier = Modifier) {
-    val viewModel = PostgresViewModel.current
+    val viewModel = ViewModelProvider.current.postgresViewModel
     val secrets by viewModel.collectAsState(viewModel.secrets)
     val updateTransition = updateTransition(targetState = rememberUpdatedState(secrets.isNotEmpty()))
     val animateColor by updateTransition.animateColor {

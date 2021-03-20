@@ -24,7 +24,7 @@ internal fun Tools(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> U
     call.respond(ApiResponse(ToolsVersionApi(psql.first, pgDump.first), psql.second + pgDump.second))
 }
 
-object TransactionLogger {
+internal object TransactionLogger {
     val databaseLog = DatabaseLogProvider.DatabaseLog
 
     val transactions: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
@@ -94,7 +94,8 @@ object TransactionLogger {
     private fun PortForwardEvent.toPortForwardEventApi() = PortForwardEventApi(
         project = project,
         service = service,
-        port = port.toInt(),
+        port = port,
+        color = color,
         startTime = startTime,
         endTime = endTime,
         eventType = when (type) {
@@ -104,6 +105,7 @@ object TransactionLogger {
         result = when (result) {
             EventResult.Success -> EventResultApi.Success
             EventResult.Error -> EventResultApi.Error
+            else -> null
         },
     )
 
@@ -111,7 +113,8 @@ object TransactionLogger {
         id = -1,
         project = project,
         service = service,
-        port = port.toLong(),
+        port = port,
+        color = color,
         startTime = startTime,
         endTime = endTime,
         type = when (eventType) {
@@ -121,6 +124,7 @@ object TransactionLogger {
         result = when (result) {
             is EventResultApi.Success -> EventResult.Success
             is EventResultApi.Error -> EventResult.Error
+            else -> null
         },
     )
 }

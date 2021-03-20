@@ -16,13 +16,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.PostgresViewModel
+import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.collectAsState
 import javax.swing.JFileChooser
 
 @Composable
 internal fun DatabaseChooser() {
-    val viewModel = PostgresViewModel.current
+    val viewModel = ViewModelProvider.current.postgresViewModel
     val selectedDatabase by viewModel.collectAsState(viewModel.selectedDatabase)
     val databases by viewModel.collectAsState(viewModel.databasesLines)
     val dumpPath by viewModel.collectAsState(viewModel.dumpPath)

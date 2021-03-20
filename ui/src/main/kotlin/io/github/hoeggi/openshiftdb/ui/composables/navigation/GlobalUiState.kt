@@ -13,6 +13,7 @@ internal sealed class Screen {
     object Main : Screen()
     object Detail : Screen()
     object Restore : Screen()
+    object Events : Screen()
 }
 
 internal interface Navigator {
@@ -20,6 +21,7 @@ internal interface Navigator {
     fun main()
     fun detail()
     fun restore()
+    fun events()
     val showDrawer: StateFlow<Boolean>
     fun toggleDrawer()
     fun hideDrawer()
@@ -89,6 +91,7 @@ private object GlobalUiState : CustomErrorViewer, MenuControl, LogLines {
     override fun main() = navigateTo(Screen.Main)
     override fun detail() = navigateTo(Screen.Detail)
     override fun restore() = navigateTo(Screen.Restore)
+    override fun events() = navigateTo(Screen.Events)
     private fun navigateTo(screen: Screen) {
         _screen.value = screen
     }

@@ -58,7 +58,7 @@ class PostgresViewModel internal constructor(port: Int, coroutineScope: Coroutin
             dumpDatabases
                 .onCompletion {
                     coroutineScope.launch(Dispatchers.IO) {
-                        val newTransaction = eventsApi.newEvent(eventTracker.transactionMessage())
+                        val newTransaction = eventsApi.newEvent(eventTracker.event())
                         newTransaction.onSuccess {
                             logger.debug("tracked new transaction $it")
                         }.onFailure {
@@ -223,11 +223,11 @@ class PostgresViewModel internal constructor(port: Int, coroutineScope: Coroutin
                     restoreCommand.value.existing,
                     confirmationChannel)
             val eventTracker =
-                DatabaseEventTracker(userName.value, restorePath.value, restoreCommand.value.database, "custom")
+                DatabaseEventTracker(restorePath.value, userName.value, restoreCommand.value.database, "custom")
             dumpDatabases
                 .onCompletion {
                     coroutineScope.launch(Dispatchers.IO) {
-                        val newTransaction = eventsApi.newEvent(eventTracker.transactionMessage())
+                        val newTransaction = eventsApi.newEvent(eventTracker.event())
                         newTransaction.onSuccess {
                             logger.debug("tracked new transaction $it")
                         }.onFailure {

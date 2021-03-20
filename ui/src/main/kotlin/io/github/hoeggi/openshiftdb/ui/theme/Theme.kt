@@ -37,8 +37,8 @@ internal fun Theme(
 ) {
     val appSettings = AppSettings.current
     val navigator = AppNavigator.current
-    val ocViewModel = OcViewModel.current
-    val postgresViewModel = PostgresViewModel.current
+    val ocViewModel = ViewModelProvider.current.ocViewModel
+    val postgresViewModel = ViewModelProvider.current.postgresViewModel
     val loginState by ocViewModel.collectAsState(ocViewModel.loginState)
     val dark by appSettings.theme.collectAsState(coroutineScope.coroutineContext)
 

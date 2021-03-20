@@ -14,7 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.PostgresViewModel
+import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.api.response.DatabaseRestoreMessage
 import io.github.hoeggi.openshiftdb.collectAsState
 import javax.swing.JFileChooser
@@ -22,7 +22,7 @@ import javax.swing.JFileChooser
 
 @Composable
 internal fun BackupPicker() {
-    val viewModel = PostgresViewModel.current
+    val viewModel = ViewModelProvider.current.postgresViewModel
     val window = LocalAppWindow.current.window
 
     val path by viewModel.collectAsState(viewModel.restorePath)

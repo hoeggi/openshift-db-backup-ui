@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.PostgresViewModel
+import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_CONNECTION_LABEL
@@ -25,7 +25,7 @@ import io.github.hoeggi.openshiftdb.ui.composables.StatefulEditTextField
 @Composable
 internal fun PsqlVersion() {
 
-    val viewModel = PostgresViewModel.current
+    val viewModel = ViewModelProvider.current.postgresViewModel
     val version by viewModel.collectAsState(viewModel.version)
     val postgresVersion by viewModel.collectAsState(viewModel.postgresVersion)
     val userName by viewModel.collectAsState(viewModel.userName)

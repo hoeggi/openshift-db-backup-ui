@@ -40,8 +40,14 @@ private class EventsApiImpl(url: BasePath) : EventsApi {
         }
 
     override suspend fun databaseEvents(): Result<List<DatabaseEventApi>> =
-        withContext(Dispatchers.IO) { client.get(Path.database()) }
+        withContext(Dispatchers.IO) {
+            val get = client.get<List<EventApi>>(Path.database())
+            return@withContext get as Result<List<DatabaseEventApi>>
+        }
 
     override suspend fun portForwardEvents(): Result<List<PortForwardEventApi>> =
-        withContext(Dispatchers.IO) { client.get(Path.portForward()) }
+        withContext(Dispatchers.IO) {
+            val get = client.get<List<EventApi>>(Path.portForward())
+            return@withContext get as Result<List<PortForwardEventApi>>
+        }
 }

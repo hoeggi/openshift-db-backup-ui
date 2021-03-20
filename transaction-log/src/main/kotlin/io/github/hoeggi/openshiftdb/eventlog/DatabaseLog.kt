@@ -40,7 +40,7 @@ internal object DatabaseLogImpl : DatabaseLog {
     private val database by lazy {
         val driver: SqlDriver = JdbcSqliteDriver("jdbc:sqlite:${dbFilePath.absolutePath}")
         migrateIfNeeded(driver)
-        OpenshiftDbGui(
+        val database = OpenshiftDbGui(
             driver = driver,
             DatabaseEventAdapter = DatabaseEvent.Adapter(
                 resultAdapter = EnumColumnAdapter(),
@@ -55,29 +55,34 @@ internal object DatabaseLogImpl : DatabaseLog {
                 endTimeAdapter = LocalDateTimeAdapter
             )
         )
+        database.portForwardEventQueries.transaction {
+            database.portForwardEventQueries.closeAllOpen(LocalDateTime.now())
+        }
+        database
     }
 
-    override suspend fun listAllPortForwardEvents()= withContext(Dispatchers.IO) {
-        database.portForwardEventQueries.listAll().executeAsList()
+    override suspend fun listAllPortForwardEvents() = withContext(Dispatchers.IO) {
+        database.portForwardEventQueries.selectAll().executeAsList()
     }
 
     override suspend fun insert(pf: PortForwardEvent) = withContext(Dispatchers.IO) {
         database.portForwardEventQueries.transactionWithResult<Long> {
-            database.portForwardEventQueries.insert(
+            database.portForwardEventQueries.insertOrReplace(
                 pf.project,
                 pf.service,
                 pf.port,
                 pf.startTime,
                 pf.endTime,
                 pf.type,
-                pf.result
+                pf.result,
+                pf.color
             )
             database.functionsQueries.selectLastInserted().executeAsOne()
         }
     }
 
     override suspend fun listAllDatabaseEvents() = withContext(Dispatchers.IO) {
-        database.databaseEventQueries.listAll().executeAsList()
+        database.databaseEventQueries.selectAll().executeAsList()
     }
 
     override suspend fun insert(dte: DatabaseEvent) = withContext(Dispatchers.IO) {

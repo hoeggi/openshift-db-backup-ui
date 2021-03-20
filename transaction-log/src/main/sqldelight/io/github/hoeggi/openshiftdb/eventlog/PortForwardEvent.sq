@@ -6,16 +6,27 @@ CREATE TABLE PortForwardEvent (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       project TEXT NOT NULL,
       service TEXT NOT NULL,
-      port INTEGER NOT NULL,
-      startTime TEXT AS LocalDateTime NOT NULL,
-      endTime TEXT AS LocalDateTime NOT NULL,
+      port INTEGER AS Int NOT NULL,
+      startTime TEXT AS LocalDateTime NOT NULL UNIQUE,
+      endTime TEXT AS LocalDateTime,
       type TEXT AS EventType NOT NULL,
-      result TEXT AS EventResult NOT NULL
+      result TEXT AS EventResult,
+      color TEXT NOT NULL
 );
 
 insert:
-INSERT INTO PortForwardEvent(project, service, port, startTime, endTime, type, result)
-VALUES (?,?,?,?,?,?,?);
+INSERT INTO PortForwardEvent (project,service,port,startTime,endTime,type,result,color)
+VALUES (?,?,?,?,?,?,?,?);
 
-listAll:
+insertOrReplace:
+INSERT OR REPLACE INTO PortForwardEvent(project,service,port,startTime,endTime,type,result,color)
+VALUES (?,?,?,?,?,?,?,?);
+
+selectAll:
 SELECT * FROM PortForwardEvent ORDER BY startTime ASC;
+
+selectOpen:
+SELECT * FROM PortForwardEvent WHERE endTime = <> ORDER BY startTime ASC;
+
+closeAllOpen:
+UPDATE PortForwardEvent SET endTime = :now, result = "Error" WHERE endTime IS NULL;

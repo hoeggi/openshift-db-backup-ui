@@ -47,9 +47,9 @@ interface EventApi {
     val startTime: LocalDateTime
 
     @Serializable(with = LocalDateTimeSerializer::class)
-    val endTime: LocalDateTime
+    val endTime: LocalDateTime?
     val eventType: EventTypeApi
-    val result: EventResultApi
+    val result: EventResultApi?
 }
 
 @Serializable

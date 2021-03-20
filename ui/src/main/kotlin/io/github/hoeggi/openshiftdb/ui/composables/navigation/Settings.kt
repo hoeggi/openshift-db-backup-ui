@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.AppSettings
-import io.github.hoeggi.openshiftdb.OcViewModel
+import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.POSTGRES_EXPORT_FORMAT_CUSTOM
@@ -34,7 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 internal fun ClusterContext() {
-    val ocViewModel = OcViewModel.current
+    val ocViewModel = ViewModelProvider.current.ocViewModel
     val context by ocViewModel.collectAsState(ocViewModel.context)
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
         Text(

@@ -48,8 +48,6 @@ subprojects {
                 includeModule("org.jetbrains.kotlinx", "kotlinx-collections-immutable")
                 includeModule("org.jetbrains.kotlinx", "kotlinx-collections-immutable-jvm")
                 includeModule("org.jetbrains.trove4j", "trove4j")
-                includeGroup("org.jetbrains.exposed")
-//                includeModule(, "exposed-core")
             }
         }
         maven {

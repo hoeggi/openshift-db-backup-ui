@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.AppSettings
-import io.github.hoeggi.openshiftdb.PostgresViewModel
+import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
 import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.ext.DesktopApi
@@ -31,7 +31,7 @@ internal fun PostgresDump() {
 
     val logger = LoggerFactory.getLogger("io.github.hoeggi.openshiftdb.ui.composables.postgres.PostgresDump")
 
-    val viewModel = PostgresViewModel.current
+    val viewModel = ViewModelProvider.current.postgresViewModel
     val settings = AppSettings.current
 
     val selectedDatabase by viewModel.collectAsState(viewModel.selectedDatabase)

@@ -14,7 +14,7 @@ dependencies {
     implementation(Dependencies.okhttp)
     implementation(Dependencies.okio)
 
-    api(project(":api_models"))
+    api(project(":api-models"))
     implementation(project(":routes"))
     compileOnly(Dependencies.slf4j_api)
 }

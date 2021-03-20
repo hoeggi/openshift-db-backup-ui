@@ -21,7 +21,7 @@ import io.github.hoeggi.openshiftdb.ui.composables.navigation.ClusterContext
 @Composable
 internal fun LoginScreen() {
 
-    val ocViewModel = OcViewModel.current
+    val ocViewModel = ViewModelProvider.current.ocViewModel
     val server by ocViewModel.collectAsState(ocViewModel.server)
 
     var token by remember { mutableStateOf(TextFieldValue("")) }

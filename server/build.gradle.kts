@@ -7,7 +7,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
     implementation(project(":oc"))
-    implementation(project(":api_models"))
+    implementation(project(":api-models"))
     implementation(project(":postgres"))
     implementation(project(":postgres-auth"))
     implementation(project(":transaction-log"))

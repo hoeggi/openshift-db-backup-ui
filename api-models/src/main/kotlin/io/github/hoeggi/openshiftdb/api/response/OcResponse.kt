@@ -35,12 +35,13 @@ data class PortForwardEventApi(
     val project: String,
     val service: String,
     val port: Int,
+    val color: String,
     @Serializable(with = LocalDateTimeSerializer::class)
     override val startTime: LocalDateTime,
     @Serializable(with = LocalDateTimeSerializer::class)
-    override val endTime: LocalDateTime,
+    override val endTime: LocalDateTime?,
     override val eventType: EventTypeApi,
-    override val result: EventResultApi,
+    override val result: EventResultApi?,
 ) : EventApi
 
 @Serializable

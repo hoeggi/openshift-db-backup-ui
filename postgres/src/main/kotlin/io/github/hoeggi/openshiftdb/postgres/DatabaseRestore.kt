@@ -1,8 +1,6 @@
 package io.github.hoeggi.openshiftdb.postgres
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.io.IOException
 
@@ -41,8 +39,8 @@ class DatabaseRestore(
                 }
             }
 
-            input.await()
-            error.await()
+            awaitAll(input, error)
+            delay(500)
             if (restore.exitCode == 0) onSuccess(restore.backup, restore.database)
             else onError(restore.exitCode, null)
         } catch (ex: Exception) {
