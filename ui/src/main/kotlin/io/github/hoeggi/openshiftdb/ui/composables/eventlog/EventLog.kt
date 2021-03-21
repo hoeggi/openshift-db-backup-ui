@@ -4,14 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.Forward
-import androidx.compose.material.icons.outlined.Upload
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,55 +55,70 @@ fun EventItems() {
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(events) {
             Column(modifier = Modifier.padding(4.dp)) {
-                with(it.first) {
-                    Row(
-                        modifier = Modifier.height(IntrinsicSize.Min),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        color()
-                        openIcon()
-                        Text("${project}/${service}:${port} $startDate : $startTime",
-                            style = MaterialTheme.typography.body2)
-                    }
-                }
-                it.second.forEach {
-                    with(it) {
-                        Row(
-                            modifier = Modifier.height(IntrinsicSize.Min),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            color()
-                            Column(Modifier.padding(horizontal = 24.dp, vertical = 4.dp)) {
-                                Row {
-                                    eventIcon(Modifier.align(Alignment.Top).size(20.dp))
-                                    Text("""
+                PortForwardOpen(it.first)
+                DatabaseEvents(it.second)
+                PortForwardClose(it.first)
+            }
+        }
+    }
+}
+
+@Composable
+internal fun DatabaseEvents(databaseEvents: List<DatabaseEvent>) = databaseEvents.forEach {
+    with(it) {
+        Row(
+            modifier = Modifier.height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            color()
+            Column(Modifier.padding(horizontal = 24.dp, vertical = 4.dp)) {
+                Row {
+                    eventIcon(Modifier.align(Alignment.Top).size(20.dp))
+                    Text("""
                             $dbname with user $username
                             from: $startDate : $startTime
                             to: $endDate : $endTime
                             ${if (isDownload) "target" else "source"}: $path
                         """.trimIndent(),
-                                        style = MaterialTheme.typography.caption)
-                                }
-                            }
-                        }
-                    }
-                }
-                with(it.first) {
-                    if (isFinished) {
-                        Row(
-                            modifier = Modifier.height(IntrinsicSize.Min),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            color()
-                            closeIcon()
-                            Text("closed on $endDate : $endTime",
-                                style = MaterialTheme.typography.body2)
-                        }
-                    }
+                        style = MaterialTheme.typography.caption)
                 }
             }
-            Divider(Modifier.padding(vertical = 4.dp))
         }
+    }
+}
+
+@Composable
+internal fun PortForwardClose(portForwardEvent: PortForwardEvent) = with(portForwardEvent) {
+    if (isFinished) {
+        Row(
+            modifier = Modifier.height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            color()
+            closeIcon()
+            Text("closed $endDate, $endTime",
+                style = MaterialTheme.typography.body2)
+            if (!isSuccess) {
+                Icon(
+                    Icons.Outlined.Close,
+                    Color.Red,
+                    Modifier.size(20.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun PortForwardOpen(portForwardEvent: PortForwardEvent) = with(portForwardEvent) {
+    Row(
+        modifier = Modifier.height(IntrinsicSize.Min),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        color()
+        openIcon()
+        Text("${project}/${service}:${port} $startDate, $startTime",
+            style = MaterialTheme.typography.body2)
     }
 }
 
@@ -119,19 +131,15 @@ internal fun ColoredEvent.color() = Box(
 
 @Composable
 internal fun PortForwardEvent.openIcon() = Icon(
-    icon = Icons.Outlined.Forward,
+    icon = Icons.Outlined.ChevronRight,
     tint = color.toColor()
 )
 
 @Composable
 internal fun PortForwardEvent.closeIcon() {
-    val tintColor = when (isSuccess) {
-        true -> color.toColor()
-        false -> Color.Red
-    }
     Icon(
-        icon = Icons.Outlined.Forward,
-        tint = tintColor
+        icon = Icons.Outlined.ChevronLeft,
+        tint = color.toColor()
     )
 }
 
