@@ -14,7 +14,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.AppNavigator
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -22,7 +21,7 @@ internal fun BottomNav(
     modifier: Modifier = Modifier.height(48.dp),
     coroutineScope: CoroutineScope,
 ) {
-    val viewModel = AppNavigator.current
+    val viewModel = NavigationProvider()
     val screen by viewModel.screen.collectAsState(coroutineScope.coroutineContext)
 
 

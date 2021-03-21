@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 object Logger {
 
-    private val log = LogLinesProvider.instance()
+    private val log = LogLinesProvider()
     private val stdout: InterceptingStream = InterceptingStream(System.out)
     private val stderr: InterceptingStream = InterceptingStream(System.err)
     private val queue = EvictingQueue.create<AnnotatedString>(250)

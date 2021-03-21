@@ -14,17 +14,19 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.*
+import io.github.hoeggi.openshiftdb.LoginScreen
+import io.github.hoeggi.openshiftdb.ViewModelProvider
+import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
+import io.github.hoeggi.openshiftdb.settings.SettingsProvider
 import io.github.hoeggi.openshiftdb.settings.Theme
 import io.github.hoeggi.openshiftdb.ui.composables.ErrorView
 import io.github.hoeggi.openshiftdb.ui.composables.Loading
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.BottomNav
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.CustomErrorViewer
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.Drawer
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.*
 import io.github.hoeggi.openshiftdb.viewmodel.models.LoginState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -32,15 +34,15 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun Theme(
-    coroutineScope: CoroutineScope,
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val appSettings = AppSettings.current
-    val navigator = AppNavigator.current
+    val settings = SettingsProvider()
+    val navigator = NavigationProvider()
     val ocViewModel = ViewModelProvider.current.ocViewModel
     val postgresViewModel = ViewModelProvider.current.postgresViewModel
     val loginState by ocViewModel.collectAsState(ocViewModel.loginState)
-    val dark by appSettings.theme.collectAsState(coroutineScope.coroutineContext)
+    val dark by settings.theme.collectAsState(coroutineScope.coroutineContext)
 
     ocViewModel.checkLoginState()
 
@@ -118,8 +120,8 @@ internal fun Theme(
 
 @Composable
 internal fun Overlays(coroutineScope: CoroutineScope, state: ScaffoldState) {
-    val viewModel = AppErrorViewer.current
-    val error by viewModel.errors.collectAsState(coroutineScope.coroutineContext)
+    val errorViewer = AppErrorViewer()
+    val error by errorViewer.errors.collectAsState(coroutineScope.coroutineContext)
 
     if (error.fired) {
         when (val message = error) {
@@ -134,7 +136,7 @@ internal fun Overlays(coroutineScope: CoroutineScope, state: ScaffoldState) {
                         duration = if (message.message.length > 50) SnackbarDuration.Long else SnackbarDuration.Short
                     )
                 }
-                viewModel.showWarning(viewModel.empty())
+                errorViewer.showWarning(errorViewer.empty())
             }
             is CustomErrorViewer.CustomOverlay -> message.overlay()
         }

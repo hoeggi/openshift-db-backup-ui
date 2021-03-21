@@ -7,6 +7,8 @@ import io.github.hoeggi.openshiftdb.api.PostgresApi
 import io.github.hoeggi.openshiftdb.errorhandler.CoroutineExceptionHandler
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.plus
 import org.slf4j.LoggerFactory
 
@@ -23,17 +25,15 @@ data class ViewModelProvider(
 
 fun viewModels(
     port: Int,
-    coroutineScope: CoroutineScope,
     errorViewer: ErrorViewer,
 ) = ViewModelProvider(
-    _ocViewModel = lazy { OcViewModel(port, coroutineScope, errorViewer) },
-    _postgresViewModel = lazy { PostgresViewModel(port, coroutineScope, errorViewer) },
-    _eventsViewModel = lazy { EventsViewModel(port, coroutineScope, errorViewer) },
+    _ocViewModel = lazy { OcViewModel(port, errorViewer) },
+    _postgresViewModel = lazy { PostgresViewModel(port, errorViewer) },
+    _eventsViewModel = lazy { EventsViewModel(port, errorViewer) },
 )
 
-abstract class BaseViewModel(port: Int, private val scope: CoroutineScope, private val errorViewer: ErrorViewer) {
+abstract class BaseViewModel(port: Int, private val errorViewer: ErrorViewer) {
     internal val logger = LoggerFactory.getLogger(this.javaClass)
-    private val coroutineExceptionHandler = CoroutineExceptionHandler(errorViewer)
     private val api: Api = Api(port)
 
     internal val ocApi: OcApi
@@ -43,9 +43,9 @@ abstract class BaseViewModel(port: Int, private val scope: CoroutineScope, priva
     internal val eventsApi: EventsApi
         get() = api
 
-
+    private val scope = CoroutineScope(Dispatchers.IO + CoroutineExceptionHandler(errorViewer))
     val coroutineScope
-        get() = scope + coroutineExceptionHandler
+        get() = scope + SupervisorJob()
 
     val showWarning: (Throwable) -> Unit = {
         logger.warn("warning", it)

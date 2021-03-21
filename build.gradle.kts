@@ -13,8 +13,10 @@ buildscript {
         classpath(Plugins.module_dependency_graph)
         classpath(Plugins.metalava)
         classpath(kotlin("gradle-plugin", version = Versions.kotlin))
+
     }
 }
+
 apply(plugin = "com.savvasdalkitsis.module-dependency-graph")
 apply(plugin = "com.autonomousapps.dependency-analysis")
 apply(plugin = "com.github.ben-manes.versions")

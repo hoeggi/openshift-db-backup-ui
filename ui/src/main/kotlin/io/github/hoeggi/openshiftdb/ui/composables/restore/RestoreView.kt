@@ -19,9 +19,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.*
+import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.api.response.DatabaseRestoreMessage
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.ErrorViewProvider
+import io.github.hoeggi.openshiftdb.collectAsState
+import io.github.hoeggi.openshiftdb.outsideClickable
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.AppErrorViewer
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.MenuControlProvider
 import io.github.hoeggi.openshiftdb.ui.composables.oc.CurrentProject
 import io.github.hoeggi.openshiftdb.ui.composables.oc.PortForward
 import kotlinx.coroutines.flow.collect
@@ -29,7 +32,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun RestoreView() {
-    val globalState = AppMenuControl.current
+    val globalState = MenuControlProvider()
     val viewModel = ViewModelProvider.current.postgresViewModel
     val path by viewModel.collectAsState(viewModel.restorePath)
 
@@ -65,14 +68,14 @@ internal fun RestoreView() {
 @Composable
 internal fun RestoreLog() {
     val viewModel = ViewModelProvider.current.postgresViewModel
-    val errorViewer = AppErrorViewer.current
+    val errorViewer = AppErrorViewer()
     val restoreState by viewModel.collectAsState(viewModel.restoreState)
     val restoreProgress by viewModel.collectAsState(viewModel.restoreProgress)
     val listState = rememberLazyListState(restoreProgress.size, 0)
 
     when (restoreState) {
         is DatabaseRestoreMessage.RequestConfirmation -> {
-            errorViewer.showOverlay(ErrorViewProvider.customOverlay {
+            errorViewer.showOverlay(AppErrorViewer.customOverlay {
                 RestoreWarning(
                     (restoreState as DatabaseRestoreMessage.RequestConfirmation).message,
                     onCancel = {

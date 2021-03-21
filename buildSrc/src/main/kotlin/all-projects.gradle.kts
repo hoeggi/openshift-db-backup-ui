@@ -1,8 +1,14 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 allprojects {
+
+}
+
+subprojects {
     group = "io.github.hoeggi"
     version = "1.0.0"
+
+    apply(plugin = "me.tylerbwong.gradle.metalava")
 
     configurations.all {
         resolutionStrategy.eachDependency {
@@ -34,11 +40,7 @@ allprojects {
             }
         }
     }
-}
 
-subprojects {
-
-    apply(plugin = "me.tylerbwong.gradle.metalava")
     repositories {
         mavenCentral()
         maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
@@ -67,7 +69,8 @@ subprojects {
             "-Xuse-experimental=androidx.compose.material.ExperimentalMaterialApi",
             "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi",
             "-Xuse-experimental=androidx.compose.animation.ExperimentalAnimationApi",
-            "-Xinline-classes"
+            "-Xinline-classes",
+            "-no-reflect"
 //            "-Xexplicit-api=strict"
         )
     }

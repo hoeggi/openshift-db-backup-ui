@@ -8,7 +8,7 @@ plugins {
 dependencies {
     implementation(compose.desktop.currentOs)
     implementation(compose.materialIconsExtended)
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib"))
     implementation(project(":viewmodel"))
     implementation(project(":i18n"))
     implementation(project(":errorhandler"))

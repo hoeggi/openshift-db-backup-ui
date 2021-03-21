@@ -1,14 +1,17 @@
 package io.github.hoeggi.openshiftdb.settings
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.coroutines.EmptyCoroutineContext
 
 object SettingsProvider {
-    fun instance(): Settings = SettingsHolder
+    val instance: Settings by lazy { SettingsHolder }
+
+    operator fun invoke() = instance
 }
 
 interface Settings {
@@ -27,8 +30,7 @@ interface Settings {
 private object SettingsHolder : Settings {
 
     private var settings = loadSettings()
-    private val coroutineScope = CoroutineScope(EmptyCoroutineContext)
-
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _theme: MutableStateFlow<Theme> =
         MutableStateFlow(settings.theme)

@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib"))
     testImplementation(kotlin("test-junit"))
     api(Dependencies.okio)
     compileOnly(Dependencies.slf4j_api)

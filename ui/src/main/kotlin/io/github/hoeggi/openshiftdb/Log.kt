@@ -10,19 +10,23 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.SYSLOG_LABEL
+import io.github.hoeggi.openshiftdb.settings.SettingsProvider
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.LogLinesProvider
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 internal fun Log(
     modifier: Modifier = Modifier,
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
-    val coroutineScope = UIScope.current
-    val logs = AppLog.current
-    val settings = AppSettings.current
+    val logs = LogLinesProvider()
+    val settings = SettingsProvider()
     val logLines by logs.syslog.collectAsState(coroutineScope.coroutineContext)
     val logLevel by settings.logLevel.collectAsState(coroutineScope.coroutineContext)
 

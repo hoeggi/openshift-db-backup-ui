@@ -16,10 +16,8 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 
-class EventsViewModel(port: Int, scope: CoroutineScope, errorViewer: ErrorViewer) :
-    BaseViewModel(port, scope, errorViewer) {
-    private val forwardablePort = 5432
-
+class EventsViewModel(port: Int, errorViewer: ErrorViewer) :
+    BaseViewModel(port, errorViewer) {
 
     private val _events = MutableStateFlow(listOf<Pair<PortForwardEvent, List<DatabaseEvent>>>())
     val events = _events.asStateFlow()
@@ -34,7 +32,7 @@ class EventsViewModel(port: Int, scope: CoroutineScope, errorViewer: ErrorViewer
             .getOrDefault(listOf())
             .map { forward ->
                 val portForwardUiEvent = forward.toUiEvent()
-                if (forward.port == forwardablePort) {
+                if (forward.port == Companion.forwardablePort) {
                     val map = databaseEvents
                         .getOrDefault(listOf())
                         .filter {
@@ -48,6 +46,10 @@ class EventsViewModel(port: Int, scope: CoroutineScope, errorViewer: ErrorViewer
             }.sortedBy {
                 it.first.start
             }.reversed()
+    }
+
+    companion object {
+        private const val forwardablePort = 5432
     }
 
 }
@@ -149,7 +151,7 @@ class Argb(val r: Int, val g: Int, val b: Int, val a: Int = "ff".toInt(16))
 sealed class ColoredEvent(
     val color: Argb,
     val start: LocalDateTime,
-    val end: LocalDateTime?,
+    end: LocalDateTime?,
     val isSuccess: Boolean,
 ) {
     val startDate = start.format(DateTimeFormatter.ISO_DATE)
@@ -161,7 +163,7 @@ sealed class ColoredEvent(
 }
 
 
-private fun String.rgb() = Argb(
+private fun String.argb() = Argb(
     a = this.substring(0, 2).toInt(16),
     r = this.substring(2, 4).toInt(16),
     g = this.substring(4, 6).toInt(16),
@@ -172,7 +174,7 @@ private fun PortForwardEventApi.toUiEvent() = PortForwardEvent(
     project = project,
     service = service,
     port = port,
-    color = color.rgb(),
+    color = color.argb(),
     start = startTime,
     end = endTime,
     success = when (result) {

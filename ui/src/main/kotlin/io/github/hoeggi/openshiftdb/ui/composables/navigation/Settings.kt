@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.AppSettings
 import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
@@ -27,6 +26,7 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_LIGHT
 import io.github.hoeggi.openshiftdb.settings.ExportFormat
 import io.github.hoeggi.openshiftdb.settings.LogLevels
+import io.github.hoeggi.openshiftdb.settings.SettingsProvider
 import io.github.hoeggi.openshiftdb.settings.Theme
 import io.github.hoeggi.openshiftdb.ui.composables.ExpandableText
 import kotlinx.coroutines.CoroutineScope
@@ -85,7 +85,7 @@ internal fun ClusterContext() {
 
 @Composable
 internal fun LogLevelChooser(coroutineScope: CoroutineScope) {
-    val settings = AppSettings.current
+    val settings = SettingsProvider()
     val level by settings.logLevel.collectAsState(coroutineScope.coroutineContext)
 
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
@@ -118,7 +118,7 @@ internal fun LogLevelChooser(coroutineScope: CoroutineScope) {
 
 @Composable
 internal fun ThemeChooser(coroutineScope: CoroutineScope) {
-    val settings = AppSettings.current
+    val settings = SettingsProvider()
     val dark by settings.theme.collectAsState(coroutineScope.coroutineContext)
 
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
@@ -163,7 +163,7 @@ internal fun ThemeChooser(coroutineScope: CoroutineScope) {
 
 @Composable
 internal fun ExportFormatChooser(coroutineScope: CoroutineScope) {
-    val settings = AppSettings.current
+    val settings = SettingsProvider()
     val format by settings.exportFormat.collectAsState(coroutineScope.coroutineContext)
 
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {

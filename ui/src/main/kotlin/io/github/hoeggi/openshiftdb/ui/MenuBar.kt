@@ -47,7 +47,7 @@ internal fun MenuBar(menuControl: MenuControl) = androidx.compose.ui.window.Menu
         MenuItem(
             name = "Reload",
             onClick = {
-                menuControl.refresh(GlobalScope)
+                menuControl.refresh()
             },
             shortcut = KeyStroke(Key.U)
         )

@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -38,8 +38,14 @@ internal interface CustomErrorViewer : ErrorViewer {
     }
 }
 
-internal object ErrorViewProvider {
-    fun instance(): CustomErrorViewer = GlobalUiState
+
+abstract class Provider<T> {
+    abstract val instance: T
+    operator fun invoke() = instance
+}
+
+internal object AppErrorViewer : Provider<CustomErrorViewer>() {
+    override val instance: CustomErrorViewer by lazy { GlobalUiState }
 
     fun customOverlay(overlay: @Composable () -> Unit) = object : CustomErrorViewer.CustomOverlay {
         override val overlay = overlay
@@ -47,21 +53,22 @@ internal object ErrorViewProvider {
     }
 }
 
+internal object MenuControlProvider : Provider<MenuControl>() {
+    override val instance: MenuControl by lazy { GlobalUiState }
+}
+
+internal object NavigationProvider : Provider<Navigator>() {
+    override val instance: Navigator by lazy { GlobalUiState }
+}
+
+internal object LogLinesProvider : Provider<LogLines>() {
+    override val instance: LogLines by lazy { GlobalUiState }
+}
+
+
 internal interface MenuControl : Navigator {
     val refreshTrigger: SharedFlow<Unit>
-    fun refresh(coroutineScope: CoroutineScope): Job
-}
-
-internal object MenuControlProvider {
-    fun instance(): MenuControl = GlobalUiState
-}
-
-internal object NavigatorProvider {
-    fun instance(): Navigator = GlobalUiState
-}
-
-internal object LogLinesProvider {
-    fun instance(): LogLines = GlobalUiState
+    fun refresh(): Job
 }
 
 internal interface LogLines {
@@ -71,15 +78,14 @@ internal interface LogLines {
 
 private object GlobalUiState : CustomErrorViewer, MenuControl, LogLines {
 
+    private val coroutineScope = MainScope()
     private val _refreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow()
     override val refreshTrigger = _refreshTrigger.asSharedFlow()
-    override fun refresh(coroutineScope: CoroutineScope) = coroutineScope.launch {
+    override fun refresh() = coroutineScope.launch {
         _refreshTrigger.emit(Unit)
     }
 
-
-    private val _syslog = MutableStateFlow(listOf(AnnotatedString("", SpanStyle()))
-    )
+    private val _syslog = MutableStateFlow(listOf(AnnotatedString("", SpanStyle())))
     override val syslog = _syslog.asStateFlow()
     override fun updateSyslog(log: List<AnnotatedString>) {
         _syslog.value = log

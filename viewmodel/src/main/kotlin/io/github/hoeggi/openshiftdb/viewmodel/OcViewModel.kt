@@ -12,8 +12,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 
-class OcViewModel internal constructor(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
-    BaseViewModel(port, coroutineScope, errorViewer) {
+class OcViewModel internal constructor(port: Int, errorViewer: ErrorViewer) :
+    BaseViewModel(port, errorViewer) {
 
     private val _projects: MutableStateFlow<List<String>> =
         MutableStateFlow(listOf())

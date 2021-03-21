@@ -14,8 +14,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class PostgresViewModel internal constructor(port: Int, coroutineScope: CoroutineScope, errorViewer: ErrorViewer) :
-    BaseViewModel(port, coroutineScope, errorViewer) {
+class PostgresViewModel internal constructor(port: Int, errorViewer: ErrorViewer) :
+    BaseViewModel(port, errorViewer) {
 
     private val downloadQueue = EvictingQueue.create<DatabaseDownloadMessage.InProgressMessage>(150)
     private val restoreQueue = EvictingQueue.create<DatabaseRestoreMessage.InProgressMessage>(300)

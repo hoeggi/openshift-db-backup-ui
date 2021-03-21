@@ -20,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import io.github.hoeggi.openshiftdb.AppMenuControl
 import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.collectAsState
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.MenuControlProvider
 import io.github.hoeggi.openshiftdb.viewmodel.Argb
 import io.github.hoeggi.openshiftdb.viewmodel.ColoredEvent
 import io.github.hoeggi.openshiftdb.viewmodel.DatabaseEvent
@@ -41,7 +41,7 @@ internal fun Argb.toColor() = Color(
 @Composable
 internal fun EventLog() {
     val eventsViewModel = ViewModelProvider.current.eventsViewModel
-    val globalState = AppMenuControl.current
+    val globalState = MenuControlProvider()
     rememberCoroutineScope().launch {
         globalState.refreshTrigger.collect {
             eventsViewModel.events()
