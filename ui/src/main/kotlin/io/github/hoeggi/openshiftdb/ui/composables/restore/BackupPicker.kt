@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.api.response.DatabaseRestoreMessage
 import io.github.hoeggi.openshiftdb.collectAsState
+import io.github.hoeggi.openshiftdb.ui.composables.pathchooser.FileChooser
 import javax.swing.JFileChooser
 
 
@@ -45,12 +46,8 @@ internal fun BackupPicker() {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.clickable {
-                    val chooser = JFileChooser(path).apply {
-                        fileSelectionMode = JFileChooser.FILES_ONLY
-                    }
-                    val returnVal = chooser.showOpenDialog(window)
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        viewModel.updateRestorePath(chooser.selectedFile.absolutePath)
+                    FileChooser(path, true) {
+                        viewModel.updateRestorePath(it.absolutePath)
                     }
                 }
             ) {

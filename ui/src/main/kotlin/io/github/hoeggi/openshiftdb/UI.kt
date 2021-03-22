@@ -4,6 +4,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
@@ -27,8 +28,9 @@ import io.github.hoeggi.openshiftdb.ui.composables.navigation.Screen
 import io.github.hoeggi.openshiftdb.ui.composables.oc.OcPane
 import io.github.hoeggi.openshiftdb.ui.composables.postgres.PostgresPane
 import io.github.hoeggi.openshiftdb.ui.composables.restore.RestoreView
+import io.github.hoeggi.openshiftdb.ui.theme.BaseView
 import io.github.hoeggi.openshiftdb.ui.theme.Theme
-import io.github.hoeggi.openshiftdb.viewmodel.ViewModelProvider
+import io.github.hoeggi.openshiftdb.viewmodel.ViewModelFactory
 import io.github.hoeggi.openshiftdb.viewmodel.viewModels
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -36,7 +38,7 @@ import org.slf4j.LoggerFactory
 
 const val APP_NAME = "Openshift DB Backup GUI"
 
-internal val ViewModelProvider = staticCompositionLocalOf<ViewModelProvider> {
+internal val ViewModelProvider = staticCompositionLocalOf<ViewModelFactory> {
     error("unexpected call to ViewModelProvider")
 }
 
@@ -45,37 +47,40 @@ class UI {
 
     fun show(port: Int, onClose: (() -> Unit)) {
         logger.info("starting ui")
+
         val errorViewer = AppErrorViewer()
         setExceptionHandler(errorViewer)
         val viewModelProvider = viewModels(
             port,
             errorViewer
         )
+//        var window
         Window(
             title = APP_NAME,
             undecorated = false,
             size = IntSize(1280, 1024),
             events = WindowEvents(
                 onClose = {
+                    AppManager.windows.drop(1).forEach { it.close() }
                     onClose()
                 }
             ),
             menuBar = MenuBar(MenuControlProvider())
         ) {
-
-            CompositionLocalProvider(
-                ViewModelProvider provides viewModelProvider,
-            ) {
-                Theme {
-                    val scope = rememberCoroutineScope()
-                    val screen by NavigationProvider().screen.collectAsState(scope.coroutineContext)
-
-                    Crossfade(targetState = screen) {
-                        when (it) {
-                            is Screen.Detail -> Log()
-                            is Screen.Main -> MainScreen()
-                            is Screen.Restore -> RestoreView()
-                            is Screen.Events -> EventLog()
+            Theme {
+                CompositionLocalProvider(
+                    ViewModelProvider provides viewModelProvider,
+                ) {
+                    BaseView {
+                        val scope = rememberCoroutineScope()
+                        val screen by NavigationProvider().screen.collectAsState(scope.coroutineContext)
+                        Crossfade(targetState = screen) {
+                            when (it) {
+                                is Screen.Detail -> Log()
+                                is Screen.Main -> MainScreen()
+                                is Screen.Restore -> RestoreView()
+                                is Screen.Events -> EventLog()
+                            }
                         }
                     }
                 }

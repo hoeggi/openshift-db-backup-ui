@@ -8,7 +8,7 @@ plugins {
 dependencies {
     testImplementation(kotlin("test-junit"))
     implementation(compose.desktop.currentOs)
-    implementation(kotlin("stdlib"))
+    implementation(kotlin("stdlib-jdk8"))
     implementation(project(":server"))
     implementation(project(":ui"))
     implementation(Dependencies.logback)

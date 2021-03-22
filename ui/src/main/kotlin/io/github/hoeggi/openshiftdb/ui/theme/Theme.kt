@@ -35,16 +35,10 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun Theme(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    content: @Composable BoxScope.() -> Unit,
+    content: @Composable () -> Unit,
 ) {
     val settings = SettingsProvider()
-    val navigator = NavigationProvider()
-    val ocViewModel = ViewModelProvider.current.ocViewModel
-    val postgresViewModel = ViewModelProvider.current.postgresViewModel
-    val loginState by ocViewModel.collectAsState(ocViewModel.loginState)
     val dark by settings.theme.collectAsState(coroutineScope.coroutineContext)
-
-    ocViewModel.checkLoginState()
 
     val colors = when (dark) {
         Theme.Dark -> darkColors(
@@ -64,56 +58,72 @@ internal fun Theme(
         colors = colors,
     ) {
         Surface {
-            val state = rememberScaffoldState()
-            val settings by navigator.showDrawer.collectAsState(coroutineScope.coroutineContext)
-            Scaffold(
-                scaffoldState = state,
-                bottomBar = {
-                    if (loginState == LoginState.LOGGEDIN) {
-                        BottomNav(
-                            coroutineScope = coroutineScope
-                        )
-                    }
-                },
-                floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = {
-                            navigator.toggleDrawer()
-                        },
-                    ) {
-                        Crossfade(targetState = settings) {
-                            val icon = when {
-                                settings -> Icons.Outlined.ArrowForward
-                                else -> Icons.Outlined.Settings
-                            }
-                            Icon(icon, "")
-                        }
+            content()
+        }
+    }
+}
 
-                    }
-                },
-                floatingActionButtonPosition = FabPosition.End,
-                isFloatingActionButtonDocked = true,
-            ) {
-                Box {
-                    when (loginState) {
-                        LoginState.LOGGEDIN -> {
-                            ocViewModel.update()
-                            postgresViewModel.update()
-                            Box(modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 48.dp)) {
-                                content()
-                            }
-                        }
-                        LoginState.NOT_LOGGEDIN -> LoginScreen()
-                        LoginState.UNCHECKED -> Loading()
-                    }
+@Composable
+fun BaseView(
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    content: @Composable BoxScope.() -> Unit,
+) {
+    val navigator = NavigationProvider()
+    val ocViewModel = ViewModelProvider.current.ocViewModel
+    val postgresViewModel = ViewModelProvider.current.postgresViewModel
 
-                    val padding = if (loginState == LoginState.LOGGEDIN) 48.dp else 0.dp
-                    Drawer(Modifier.padding(bottom = padding), settings, coroutineScope) {
-                        navigator.hideDrawer()
-                    }
-                    Overlays(coroutineScope, state)
-                }
+    val settings by navigator.showDrawer.collectAsState(coroutineScope.coroutineContext)
+    val loginState by ocViewModel.collectAsState(ocViewModel.loginState)
+    val state = rememberScaffoldState()
+
+    ocViewModel.checkLoginState()
+
+    Scaffold(
+        scaffoldState = state,
+        bottomBar = {
+            if (loginState == LoginState.LOGGEDIN) {
+                BottomNav(
+                    coroutineScope = coroutineScope
+                )
             }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navigator.toggleDrawer()
+                },
+            ) {
+                Crossfade(targetState = settings) {
+                    val icon = when {
+                        settings -> Icons.Outlined.ArrowForward
+                        else -> Icons.Outlined.Settings
+                    }
+                    Icon(icon, "")
+                }
+
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End,
+        isFloatingActionButtonDocked = true,
+    ) {
+        Box {
+            when (loginState) {
+                LoginState.LOGGEDIN -> {
+                    ocViewModel.update()
+                    postgresViewModel.update()
+                    Box(modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 48.dp)) {
+                        content()
+                    }
+                }
+                LoginState.NOT_LOGGEDIN -> LoginScreen()
+                LoginState.UNCHECKED -> Loading()
+            }
+
+            val padding = if (loginState == LoginState.LOGGEDIN) 48.dp else 0.dp
+            Drawer(Modifier.padding(bottom = padding), settings, coroutineScope) {
+                navigator.hideDrawer()
+            }
+            Overlays(coroutineScope, state)
         }
     }
 }

@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
+    implementation(kotlin("stdlib-jdk8"))
     implementation(Dependencies.Kotlin.coroutines)
     api(Dependencies.ktor.auth)
     implementation(Dependencies.Kotlin.serialization)

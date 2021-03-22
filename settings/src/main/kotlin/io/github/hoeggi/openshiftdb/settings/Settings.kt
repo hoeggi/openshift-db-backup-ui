@@ -18,7 +18,7 @@ private val settingsPath = if (System.getenv("XDG_CONFIG_HOME") != null) {
     }
 }
 
-private val DefaultSetting = Setting(Theme.Dark, ExportFormat.Custom, LogLevel.Debug)
+internal val DefaultSetting = Setting(Theme.Dark, ExportFormat.Custom, LogLevel.Debug)
 
 internal fun Setting.save() {
     val encodeToString = Json.encodeToString(this)

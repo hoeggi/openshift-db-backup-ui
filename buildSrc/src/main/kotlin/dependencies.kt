@@ -71,18 +71,20 @@ object TransitivDependencies {
         "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm"
     )
     private val compose = arrayOf(
-        "org.jetbrains.compose.material:material-icons-extended-desktop",
-        "org.jetbrains.compose.ui:ui-desktop",
-        "org.jetbrains.compose.ui:ui-unit-desktop",
-        "org.jetbrains.compose.ui:ui-geometry-desktop",
         "org.jetbrains.compose.animation:animation-core-desktop",
         "org.jetbrains.compose.animation:animation-desktop",
+        "org.jetbrains.compose.foundation:foundation-desktop",
+        "org.jetbrains.compose.foundation:foundation-layout-desktop",
+        "org.jetbrains.compose.ui:ui-desktop",
+        "org.jetbrains.compose.ui:ui-geometry-desktop",
         "org.jetbrains.compose.ui:ui-graphics-desktop",
-        "org.jetbrains.compose.desktop:desktop-jvm",
-        "org.jetbrains.compose.material:material-icons-core-desktop",
         "org.jetbrains.compose.ui:ui-text-desktop",
+        "org.jetbrains.compose.ui:ui-unit-desktop",
+        "org.jetbrains.compose.desktop:desktop-jvm",
         "org.jetbrains.compose.material:material-desktop",
-        "org.jetbrains.compose.foundation:foundation-desktop"
+        "org.jetbrains.compose.material:material-icons-core-desktop",
+        "org.jetbrains.compose.material:material-icons-extended-desktop",
+        "org.jetbrains.compose.runtime:runtime-desktop"
     )
     val dependencies = arrayOf(
         *kotlinx,

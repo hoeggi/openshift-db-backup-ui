@@ -12,7 +12,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.plus
 import org.slf4j.LoggerFactory
 
-data class ViewModelProvider(
+data class ViewModelFactory(
     private val _ocViewModel: Lazy<OcViewModel>,
     private val _postgresViewModel: Lazy<PostgresViewModel>,
     private val _eventsViewModel: Lazy<EventsViewModel>,
@@ -26,7 +26,7 @@ data class ViewModelProvider(
 fun viewModels(
     port: Int,
     errorViewer: ErrorViewer,
-) = ViewModelProvider(
+) = ViewModelFactory(
     _ocViewModel = lazy { OcViewModel(port, errorViewer) },
     _postgresViewModel = lazy { PostgresViewModel(port, errorViewer) },
     _eventsViewModel = lazy { EventsViewModel(port, errorViewer) },

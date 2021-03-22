@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.collectAsState
-import javax.swing.JFileChooser
+import io.github.hoeggi.openshiftdb.ui.composables.pathchooser.FileChooser
 
 @Composable
 internal fun DatabaseChooser() {
@@ -54,15 +54,10 @@ internal fun DatabaseChooser() {
         }
 
         if (selectedDatabase != -1) {
-            val window = LocalAppWindow.current.window
             Row(
                 modifier = Modifier.padding(10.dp).clickable {
-                    val chooser = JFileChooser(dumpPath).apply {
-                        fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
-                    }
-                    val returnVal = chooser.showOpenDialog(window)
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        viewModel.dumpPath(chooser.selectedFile.absolutePath)
+                    FileChooser(dumpPath, false) {
+                        viewModel.dumpPath(it.absolutePath)
                     }
                 },
                 verticalAlignment = Alignment.CenterVertically

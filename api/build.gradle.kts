@@ -7,7 +7,7 @@ group = "io.github.hoeggi"
 version = "1.0.0-alpha01"
 
 dependencies {
-    implementation(kotlin("stdlib"))
+    implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
     implementation(Dependencies.Kotlin.serialization)
     implementation(Dependencies.Kotlin.coroutines)

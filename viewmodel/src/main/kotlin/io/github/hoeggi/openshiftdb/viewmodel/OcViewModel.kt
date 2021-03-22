@@ -150,32 +150,16 @@ class OcViewModel internal constructor(port: Int, errorViewer: ErrorViewer) :
                 logger.debug("port-forward completed")
                 coroutineScope.launch(Dispatchers.IO) {
                     eventTracker.stopped()
-                    val newTransaction = eventsApi.newEvent(eventTracker.event())
-                    newTransaction.onSuccess {
-                        logger.debug("tracked port-forward finished $it")
-                    }.onFailure {
-                        logger.error("error trackeing port-forward finished", it)
+                    sendPortForwardEvent(eventTracker)
+                }
+            }.collect {
+                trackPortforwardMessages(it, eventTracker) {
+                    portForwardData[target] = portForwardData.getOrDefault(target, mutableListOf()).apply {
+                        add(portForwardMessage(it))
                     }
-                }
-            }.collect { message ->
-                eventTracker.trackMessage(message)
-                if (message is io.github.hoeggi.openshiftdb.api.response.PortForwardMessage.Start) {
-                    val newTransaction = eventsApi.newEvent(eventTracker.event())
-                    newTransaction.onSuccess {
-                        logger.debug("tracked port-forward finished $it")
-                    }.onFailure {
-                        logger.error("error trackeing port-forward finished", it)
+                    _portForward.value = portForwardData.map {
+                        OpenPortForward(it.key, it.value)
                     }
-                }
-                ensureActive()
-                portForwardData[target] = portForwardData.getOrDefault(target, mutableListOf()).apply {
-                    add(portForwardMessage(message))
-                }
-                _portForward.value = portForwardData.map {
-                    OpenPortForward(it.key, it.value)
-                }
-                if (message is io.github.hoeggi.openshiftdb.api.response.PortForwardMessage.CloseMessage) {
-                    cancel("closed")
                 }
             }
         }
@@ -194,5 +178,30 @@ class OcViewModel internal constructor(port: Int, errorViewer: ErrorViewer) :
         }.clear()
         portForwardData.clear()
         _portForward.value = listOf()
+    }
+
+    private suspend inline fun CoroutineScope.trackPortforwardMessages(
+        message: io.github.hoeggi.openshiftdb.api.response.PortForwardMessage,
+        eventTracker: PortForwardEventTracker,
+        crossinline action: suspend (value: io.github.hoeggi.openshiftdb.api.response.PortForwardMessage) -> Unit,
+    ) {
+        eventTracker.trackMessage(message)
+        if (message is io.github.hoeggi.openshiftdb.api.response.PortForwardMessage.Start) {
+            sendPortForwardEvent(eventTracker)
+        }
+        ensureActive()
+        action(message)
+        if (message is io.github.hoeggi.openshiftdb.api.response.PortForwardMessage.CloseMessage) {
+            cancel("closed")
+        }
+    }
+
+    private suspend fun sendPortForwardEvent(tracker: PortForwardEventTracker) {
+        val newTransaction = eventsApi.newEvent(tracker.event())
+        newTransaction.onSuccess {
+            logger.debug("tracked port-forward finished $it")
+        }.onFailure {
+            logger.error("error tracking port-forward finished", it)
+        }
     }
 }

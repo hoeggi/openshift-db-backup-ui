@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
+    implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
     implementation(project(":oc"))
     implementation(project(":api-models"))
