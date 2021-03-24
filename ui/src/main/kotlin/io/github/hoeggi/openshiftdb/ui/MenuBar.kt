@@ -34,7 +34,7 @@ internal fun MenuBar(menuControl: MenuControl) = androidx.compose.ui.window.Menu
         ),
         MenuItem(
             name = "Events",
-            onClick = { menuControl.restore() },
+            onClick = { menuControl.events() },
             shortcut = KeyStroke(Key.E)
         ),
         MenuItem(
