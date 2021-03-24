@@ -40,7 +40,9 @@ internal fun RestoreData(modifier: Modifier = Modifier) {
         Divider(Modifier.padding(vertical = 10.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = "Restore Command:")
-            Icon(Icons.Outlined.ContentCopy, "",
+            Icon(
+                Icons.Outlined.ContentCopy,
+                "",
                 modifier = Modifier.padding(horizontal = 4.dp)
                     .size(16.dp)
                     .clickable {

@@ -5,11 +5,12 @@ import io.github.hoeggi.openshiftdb.api.response.RestoreCommandApi
 import io.github.hoeggi.openshiftdb.api.response.RestoreInfoApi
 import io.github.hoeggi.openshiftdb.postgres.Postgres
 import io.github.hoeggi.openshiftdb.postgres.PostgresPrincibal
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.util.pipeline.*
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.auth.principal
+import io.ktor.http.HttpStatusCode
+import io.ktor.response.respond
+import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
@@ -73,18 +74,18 @@ internal fun RestoreInfo(): suspend PipelineContext<Unit, ApplicationCall>.(Unit
             }
             val extensions = async {
                 "extensions: ${
-                    infoLines
-                        .filter { it.contains("COMMENT - EXTENSION") }
-                        .map { it.trim().substring(it.trim().lastIndexOf(" ")) }
-                        .toList()
+                infoLines
+                    .filter { it.contains("COMMENT - EXTENSION") }
+                    .map { it.trim().substring(it.trim().lastIndexOf(" ")) }
+                    .toList()
                 }"
             }
             val users = async {
                 "hdb_role: ${
-                    infoLines
-                        .filter { it.contains("hdb_role") }
-                        .map { it.trim().substring(it.trim().lastIndexOf(" ")) }
-                        .toList()
+                infoLines
+                    .filter { it.contains("hdb_role") }
+                    .map { it.trim().substring(it.trim().lastIndexOf(" ")) }
+                    .toList()
                 }"
             }
             awaitAll(info, extensions, users)

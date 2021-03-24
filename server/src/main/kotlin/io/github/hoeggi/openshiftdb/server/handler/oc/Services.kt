@@ -4,10 +4,11 @@ import io.github.hoeggi.openshiftdb.api.response.ApiResponse
 import io.github.hoeggi.openshiftdb.api.response.ServicesApi
 import io.github.hoeggi.openshiftdb.api.response.ServicesPortApi
 import io.github.hoeggi.openshiftdb.oc.OC
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.util.pipeline.*
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
+import io.ktor.response.respond
+import io.ktor.util.pipeline.PipelineContext
 
 internal fun Services(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {

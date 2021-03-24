@@ -1,5 +1,5 @@
 object Versions {
-    val kotlin = "1.4.31"
+    val kotlin = "1.4.32"
     val okio = "2.10.0"
     val ktor = "1.5.2"
     val kotlinx_coroutines = "1.4.3"
@@ -12,7 +12,7 @@ object Versions {
     val logback = "1.2.3"
     val compose = "0.4.0-build174"
     val ansi_sequence = "0.2"
-    val flatlaf = "1.0"
+    val flatlaf = "1.1"
     val sqldelight = "1.4.4"
     val buildconfig = "3.0.0"
 }
@@ -24,6 +24,7 @@ object Plugins {
     val module_dependency_graph = "com.savvasdalkitsis:module-dependency-graph:0.9"
     val metalava = "me.tylerbwong.gradle:metalava-gradle:0.1.6"
     val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
+    val spotless = "com.diffplug.spotless:spotless-plugin-gradle:5.11.0"
 }
 
 object Dependencies {

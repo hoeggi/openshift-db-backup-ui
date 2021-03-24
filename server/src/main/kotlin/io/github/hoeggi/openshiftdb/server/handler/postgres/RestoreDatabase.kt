@@ -5,19 +5,22 @@ import io.github.hoeggi.openshiftdb.api.response.Json
 import io.github.hoeggi.openshiftdb.postgres.DatabaseRestore
 import io.github.hoeggi.openshiftdb.postgres.Postgres
 import io.github.hoeggi.openshiftdb.postgres.PostgresPrincibal
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.http.*
-import io.ktor.http.cio.websocket.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.websocket.*
+import io.ktor.auth.principal
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.cio.websocket.CloseReason
+import io.ktor.http.cio.websocket.DefaultWebSocketSession
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.FrameType
+import io.ktor.http.cio.websocket.WebSocketSession
+import io.ktor.http.cio.websocket.close
+import io.ktor.http.cio.websocket.readText
+import io.ktor.response.respond
+import io.ktor.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -72,7 +75,8 @@ private suspend fun restore(
 ) {
     val outgoing = session.outgoing
     val incoming = session.incoming
-    val downloader = DatabaseRestore(restore,
+    val downloader = DatabaseRestore(
+        restore,
         onNewLine = {
             logger.debug("onNewLine: $it")
             if (outgoing.isClosedForSend.not()) outgoing.sendAsText(DatabaseRestoreMessage.inprogress(it))
@@ -89,7 +93,8 @@ private suspend fun restore(
                 CloseReason.Codes.INTERNAL_ERROR,
                 DatabaseRestoreMessage.error("code: $code - message: ${ex?.message}")
             )
-        })
+        }
+    )
 
     val confirmationChannel = Channel<DatabaseRestoreMessage.ConfirmRestore>()
     val async = session.async(Dispatchers.IO) {

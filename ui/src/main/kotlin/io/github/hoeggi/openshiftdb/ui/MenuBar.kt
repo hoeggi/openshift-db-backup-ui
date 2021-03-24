@@ -6,10 +6,10 @@ import androidx.compose.ui.window.KeyStroke
 import androidx.compose.ui.window.Menu
 import androidx.compose.ui.window.MenuItem
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.MenuControl
-import kotlinx.coroutines.GlobalScope
 
 internal fun MenuBar(menuControl: MenuControl) = androidx.compose.ui.window.MenuBar(
-    Menu("File",
+    Menu(
+        "File",
         MenuItem(
             name = "Settings",
             onClick = { menuControl.toggleDrawer() },
@@ -21,7 +21,8 @@ internal fun MenuBar(menuControl: MenuControl) = androidx.compose.ui.window.Menu
             shortcut = KeyStroke(Key.F4)
         )
     ),
-    Menu("View",
+    Menu(
+        "View",
         MenuItem(
             name = "Main",
             onClick = { menuControl.main() },
@@ -43,7 +44,8 @@ internal fun MenuBar(menuControl: MenuControl) = androidx.compose.ui.window.Menu
             shortcut = KeyStroke(Key.L)
         )
     ),
-    Menu("Help",
+    Menu(
+        "Help",
         MenuItem(
             name = "Reload",
             onClick = {

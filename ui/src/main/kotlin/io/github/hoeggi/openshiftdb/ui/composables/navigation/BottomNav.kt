@@ -24,7 +24,6 @@ internal fun BottomNav(
     val viewModel = NavigationProvider()
     val screen by viewModel.screen.collectAsState(coroutineScope.coroutineContext)
 
-
     BottomNavigation(
         modifier = modifier
     ) {

@@ -6,12 +6,17 @@ import io.github.hoeggi.openshiftdb.postgres.DatabaseDownloaderCustom
 import io.github.hoeggi.openshiftdb.postgres.DatabaseDownloaderPlain
 import io.github.hoeggi.openshiftdb.postgres.Postgres
 import io.github.hoeggi.openshiftdb.postgres.PostgresPrincibal
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.http.*
-import io.ktor.http.cio.websocket.*
-import io.ktor.response.*
-import io.ktor.websocket.*
+import io.ktor.auth.principal
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.cio.websocket.CloseReason
+import io.ktor.http.cio.websocket.DefaultWebSocketSession
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.FrameType
+import io.ktor.http.cio.websocket.WebSocketSession
+import io.ktor.http.cio.websocket.close
+import io.ktor.http.cio.websocket.readText
+import io.ktor.response.respond
+import io.ktor.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
@@ -69,7 +74,8 @@ private suspend fun downloadPlain(
     val outgoing = session.outgoing
     val incoming = session.incoming
     val dump = Postgres.dumpDatabasePlain(database, path, username, password)
-    val downloader = DatabaseDownloaderPlain(dump,
+    val downloader = DatabaseDownloaderPlain(
+        dump,
         onNewLine = {
             logger.debug("onNewLine: $it")
             if (outgoing.isClosedForSend.not()) outgoing.sendAsText(DatabaseDownloadMessage.inprogress(it))
@@ -88,7 +94,8 @@ private suspend fun downloadPlain(
                 CloseReason.Codes.INTERNAL_ERROR,
                 DatabaseDownloadMessage.error("code: $code - message: ${ex?.message}")
             )
-        })
+        }
+    )
     val async = session.async {
         if (outgoing.isClosedForSend.not()) outgoing.sendAsText(DatabaseDownloadMessage.start())
         downloader.download()
@@ -122,7 +129,8 @@ private suspend fun downloadCustom(
     val outgoing = session.outgoing
     val incoming = session.incoming
     val dump = Postgres.dumpDatabaseCustom(database, path, username, password)
-    val downloader = DatabaseDownloaderCustom(dump,
+    val downloader = DatabaseDownloaderCustom(
+        dump,
         onSuccess = {
             logger.debug("onSuccess")
             session.close(
@@ -136,7 +144,8 @@ private suspend fun downloadCustom(
                 CloseReason.Codes.INTERNAL_ERROR,
                 DatabaseDownloadMessage.error("code: $code - message: ${message ?: ex?.message}")
             )
-        })
+        }
+    )
     val async = session.async {
         if (outgoing.isClosedForSend.not()) outgoing.sendAsText(DatabaseDownloadMessage.start())
         downloader.download()

@@ -1,14 +1,27 @@
 package io.github.hoeggi.openshiftdb.ui.composables.eventlog
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.ChevronLeft
+import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,7 +39,6 @@ import io.github.hoeggi.openshiftdb.viewmodel.DatabaseEvent
 import io.github.hoeggi.openshiftdb.viewmodel.PortForwardEvent
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-
 
 internal fun Argb.toColor() = Color(
     alpha = a,
@@ -74,13 +86,15 @@ internal fun DatabaseEvents(databaseEvents: List<DatabaseEvent>) = databaseEvent
             Column(Modifier.padding(horizontal = 24.dp, vertical = 4.dp)) {
                 Row {
                     eventIcon(Modifier.align(Alignment.Top).size(20.dp))
-                    Text("""
+                    Text(
+                        """
                             $dbname with user $username
                             from: $startDate : $startTime
                             to: $endDate : $endTime
                             ${if (isDownload) "target" else "source"}: $path
                         """.trimIndent(),
-                        style = MaterialTheme.typography.caption)
+                        style = MaterialTheme.typography.caption
+                    )
                 }
             }
         }
@@ -96,8 +110,10 @@ internal fun PortForwardClose(portForwardEvent: PortForwardEvent) = with(portFor
         ) {
             color()
             closeIcon()
-            Text("closed $endDate, $endTime",
-                style = MaterialTheme.typography.body2)
+            Text(
+                "closed $endDate, $endTime",
+                style = MaterialTheme.typography.body2
+            )
             if (!isSuccess) {
                 Icon(
                     Icons.Outlined.Close,
@@ -117,8 +133,10 @@ internal fun PortForwardOpen(portForwardEvent: PortForwardEvent) = with(portForw
     ) {
         color()
         openIcon()
-        Text("${project}/${service}:${port} $startDate, $startTime",
-            style = MaterialTheme.typography.body2)
+        Text(
+            "$project/$service:$port $startDate, $startTime",
+            style = MaterialTheme.typography.body2
+        )
     }
 }
 

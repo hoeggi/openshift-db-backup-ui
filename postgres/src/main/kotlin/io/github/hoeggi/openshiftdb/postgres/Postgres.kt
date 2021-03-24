@@ -89,9 +89,11 @@ object Postgres {
 
     private fun Process.await() = also {
         it.onExit().thenAcceptAsync {
-            logger.debug("postgres onExit: ${it.exitValue()} - ${Thread.currentThread().name} - ${
+            logger.debug(
+                "postgres onExit: ${it.exitValue()} - ${Thread.currentThread().name} - ${
                 it.toHandle().info()
-            }")
+                }"
+            )
         }
         it.waitFor()
     }
@@ -202,7 +204,6 @@ object Postgres {
         }
     }
 
-
     private fun restoreCommandRaw(
         user: String,
         path: String,
@@ -224,7 +225,9 @@ object Postgres {
         val command = restoreCommand(username, password, path, if (exists) database else null)
         return PostgresResult.Restore(
             ProcessBuilder(rawCommand.commands).withPassword(password),
-            path, database, command.command()
+            path,
+            database,
+            command.command()
         )
     }
 

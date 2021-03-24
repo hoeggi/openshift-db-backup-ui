@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-
 @Composable
 internal fun OcPane(
     modifier: Modifier = Modifier.fillMaxWidth(0.5f),

@@ -7,7 +7,6 @@ import java.io.IOException
 import java.net.ServerSocket
 import javax.swing.UIManager
 
-
 class Main
 
 @Throws(IOException::class)

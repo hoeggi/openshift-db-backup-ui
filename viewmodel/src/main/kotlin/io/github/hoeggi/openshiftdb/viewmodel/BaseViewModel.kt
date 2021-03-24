@@ -22,7 +22,6 @@ data class ViewModelFactory(
     val eventsViewModel by _eventsViewModel
 }
 
-
 fun viewModels(
     port: Int,
     errorViewer: ErrorViewer,

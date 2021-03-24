@@ -7,10 +7,19 @@ import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.FabPosition
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.Surface
+import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.lightColors
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,11 +35,14 @@ import io.github.hoeggi.openshiftdb.settings.SettingsProvider
 import io.github.hoeggi.openshiftdb.settings.Theme
 import io.github.hoeggi.openshiftdb.ui.composables.ErrorView
 import io.github.hoeggi.openshiftdb.ui.composables.Loading
-import io.github.hoeggi.openshiftdb.ui.composables.navigation.*
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.AppErrorViewer
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.BottomNav
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.CustomErrorViewer
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.Drawer
+import io.github.hoeggi.openshiftdb.ui.composables.navigation.NavigationProvider
 import io.github.hoeggi.openshiftdb.viewmodel.models.LoginState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
 
 @Composable
 internal fun Theme(
@@ -100,7 +112,6 @@ fun BaseView(
                     }
                     Icon(icon, "")
                 }
-
             }
         },
         floatingActionButtonPosition = FabPosition.End,

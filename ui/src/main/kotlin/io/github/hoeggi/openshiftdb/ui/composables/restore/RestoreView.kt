@@ -2,12 +2,25 @@ package io.github.hoeggi.openshiftdb.ui.composables.restore
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FlashOn
 import androidx.compose.runtime.Composable
@@ -75,19 +88,21 @@ internal fun RestoreLog() {
 
     when (restoreState) {
         is DatabaseRestoreMessage.RequestConfirmation -> {
-            errorViewer.showOverlay(AppErrorViewer.customOverlay {
-                RestoreWarning(
-                    (restoreState as DatabaseRestoreMessage.RequestConfirmation).message,
-                    onCancel = {
-                        viewModel.cancelRestore()
-                        errorViewer.resetOverlay()
-                    },
-                    onConfirm = {
-                        viewModel.confirmeRestore()
-                        errorViewer.resetOverlay()
-                    }
-                )
-            })
+            errorViewer.showOverlay(
+                AppErrorViewer.customOverlay {
+                    RestoreWarning(
+                        (restoreState as DatabaseRestoreMessage.RequestConfirmation).message,
+                        onCancel = {
+                            viewModel.cancelRestore()
+                            errorViewer.resetOverlay()
+                        },
+                        onConfirm = {
+                            viewModel.confirmeRestore()
+                            errorViewer.resetOverlay()
+                        }
+                    )
+                }
+            )
         }
     }
     if (restoreProgress.isNotEmpty()) {
@@ -115,7 +130,9 @@ internal fun RestoreLog() {
 
 @Composable
 internal fun RestoreWarning(
-    command: String, onCancel: () -> Unit, onConfirm: () -> Unit,
+    command: String,
+    onCancel: () -> Unit,
+    onConfirm: () -> Unit,
 ) {
     Box(
         modifier = Modifier.background(MaterialTheme.colors.background.copy(alpha = 0.7f))
@@ -162,7 +179,6 @@ internal fun RestoreWarning(
                     }
                 }
             }
-
         }
     }
 }

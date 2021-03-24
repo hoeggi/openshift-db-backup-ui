@@ -19,7 +19,6 @@ interface Settings {
     fun themeDark()
     fun themeLight()
 
-
     val logLevel: StateFlow<LogLevel>
     fun updateLogLevel(logLevel: LogLevel)
 
@@ -48,7 +47,6 @@ private object SettingsHolder : Settings {
             settings = settings.update(theme = _theme.value)
         }
     }
-
 
     private val _logLevel: MutableStateFlow<LogLevel> = MutableStateFlow(settings.logLevel)
     override val logLevel = _logLevel.asStateFlow()

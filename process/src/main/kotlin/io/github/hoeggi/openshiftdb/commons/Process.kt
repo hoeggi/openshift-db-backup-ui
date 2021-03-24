@@ -4,18 +4,17 @@ import okio.buffer
 import okio.source
 import org.slf4j.LoggerFactory
 
-
 private val logger = LoggerFactory.getLogger(ProcessResult::class.java)
 
 interface Command {
     val commands: List<String>
 }
 
-//interface ProcessResult {
+// interface ProcessResult {
 //    val code: Int
-//}
-//inline class Ok(override val code: Int = 0) : ProcessResult
-//inline class Error(override val code: Int = 0) : ProcessResult
+// }
+// inline class Ok(override val code: Int = 0) : ProcessResult
+// inline class Error(override val code: Int = 0) : ProcessResult
 sealed class ProcessResult(val code: Int = -1) {
     object Ok : ProcessResult(0)
     class Error(result: Int) : ProcessResult(result)
@@ -57,4 +56,3 @@ fun process(command: Command): Process = ProcessBuilder(command.commands).start(
     }
     it.waitFor()
 }
-

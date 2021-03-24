@@ -1,7 +1,26 @@
 package io.github.hoeggi.openshiftdb.api
 
-import io.github.hoeggi.openshiftdb.api.response.*
-import io.github.hoeggi.openshiftdb.server.*
+import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
+import io.github.hoeggi.openshiftdb.api.response.DatabaseRestoreMessage
+import io.github.hoeggi.openshiftdb.api.response.DatabaseVersionApi
+import io.github.hoeggi.openshiftdb.api.response.DatabasesApi
+import io.github.hoeggi.openshiftdb.api.response.DefaultDatabaseApi
+import io.github.hoeggi.openshiftdb.api.response.Json
+import io.github.hoeggi.openshiftdb.api.response.RestoreCommandApi
+import io.github.hoeggi.openshiftdb.api.response.RestoreInfoApi
+import io.github.hoeggi.openshiftdb.api.response.ToolsVersionApi
+import io.github.hoeggi.openshiftdb.server.Path
+import io.github.hoeggi.openshiftdb.server.command
+import io.github.hoeggi.openshiftdb.server.database
+import io.github.hoeggi.openshiftdb.server.databases
+import io.github.hoeggi.openshiftdb.server.default
+import io.github.hoeggi.openshiftdb.server.dump
+import io.github.hoeggi.openshiftdb.server.info
+import io.github.hoeggi.openshiftdb.server.postgres
+import io.github.hoeggi.openshiftdb.server.restore
+import io.github.hoeggi.openshiftdb.server.tools
+import io.github.hoeggi.openshiftdb.server.v1
+import io.github.hoeggi.openshiftdb.server.version
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -58,7 +77,6 @@ interface PostgresApi {
         fun api(port: Int, baseUrl: BasePath): PostgresApi =
             PostgresApiImpl("$baseUrl:$port${Path.v1().postgres().path}")
     }
-
 }
 
 private class PostgresApiImpl(url: BasePath) : PostgresApi {
@@ -124,7 +142,6 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
             client.get(Path.version().database(), Credentials.basic(username, password))
         }
 
-
     override suspend fun databases(
         username: String,
         password: String,
@@ -139,7 +156,8 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
                     }
                 }
                 .build()
-                .toGetRequest(Credentials.basic(username, password)))
+                .toGetRequest(Credentials.basic(username, password))
+        )
             .execute().get()
     }
 
@@ -172,7 +190,6 @@ private class PostgresApiImpl(url: BasePath) : PostgresApi {
             webSocket.close(1000, Json.encodeToString(DatabaseDownloadMessage.finish("closing")))
         }
     }.shareIn(CoroutineScope(coroutineContext), SharingStarted.Eagerly)
-
 
     companion object {
         val logger = LoggerFactory.getLogger(PostgresApiImpl::class.java)

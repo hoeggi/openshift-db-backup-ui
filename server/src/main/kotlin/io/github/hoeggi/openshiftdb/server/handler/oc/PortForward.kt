@@ -4,8 +4,13 @@ import io.github.hoeggi.openshiftdb.api.response.Json
 import io.github.hoeggi.openshiftdb.api.response.PortForwardMessage
 import io.github.hoeggi.openshiftdb.oc.OC
 import io.github.hoeggi.openshiftdb.oc.PortForward
-import io.ktor.http.cio.websocket.*
-import io.ktor.websocket.*
+import io.ktor.http.cio.websocket.CloseReason
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.FrameType
+import io.ktor.http.cio.websocket.WebSocketSession
+import io.ktor.http.cio.websocket.close
+import io.ktor.http.cio.websocket.readText
+import io.ktor.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ClosedReceiveChannelException

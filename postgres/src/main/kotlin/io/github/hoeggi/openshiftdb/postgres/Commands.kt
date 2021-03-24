@@ -13,23 +13,34 @@ internal sealed class Commands(override val commands: List<String>) : Command {
         sealed class WithUser(username: String, vararg commands: String) : Psql("-U", username, *commands) {
             class ConnectionCheck(username: String) : WithUser(username, "-c", "\\q")
             class List(username: String) : WithUser(
-                username, "-q", "-A", "-t",
-                "-c", "SELECT datname FROM pg_database;"
+                username,
+                "-q",
+                "-A",
+                "-t",
+                "-c",
+                "SELECT datname FROM pg_database;"
             )
 
             class ListPretty(username: String) : WithUser(username, "-c", "\\l")
             class DefaultDb(username: String) : WithUser(
-                username, "-q", "-A", "-t",
-                "-c", "select current_database();"
+                username,
+                "-q",
+                "-A",
+                "-t",
+                "-c",
+                "select current_database();"
             )
 
             class DatabaseVersion(username: String) : WithUser(
-                username, "-q", "-A", "-t",
-                "-c", "select version();"
+                username,
+                "-q",
+                "-A",
+                "-t",
+                "-c",
+                "select version();"
             )
         }
     }
-
 
     sealed class PgRestore(vararg _commands: String) :
         Commands(listOf("pg_restore", "-h", "localhost", "-p", "5432", *_commands)) {
@@ -39,11 +50,21 @@ internal sealed class Commands(override val commands: List<String>) : Command {
         }
 
         class RestoreExisting(user: String, database: String, path: String) : PgRestore(
-            "-U", user, "-c", "-d", database, path
+            "-U",
+            user,
+            "-c",
+            "-d",
+            database,
+            path
         )
 
         class RestoreNew(user: String, path: String) : PgRestore(
-            "-U", user, "-C", "-d", Postgres.DEFAULT_DB, path
+            "-U",
+            user,
+            "-C",
+            "-d",
+            Postgres.DEFAULT_DB,
+            path
         )
     }
 
@@ -55,7 +76,9 @@ internal sealed class Commands(override val commands: List<String>) : Command {
             "--user=$username",
             "--host=localhost",
             "--port=5432",
-            "--clean", "--create", "--format=p",
+            "--clean",
+            "--create",
+            "--format=p",
             "--dbname=$database",
         )
 
@@ -63,7 +86,9 @@ internal sealed class Commands(override val commands: List<String>) : Command {
             "--user=$username",
             "--host=localhost",
             "--port=5432",
-            "--clean", "--create", "--format=c",
+            "--clean",
+            "--create",
+            "--format=c",
             "--dbname=$database",
             "--file=${path.absolutePath}"
         )

@@ -12,19 +12,19 @@ buildscript {
         classpath(Plugins.dependency_analysis)
         classpath(Plugins.module_dependency_graph)
         classpath(Plugins.metalava)
+        classpath(Plugins.spotless)
         classpath(kotlin("gradle-plugin", version = Versions.kotlin))
-
     }
 }
 
+apply(plugin = "com.diffplug.spotless")
 apply(plugin = "com.savvasdalkitsis.module-dependency-graph")
 apply(plugin = "com.autonomousapps.dependency-analysis")
 apply(plugin = "com.github.ben-manes.versions")
 apply(plugin = "all-projects")
-//apply {
+// apply {
 //    from("https://raw.githubusercontent.com/JakeWharton/SdkSearch/master/gradle/projectDependencyGraph.gradle")
-//}
-
+// }
 
 fun isNonStable(version: String): Boolean {
     val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
@@ -39,6 +39,21 @@ tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
     }
 }
 
+configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+    kotlin {
+        target("**/src/**/*.kt", "**/src/**/*.kt")
+        ktlint("0.38.0").userData(mapOf("indent_size" to "4", "continuation_indent_size" to "2"))
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktlint("0.38.0").userData(mapOf("indent_size" to "4", "continuation_indent_size" to "2"))
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
 extensions.configure<DependencyAnalysisExtension> {
     issues {
         all {
@@ -48,4 +63,3 @@ extensions.configure<DependencyAnalysisExtension> {
         }
     }
 }
-

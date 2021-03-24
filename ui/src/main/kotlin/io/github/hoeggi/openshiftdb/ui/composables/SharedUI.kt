@@ -2,12 +2,24 @@ package io.github.hoeggi.openshiftdb.ui.composables
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -154,14 +166,18 @@ internal fun EditTextField(
                     onValueChange(value.moveCursor(value.text.length))
                 }
                 on(Key.ShiftLeft + Key.Home) {
-                    onValueChange(value.copy(
-                        selection = TextRange(value.selection.start, 0)
-                    ))
+                    onValueChange(
+                        value.copy(
+                            selection = TextRange(value.selection.start, 0)
+                        )
+                    )
                 }
                 on(Key.ShiftLeft + Key(KeyEvent.VK_END)) {
-                    onValueChange(value.copy(
-                        selection = TextRange(value.selection.start, value.text.length)
-                    ))
+                    onValueChange(
+                        value.copy(
+                            selection = TextRange(value.selection.start, value.text.length)
+                        )
+                    )
                 }
                 on(Key.ShiftLeft + Key(KeyEvent.VK_RIGHT)) {
                     onValueChange(value.selectNext())
@@ -175,7 +191,6 @@ internal fun EditTextField(
         label = { Text(label) },
     )
 }
-
 
 @Composable
 internal fun StatefulEditTextField(
@@ -196,7 +211,6 @@ internal fun StatefulEditTextField(
         onValueChange = _onValueChange
     )
 }
-
 
 private fun TextFieldValue.moveCursor(position: Int) = copy(
     selection = TextRange(position)

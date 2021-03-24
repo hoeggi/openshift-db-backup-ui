@@ -3,10 +3,21 @@ package io.github.hoeggi.openshiftdb.ui.composables
 import androidx.compose.desktop.AppManager
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,19 +61,24 @@ internal fun ErrorView(t: Thread?, th: Throwable?) {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(6.dp)
                 ) {
-                    Button(onClick = {
-                        errorViewer.showError(errorViewer.empty())
-                    }, modifier = Modifier.weight(1f).padding(6.dp)) {
+                    Button(
+                        onClick = {
+                            errorViewer.showError(errorViewer.empty())
+                        },
+                        modifier = Modifier.weight(1f).padding(6.dp)
+                    ) {
                         Text(MessageProvider.message(GLOBAL_OK))
                     }
-                    Button(onClick = {
-                        AppManager.exit()
-                    }, modifier = Modifier.weight(1f).padding(6.dp)) {
+                    Button(
+                        onClick = {
+                            AppManager.exit()
+                        },
+                        modifier = Modifier.weight(1f).padding(6.dp)
+                    ) {
                         Text(MessageProvider.message(GLOBAL_EXIT))
                     }
                 }
             }
         }
-
     }
 }

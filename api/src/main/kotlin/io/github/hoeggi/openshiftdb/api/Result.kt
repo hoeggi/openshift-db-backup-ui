@@ -19,7 +19,6 @@ class Result<out T> private constructor(internal val value: Any?) {
         }
 
     class Failure(val exception: Exception)
-
 }
 
 fun <R, T : R> Result<T>.getOrDefault(defaultValue: R): R {

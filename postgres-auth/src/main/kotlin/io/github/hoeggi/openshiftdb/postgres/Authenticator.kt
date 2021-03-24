@@ -1,7 +1,8 @@
 package io.github.hoeggi.openshiftdb.postgres
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.application.ApplicationCall
+import io.ktor.auth.Principal
+import io.ktor.auth.UserPasswordCredential
 import org.slf4j.LoggerFactory
 
 data class PostgresPrincibal(val username: String, val password: String) : Principal
@@ -26,5 +27,4 @@ class Authenticator {
                 null
             }
         }
-
 }

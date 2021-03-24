@@ -3,7 +3,6 @@ package io.github.hoeggi.openshiftdb.eventlog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-
 object DatabaseLogProvider {
     val DatabaseLog: DatabaseLog by lazy { DatabaseLogImpl }
 }

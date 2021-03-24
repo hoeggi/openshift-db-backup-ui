@@ -18,7 +18,7 @@ class HighlightingCompositeConverterEx : ForegroundCompositeConverterBase<ILoggi
     }
 }
 //
-//object MemoryAppenderAccess {
+// object MemoryAppenderAccess {
 //    fun asText(): String {
 //        val instance = instance ?: return ""
 //        val sb = StringBuilder()
@@ -28,13 +28,13 @@ class HighlightingCompositeConverterEx : ForegroundCompositeConverterBase<ILoggi
 //        }
 //        return sb.toString()
 //    }
-//}
+// }
 //
-//object MemoryAppenderInstance {
+// object MemoryAppenderInstance {
 //    var instance: MemoryAppender? = null
-//}
+// }
 //
-//class MemoryAppender : AppenderBase<ILoggingEvent>() {
+// class MemoryAppender : AppenderBase<ILoggingEvent>() {
 //    var limit = 150
 //    private val events: MutableList<ILoggingEvent> = ArrayList()
 //    override fun start() {
@@ -62,4 +62,4 @@ class HighlightingCompositeConverterEx : ForegroundCompositeConverterBase<ILoggi
 //        synchronized(events) { retVal.addAll(events) }
 //        return retVal
 //    }
-//}
+// }

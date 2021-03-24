@@ -4,7 +4,7 @@ import java.awt.Desktop
 import java.io.File
 import java.io.IOException
 import java.net.URI
-import java.util.*
+import java.util.ArrayList
 
 object DesktopApi {
     fun browse(uri: URI): Boolean {
@@ -128,7 +128,7 @@ object DesktopApi {
         parts.add(command)
         if (args != null) {
             for (s in args.split(" ").toTypedArray()) {
-                parts.add(String.format(s, file).trim { it <= ' ' })// put in the filename thing
+                parts.add(String.format(s, file).trim { it <= ' ' }) // put in the filename thing
             }
         }
         return parts.toTypedArray()

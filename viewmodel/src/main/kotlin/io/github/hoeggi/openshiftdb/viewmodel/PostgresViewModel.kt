@@ -5,13 +5,21 @@ import io.github.hoeggi.openshiftdb.api.PostgresApi
 import io.github.hoeggi.openshiftdb.api.getOrDefault
 import io.github.hoeggi.openshiftdb.api.onFailure
 import io.github.hoeggi.openshiftdb.api.onSuccess
-import io.github.hoeggi.openshiftdb.api.response.*
+import io.github.hoeggi.openshiftdb.api.response.DatabaseDownloadMessage
+import io.github.hoeggi.openshiftdb.api.response.DatabaseRestoreMessage
+import io.github.hoeggi.openshiftdb.api.response.DatabasesApi
+import io.github.hoeggi.openshiftdb.api.response.RestoreCommandApi
+import io.github.hoeggi.openshiftdb.api.response.SecretsApi
+import io.github.hoeggi.openshiftdb.api.response.ToolsVersionApi
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 
 class PostgresViewModel internal constructor(port: Int, errorViewer: ErrorViewer) :
@@ -219,12 +227,14 @@ class PostgresViewModel internal constructor(port: Int, errorViewer: ErrorViewer
     fun restoreDatabase() {
         coroutineScope.launch(Dispatchers.IO) {
             val dumpDatabases =
-                postgresApi.restoreDatabase(userName.value,
+                postgresApi.restoreDatabase(
+                    userName.value,
                     password.value,
                     restorePath.value,
                     restoreCommand.value.database,
                     restoreCommand.value.existing,
-                    confirmationChannel)
+                    confirmationChannel
+                )
             val eventTracker =
                 DatabaseEventTracker(restorePath.value, userName.value, restoreCommand.value.database, "custom")
             dumpDatabases

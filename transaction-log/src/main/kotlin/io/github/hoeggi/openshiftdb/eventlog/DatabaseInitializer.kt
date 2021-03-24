@@ -9,7 +9,6 @@ import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-
 private val LocalDateTimeAdapter = object : ColumnAdapter<LocalDateTime, String> {
     override fun decode(databaseValue: String) = LocalDateTime.parse(databaseValue, DateTimeFormatter.ISO_DATE_TIME)
     override fun encode(value: LocalDateTime) = value.format(DateTimeFormatter.ISO_DATE_TIME)

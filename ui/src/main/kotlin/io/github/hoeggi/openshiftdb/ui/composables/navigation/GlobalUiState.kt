@@ -6,7 +6,12 @@ import androidx.compose.ui.text.SpanStyle
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 internal sealed class Screen {
@@ -38,7 +43,6 @@ internal interface CustomErrorViewer : ErrorViewer {
     }
 }
 
-
 abstract class Provider<T> {
     abstract val instance: T
     operator fun invoke() = instance
@@ -64,7 +68,6 @@ internal object NavigationProvider : Provider<Navigator>() {
 internal object LogLinesProvider : Provider<LogLines>() {
     override val instance: LogLines by lazy { GlobalUiState }
 }
-
 
 internal interface MenuControl : Navigator {
     val refreshTrigger: SharedFlow<Unit>
@@ -130,5 +133,4 @@ private object GlobalUiState : CustomErrorViewer, MenuControl, LogLines {
     override fun showWarning(warning: ErrorViewer.Message) {
         _errors.value = warning
     }
-
 }

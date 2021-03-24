@@ -25,7 +25,6 @@ import io.github.hoeggi.openshiftdb.settings.SettingsProvider
 import org.slf4j.LoggerFactory
 import java.io.File
 
-
 @Composable
 internal fun PostgresDump() {
 
@@ -44,10 +43,11 @@ internal fun PostgresDump() {
     ) {
         Button(
             enabled = resultState !is DatabaseDownloadMessage.InProgressMessage &&
-                    resultState !is DatabaseDownloadMessage.StartMessage,
+                resultState !is DatabaseDownloadMessage.StartMessage,
             onClick = {
                 viewModel.dumpDatabase(databases[selectedDatabase], settings.exportFormat.value.format)
-            }) {
+            }
+        ) {
             Text(text = MessageProvider.message(POSTGRES_DUMP_LABEL))
         }
         when (resultState) {
@@ -86,4 +86,3 @@ internal fun PostgresDump() {
         }
     }
 }
-

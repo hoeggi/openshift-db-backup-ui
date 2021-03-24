@@ -17,7 +17,6 @@ import okhttp3.Response
 internal typealias ApiClient = Pair<OkHttpClient, BasePath>
 typealias BasePath = String
 
-
 fun Api(port: Int, baseUrl: BasePath = "http://localhost"): Api = ApiImp(
     OcApi.api(port, baseUrl),
     PostgresApi.api(port, baseUrl),
@@ -25,9 +24,11 @@ fun Api(port: Int, baseUrl: BasePath = "http://localhost"): Api = ApiImp(
 )
 
 interface Api : OcApi, PostgresApi, EventsApi
-private class ApiImp(val oc: OcApi, val postgres: PostgresApi, val eventsApi: EventsApi) : Api, OcApi by oc,
-    PostgresApi by postgres, EventsApi by eventsApi
-
+private class ApiImp(val oc: OcApi, val postgres: PostgresApi, val eventsApi: EventsApi) :
+    Api,
+    OcApi by oc,
+    PostgresApi by postgres,
+    EventsApi by eventsApi
 
 internal operator fun OkHttpClient.plus(baseUrl: BasePath): ApiClient = this to baseUrl
 

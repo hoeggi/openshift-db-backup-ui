@@ -15,7 +15,6 @@ import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.OC_PROJECT_CURRENT_LABEL
 
-
 @Composable
 internal fun CurrentProject() {
 

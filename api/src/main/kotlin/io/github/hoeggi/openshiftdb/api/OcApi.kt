@@ -1,7 +1,28 @@
 package io.github.hoeggi.openshiftdb.api
 
-import io.github.hoeggi.openshiftdb.api.response.*
-import io.github.hoeggi.openshiftdb.server.*
+import io.github.hoeggi.openshiftdb.api.response.ClusterApi
+import io.github.hoeggi.openshiftdb.api.response.ContextApi
+import io.github.hoeggi.openshiftdb.api.response.Json
+import io.github.hoeggi.openshiftdb.api.response.LoginApi
+import io.github.hoeggi.openshiftdb.api.response.PortForwardMessage
+import io.github.hoeggi.openshiftdb.api.response.ProjectApi
+import io.github.hoeggi.openshiftdb.api.response.SecretsApi
+import io.github.hoeggi.openshiftdb.api.response.ServicesApi
+import io.github.hoeggi.openshiftdb.api.response.SwitchContextApi
+import io.github.hoeggi.openshiftdb.api.response.VersionApi
+import io.github.hoeggi.openshiftdb.server.Path
+import io.github.hoeggi.openshiftdb.server.context
+import io.github.hoeggi.openshiftdb.server.current
+import io.github.hoeggi.openshiftdb.server.login
+import io.github.hoeggi.openshiftdb.server.oc
+import io.github.hoeggi.openshiftdb.server.password
+import io.github.hoeggi.openshiftdb.server.portForward
+import io.github.hoeggi.openshiftdb.server.projects
+import io.github.hoeggi.openshiftdb.server.secrets
+import io.github.hoeggi.openshiftdb.server.server
+import io.github.hoeggi.openshiftdb.server.services
+import io.github.hoeggi.openshiftdb.server.v1
+import io.github.hoeggi.openshiftdb.server.version
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -102,7 +123,6 @@ private class OcApiImpl(url: BasePath) : OcApi {
 
     override suspend fun checkLogin(): Result<Unit> =
         withContext(Dispatchers.IO) { authorize(loginRequest().toGetRequest()) }
-
 
     private fun loginRequest() = client.second.withPath(Path.login())
     private fun authorize(request: Request): Result<Unit> = try {

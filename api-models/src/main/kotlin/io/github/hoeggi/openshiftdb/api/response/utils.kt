@@ -15,7 +15,6 @@ import kotlinx.serialization.modules.subclass
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-
 val SerializersModule = SerializersModule {
     polymorphic(EventApi::class) {
         subclass(DatabaseEventApi::class)
@@ -27,7 +26,6 @@ val Json = Json { serializersModule = SerializersModule }
 
 @Serializable
 data class ApiResponse<T>(val data: T, val result: Int)
-
 
 interface Trackable {
     interface Start
@@ -76,7 +74,6 @@ sealed class EventTypeApi {
     @SerialName("portforward")
     object PortForward : EventTypeApi()
 }
-
 
 object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("LocalDateTime", PrimitiveKind.STRING)

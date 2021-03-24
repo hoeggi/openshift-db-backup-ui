@@ -9,7 +9,7 @@ typealias FullContext = String
 fun FullContext.isSameCluster(other: FullContext): Boolean {
     if (this == other) return true
     return this.substring(this.indexOf("/"), this.lastIndexOf("/")) ==
-            other.substring(other.indexOf("/"), other.lastIndexOf("/"))
+        other.substring(other.indexOf("/"), other.lastIndexOf("/"))
 }
 
 @Serializable

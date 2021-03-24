@@ -2,11 +2,12 @@ package io.github.hoeggi.openshiftdb.server.handler.oc
 
 import io.github.hoeggi.openshiftdb.api.response.ProjectApi
 import io.github.hoeggi.openshiftdb.oc.OC
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.util.pipeline.*
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
+import io.ktor.request.receiveOrNull
+import io.ktor.response.respond
+import io.ktor.util.pipeline.PipelineContext
 
 internal fun SwitchProject(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit =
     {

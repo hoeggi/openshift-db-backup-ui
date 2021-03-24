@@ -25,5 +25,3 @@ internal fun PostgresPane() {
         ConsoleOutput()
     }
 }
-
-

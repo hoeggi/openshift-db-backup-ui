@@ -1,7 +1,7 @@
 package io.github.hoeggi.openshiftdb.i18n
 
 import java.text.MessageFormat
-import java.util.*
+import java.util.ResourceBundle
 
 object MessageProvider {
 
@@ -14,13 +14,11 @@ object MessageProvider {
         return formatter.format(arguments)
     }
 
-
     const val ERROR_MESSAGE = "error.message"
     const val ERROR_HEADER = "error.header"
     const val GLOBAL_EXIT = "global.exit"
     const val GLOBAL_OK = "global.ok"
     const val SECRETS_LABEL = "secrets.label"
-
 
     const val THEME_LABEL = "theme.label"
     const val THEME_LIGHT = "theme.light"

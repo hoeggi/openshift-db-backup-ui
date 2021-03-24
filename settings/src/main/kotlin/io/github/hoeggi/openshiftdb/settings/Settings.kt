@@ -1,7 +1,11 @@
 package io.github.hoeggi.openshiftdb.settings
 
 import io.github.hoeggi.openshiftdb.BuildConfig
-import kotlinx.serialization.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.buffer
 import okio.sink

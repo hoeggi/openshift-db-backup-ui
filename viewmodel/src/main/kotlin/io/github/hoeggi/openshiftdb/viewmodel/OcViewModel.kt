@@ -3,14 +3,33 @@ package io.github.hoeggi.openshiftdb.viewmodel
 import io.github.hoeggi.openshiftdb.api.getOrDefault
 import io.github.hoeggi.openshiftdb.api.onFailure
 import io.github.hoeggi.openshiftdb.api.onSuccess
-import io.github.hoeggi.openshiftdb.api.response.*
+import io.github.hoeggi.openshiftdb.api.response.ClusterApi
+import io.github.hoeggi.openshiftdb.api.response.FullContext
+import io.github.hoeggi.openshiftdb.api.response.ProjectApi
+import io.github.hoeggi.openshiftdb.api.response.SwitchContextApi
+import io.github.hoeggi.openshiftdb.api.response.VersionApi
+import io.github.hoeggi.openshiftdb.api.response.isSameCluster
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
-import io.github.hoeggi.openshiftdb.viewmodel.models.*
+import io.github.hoeggi.openshiftdb.viewmodel.models.Context
+import io.github.hoeggi.openshiftdb.viewmodel.models.LoginState
+import io.github.hoeggi.openshiftdb.viewmodel.models.OpenPortForward
 import io.github.hoeggi.openshiftdb.viewmodel.models.PortForwardMessage
 import io.github.hoeggi.openshiftdb.viewmodel.models.PortForwardMessage.Companion.portForwardMessage
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
+import io.github.hoeggi.openshiftdb.viewmodel.models.PortForwardTarget
+import io.github.hoeggi.openshiftdb.viewmodel.models.Service
+import io.github.hoeggi.openshiftdb.viewmodel.models.toContext
+import io.github.hoeggi.openshiftdb.viewmodel.models.toService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.launch
 
 class OcViewModel internal constructor(port: Int, errorViewer: ErrorViewer) :
     BaseViewModel(port, errorViewer) {

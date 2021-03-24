@@ -6,11 +6,34 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.Computer
+import androidx.compose.material.icons.outlined.FilePresent
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,7 +51,6 @@ import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileSystemView
 
-
 private typealias FileFilter = (File) -> Boolean
 
 internal class FileChooser(
@@ -38,7 +60,6 @@ internal class FileChooser(
     private val currentPath = mutableStateOf(File(initialPath))
     private val selectedPath = mutableStateOf<File?>(null)
     private val showHiddenFiles = mutableStateOf(false)
-
 
     fun show(onFileChoosen: (File) -> Unit) = Window(
         title = "Choose a File",
@@ -55,9 +76,11 @@ internal class FileChooser(
             if (!showFiles) add(hideFilesFilter)
         }
 
-        val list: List<File> = (openedDir.listFiles()?.filter { file ->
-            filter.all { it(file) }
-        }?.toMutableList() ?: mutableListOf()).apply {
+        val list: List<File> = (
+            openedDir.listFiles()?.filter { file ->
+                filter.all { it(file) }
+            }?.toMutableList() ?: mutableListOf()
+            ).apply {
             sortWith(fileSorter)
         }
 
@@ -130,21 +153,23 @@ internal class FileChooser(
                             val backgroundColor = if (it == selectedDir) {
                                 MaterialTheme.colors.primary
                             } else Color.Transparent
-                            Row(modifier = Modifier.height(IntrinsicSize.Min)
-                                .background(backgroundColor)
-                                .combinedClickable(
-                                    onDoubleClick = {
-                                        if (it.isDirectory) {
-                                            println("${it.absolutePath}")
-                                            setCurrent(it)
-                                        } else {
-                                            fileChosen(it)
+                            Row(
+                                modifier = Modifier.height(IntrinsicSize.Min)
+                                    .background(backgroundColor)
+                                    .combinedClickable(
+                                        onDoubleClick = {
+                                            if (it.isDirectory) {
+                                                println("${it.absolutePath}")
+                                                setCurrent(it)
+                                            } else {
+                                                fileChosen(it)
+                                            }
                                         }
-                                    }
-                                ) {
-                                    selectedPath.value = it
-                                },
-                                verticalAlignment = Alignment.CenterVertically) {
+                                    ) {
+                                        selectedPath.value = it
+                                    },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Icon(
                                     imageVector = icon,
                                     "",
@@ -167,8 +192,10 @@ internal class FileChooser(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clickable { showHiddenFiles.value = !showHidden }) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable { showHiddenFiles.value = !showHidden }
+                        ) {
                             Checkbox(
                                 checked = showHidden,
                                 onCheckedChange = {

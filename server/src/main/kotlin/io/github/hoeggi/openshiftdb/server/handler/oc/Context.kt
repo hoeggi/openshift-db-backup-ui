@@ -1,12 +1,17 @@
 package io.github.hoeggi.openshiftdb.server.handler.oc
 
-import io.github.hoeggi.openshiftdb.api.response.*
+import io.github.hoeggi.openshiftdb.api.response.ApiResponse
+import io.github.hoeggi.openshiftdb.api.response.ContextApi
+import io.github.hoeggi.openshiftdb.api.response.ContextDetailApi
+import io.github.hoeggi.openshiftdb.api.response.ContextsApi
+import io.github.hoeggi.openshiftdb.api.response.SwitchContextApi
 import io.github.hoeggi.openshiftdb.oc.OC
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.util.pipeline.*
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
+import io.ktor.request.receiveOrNull
+import io.ktor.response.respond
+import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 

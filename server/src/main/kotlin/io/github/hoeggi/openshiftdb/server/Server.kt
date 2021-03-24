@@ -7,47 +7,64 @@ import io.github.hoeggi.openshiftdb.server.handler.postgres.TransactionLogger
 import io.github.hoeggi.openshiftdb.server.routes.default
 import io.github.hoeggi.openshiftdb.server.routes.oc
 import io.github.hoeggi.openshiftdb.server.routes.postgres
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.metrics.dropwizard.*
-import io.ktor.metrics.micrometer.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.serialization.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import io.ktor.websocket.*
+import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.auth.Authentication
+import io.ktor.auth.basic
+import io.ktor.features.CallId
+import io.ktor.features.CallLogging
+import io.ktor.features.Compression
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.DefaultHeaders
+import io.ktor.features.callIdMdc
+import io.ktor.features.toLogString
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.metrics.dropwizard.DropwizardMetrics
+import io.ktor.metrics.micrometer.MicrometerMetrics
+import io.ktor.request.header
+import io.ktor.request.queryString
+import io.ktor.response.respond
+import io.ktor.routing.get
+import io.ktor.routing.post
+import io.ktor.routing.routing
+import io.ktor.serialization.json
+import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.engine.connector
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
+import io.ktor.websocket.WebSockets
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.slf4j.event.Level
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.TimeUnit
-
 
 class Server(private val listeningPort: Int) : Runnable {
     private val logging = LoggerFactory.getLogger(Server::class.java)
 
     override fun run() {
         logging.info("port used: $listeningPort}")
-        embeddedServer(Netty, environment = applicationEngineEnvironment {
-            log = LoggerFactory.getLogger("ktor")
-            module {
-                val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
-                features(appMicrometerRegistry)
-                routes(appMicrometerRegistry)
+        embeddedServer(
+            Netty,
+            environment = applicationEngineEnvironment {
+                log = LoggerFactory.getLogger("ktor")
+                module {
+                    val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+                    features(appMicrometerRegistry)
+                    routes(appMicrometerRegistry)
+                }
+                connector {
+                    port = listeningPort
+                    host = "localhost"
+                }
             }
-            connector {
-                port = listeningPort
-                host = "localhost"
-            }
-        }).start(false)
-
+        ).start(false)
     }
 
     private fun Application.routes(appMicrometerRegistry: PrometheusMeterRegistry) {
@@ -111,9 +128,9 @@ class Server(private val listeningPort: Int) : Runnable {
             }
             format { call ->
                 "[${
-                    MDC.getCopyOfContextMap().apply {
-                        put("status", "${call.response.status()}")
-                    }
+                MDC.getCopyOfContextMap().apply {
+                    put("status", "${call.response.status()}")
+                }
                 }]"
             }
         }
@@ -129,7 +146,6 @@ class Server(private val listeningPort: Int) : Runnable {
                 callId.isNotEmpty()
             }
             replyToHeader(HttpHeaders.XRequestId)
-
         }
         install(DropwizardMetrics) {
             JmxReporter.forRegistry(registry)
@@ -143,7 +159,3 @@ class Server(private val listeningPort: Int) : Runnable {
         }
     }
 }
-
-
-
-

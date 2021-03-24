@@ -70,7 +70,9 @@ subprojects {
             "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi",
             "-Xuse-experimental=androidx.compose.animation.ExperimentalAnimationApi",
             "-Xinline-classes",
-            "-no-reflect"
+            "-no-reflect",
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
 //            "-Xexplicit-api=strict"
         )
     }

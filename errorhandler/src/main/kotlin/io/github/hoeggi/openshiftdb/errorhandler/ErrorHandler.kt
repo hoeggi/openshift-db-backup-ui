@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 
-
 interface ErrorViewer {
     fun showError(error: Message)
     fun showWarning(warning: Message)
@@ -32,7 +31,6 @@ interface ErrorViewer {
         thread: Thread? = Thread.currentThread(),
         throwable: Throwable? = Throwable(),
     ): Error = Error(thread, throwable, true)
-
 }
 
 class CoroutineExceptionHandler(private val errorViewer: ErrorViewer) :
@@ -41,11 +39,13 @@ class CoroutineExceptionHandler(private val errorViewer: ErrorViewer) :
     private val logger = LoggerFactory.getLogger(CoroutineExceptionHandler::class.java)
     override fun handleException(context: CoroutineContext, exception: Throwable) {
         logger.error("error in coroutine", exception)
-        errorViewer.showError(object : ErrorViewer.Error {
-            override val thread = Thread.currentThread()
-            override val throwable = exception
-            override val fired = true
-        })
+        errorViewer.showError(
+            object : ErrorViewer.Error {
+                override val thread = Thread.currentThread()
+                override val throwable = exception
+                override val fired = true
+            }
+        )
     }
 }
 

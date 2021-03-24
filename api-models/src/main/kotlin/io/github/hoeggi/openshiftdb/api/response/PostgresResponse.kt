@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
-
 @Serializable
 data class DatabaseEventApi(
     val dbname: String,
@@ -18,7 +17,6 @@ data class DatabaseEventApi(
     override val eventType: EventTypeApi,
     override val result: EventResultApi,
 ) : EventApi
-
 
 @Serializable
 sealed class DatabaseRestoreMessage : Trackable {
@@ -97,7 +95,6 @@ sealed class DatabaseDownloadMessage : Trackable {
     data class FinishMessage(override val message: String) : DatabaseDownloadMessage(), Trackable.Finish
 }
 
-
 @Serializable
 data class ToolsVersionApi(
     val psql: String = "",
@@ -127,8 +124,8 @@ data class DatabaseVersionApi(
     val database: String = "",
 )
 
-//@Serializable
-//inline class StringList(val databases: List<String>)
+// @Serializable
+// inline class StringList(val databases: List<String>)
 
 @Serializable
 sealed class DatabasesApi {

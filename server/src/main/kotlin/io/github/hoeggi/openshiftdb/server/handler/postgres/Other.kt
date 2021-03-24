@@ -1,16 +1,28 @@
 package io.github.hoeggi.openshiftdb.server.handler.postgres
 
-import io.github.hoeggi.openshiftdb.api.response.*
-import io.github.hoeggi.openshiftdb.eventlog.*
+import io.github.hoeggi.openshiftdb.api.response.ApiResponse
+import io.github.hoeggi.openshiftdb.api.response.DatabaseEventApi
+import io.github.hoeggi.openshiftdb.api.response.EventApi
+import io.github.hoeggi.openshiftdb.api.response.EventResultApi
+import io.github.hoeggi.openshiftdb.api.response.EventTypeApi
+import io.github.hoeggi.openshiftdb.api.response.PortForwardEventApi
+import io.github.hoeggi.openshiftdb.api.response.ToolsVersionApi
+import io.github.hoeggi.openshiftdb.eventlog.DatabaseEvent
+import io.github.hoeggi.openshiftdb.eventlog.DatabaseLogProvider
+import io.github.hoeggi.openshiftdb.eventlog.EventResult
+import io.github.hoeggi.openshiftdb.eventlog.EventType
+import io.github.hoeggi.openshiftdb.eventlog.PortForwardEvent
 import io.github.hoeggi.openshiftdb.postgres.Postgres
 import io.github.hoeggi.openshiftdb.server.Path
 import io.github.hoeggi.openshiftdb.server.database
 import io.github.hoeggi.openshiftdb.server.portForward
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.util.pipeline.*
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
+import io.ktor.request.path
+import io.ktor.request.receiveOrNull
+import io.ktor.response.respond
+import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
@@ -30,10 +42,12 @@ internal object TransactionLogger {
     val transactions: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
         val path = call.request.path()
         val events = when {
-            path.endsWith(Path.database().path) -> databaseLog.listAllDatabaseEvents()
-                .map { it.toDatabaseEventApi() }
-            path.endsWith(Path.portForward().path) -> databaseLog.listAllPortForwardEvents()
-                .map { it.toPortForwardEventApi() }
+            path.endsWith(Path.database().path) ->
+                databaseLog.listAllDatabaseEvents()
+                    .map { it.toDatabaseEventApi() }
+            path.endsWith(Path.portForward().path) ->
+                databaseLog.listAllPortForwardEvents()
+                    .map { it.toPortForwardEventApi() }
             else -> null
         }
         if (events == null) call.respond(HttpStatusCode.BadRequest, "invalid path")

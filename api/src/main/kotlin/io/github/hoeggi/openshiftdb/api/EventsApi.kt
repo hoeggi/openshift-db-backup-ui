@@ -3,7 +3,12 @@ package io.github.hoeggi.openshiftdb.api
 import io.github.hoeggi.openshiftdb.api.response.DatabaseEventApi
 import io.github.hoeggi.openshiftdb.api.response.EventApi
 import io.github.hoeggi.openshiftdb.api.response.PortForwardEventApi
-import io.github.hoeggi.openshiftdb.server.*
+import io.github.hoeggi.openshiftdb.server.Path
+import io.github.hoeggi.openshiftdb.server.Routes
+import io.github.hoeggi.openshiftdb.server.database
+import io.github.hoeggi.openshiftdb.server.events
+import io.github.hoeggi.openshiftdb.server.portForward
+import io.github.hoeggi.openshiftdb.server.v1
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -13,7 +18,6 @@ interface EventsApi {
     suspend fun <T : EventApi> newEvent(event: T): Result<Int>
     suspend fun databaseEvents(): Result<List<DatabaseEventApi>>
     suspend fun portForwardEvents(): Result<List<PortForwardEventApi>>
-
 
     companion object {
         fun api(port: Int, baseUrl: BasePath): EventsApi {

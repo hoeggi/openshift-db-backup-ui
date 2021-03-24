@@ -6,11 +6,12 @@ import io.github.hoeggi.openshiftdb.api.response.DatabasesApi
 import io.github.hoeggi.openshiftdb.api.response.DefaultDatabaseApi
 import io.github.hoeggi.openshiftdb.postgres.Postgres
 import io.github.hoeggi.openshiftdb.postgres.PostgresPrincibal
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.util.pipeline.*
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.auth.principal
+import io.ktor.http.HttpStatusCode
+import io.ktor.response.respond
+import io.ktor.util.pipeline.PipelineContext
 
 internal fun DefaultDatabase(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
     val principal = call.principal<PostgresPrincibal>()

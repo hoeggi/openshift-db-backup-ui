@@ -1,10 +1,14 @@
 package io.github.hoeggi.openshiftdb.viewmodel
 
 import io.github.hoeggi.openshiftdb.api.getOrDefault
-import io.github.hoeggi.openshiftdb.api.response.*
+import io.github.hoeggi.openshiftdb.api.response.DatabaseEventApi
+import io.github.hoeggi.openshiftdb.api.response.EventApi
+import io.github.hoeggi.openshiftdb.api.response.EventResultApi
+import io.github.hoeggi.openshiftdb.api.response.EventTypeApi
+import io.github.hoeggi.openshiftdb.api.response.PortForwardEventApi
+import io.github.hoeggi.openshiftdb.api.response.Trackable
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import io.github.hoeggi.openshiftdb.viewmodel.models.PortForwardTarget
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,8 +17,7 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
-
+import java.util.Random
 
 class EventsViewModel(port: Int, errorViewer: ErrorViewer) :
     BaseViewModel(port, errorViewer) {
@@ -37,7 +40,7 @@ class EventsViewModel(port: Int, errorViewer: ErrorViewer) :
                         .getOrDefault(listOf())
                         .filter {
                             it.startTime.isAfter(forward.startTime) &&
-                                    it.startTime.isBefore(forward.endTime ?: LocalDateTime.now())
+                                it.startTime.isBefore(forward.endTime ?: LocalDateTime.now())
                         }.map {
                             it.toUiEvent(portForwardUiEvent.color)
                         }
@@ -51,7 +54,6 @@ class EventsViewModel(port: Int, errorViewer: ErrorViewer) :
     companion object {
         private const val forwardablePort = 5432
     }
-
 }
 
 internal class DatabaseEventTracker(
@@ -146,7 +148,6 @@ internal abstract class EventTracker {
     abstract fun event(): EventApi
 }
 
-
 class Argb(val r: Int, val g: Int, val b: Int, val a: Int = "ff".toInt(16))
 sealed class ColoredEvent(
     val color: Argb,
@@ -161,7 +162,6 @@ sealed class ColoredEvent(
 
     val isFinished = end != null
 }
-
 
 private fun String.argb() = Argb(
     a = this.substring(0, 2).toInt(16),

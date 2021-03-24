@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("io.github.hoeggi.openshiftdb.oc.Service")
 
-
 private val jsonParser = Json {
     ignoreUnknownKeys = true
     isLenient = true
@@ -110,10 +109,10 @@ internal fun parseSecrets(json: String?) = try {
                     data = it.data.map {
                         it.key to (it.value?.decodeBase64()?.utf8() ?: "")
                     }.filter {
-                        it.first.isNotEmpty()
-                                && it.second.isNotEmpty()
-                                && !it.first.contains("cfg")
-                                && !it.first.contains(".crt")
+                        it.first.isNotEmpty() &&
+                            it.second.isNotEmpty() &&
+                            !it.first.contains("cfg") &&
+                            !it.first.contains(".crt")
                     }.toMap()
                 )
             }.filter { it.data.isNotEmpty() }
@@ -160,7 +159,9 @@ internal fun parseServer(json: String?) = try {
 }
 
 private fun matchesUsername(key: String, value: String?, userName: String) =
-    (key.equals("username", true)
-            || key.equals("user", true)
-            || key.equals("database-user", true))
-            && value?.decodeBase64()?.utf8().equals(userName, true)
+    (
+        key.equals("username", true) ||
+            key.equals("user", true) ||
+            key.equals("database-user", true)
+        ) &&
+        value?.decodeBase64()?.utf8().equals(userName, true)

@@ -6,8 +6,11 @@ import androidx.compose.ui.text.SpanStyle
 import com.google.common.collect.EvictingQueue
 import io.github.hoeggi.openshiftdb.ui.composables.ColorMapping
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.LogLinesProvider
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import net.rubygrapefruit.ansi.AnsiParser
 import net.rubygrapefruit.ansi.TextColor
 import net.rubygrapefruit.ansi.token.ForegroundColor
@@ -46,9 +49,11 @@ object Logger {
                 val line = stdout.source.readUtf8Line()
                 if (line != null) {
                     val parsed = parseLine(line)
-                    log.updateSyslog(queue.apply {
-                        add(parsed)
-                    }.toList())
+                    log.updateSyslog(
+                        queue.apply {
+                            add(parsed)
+                        }.toList()
+                    )
                 }
             }
         }
@@ -59,17 +64,21 @@ object Logger {
             while (running.get()) {
                 val line = stderr.source.readUtf8Line()
                 if (line != null) {
-                    log.updateSyslog(queue.apply {
-                        val parseLine = parseLine(line)
-                        val result = AnnotatedString.Builder()
-                            .apply {
-                                append(parseLine)
-                                addStyle(SpanStyle(ColorMapping.colors[TextColor.RED] ?: Color.Red),
-                                    0,
-                                    parseLine.length)
-                            }.toAnnotatedString()
-                        add(result)
-                    }.toList())
+                    log.updateSyslog(
+                        queue.apply {
+                            val parseLine = parseLine(line)
+                            val result = AnnotatedString.Builder()
+                                .apply {
+                                    append(parseLine)
+                                    addStyle(
+                                        SpanStyle(ColorMapping.colors[TextColor.RED] ?: Color.Red),
+                                        0,
+                                        parseLine.length
+                                    )
+                                }.toAnnotatedString()
+                            add(result)
+                        }.toList()
+                    )
                 }
             }
         }
@@ -132,9 +141,11 @@ object Logger {
         private val sink = pipe.sink.buffer()
 
         override fun write(c: Int) {
-            sink.write(ByteArray(1).apply {
-                set(0, c.toByte())
-            }).flush()
+            sink.write(
+                ByteArray(1).apply {
+                    set(0, c.toByte())
+                }
+            ).flush()
             super.write(c)
         }
 

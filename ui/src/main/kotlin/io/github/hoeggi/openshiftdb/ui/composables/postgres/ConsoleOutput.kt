@@ -2,7 +2,11 @@ package io.github.hoeggi.openshiftdb.ui.composables.postgres
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,7 +54,8 @@ internal fun ConsoleOutput() {
                                 .padding(top = 10.dp)
                         )
                         Icon(
-                            Icons.Outlined.Close, "",
+                            Icons.Outlined.Close,
+                            "",
                             modifier = Modifier.size(24.dp)
                                 .padding(6.dp)
                                 .align(Alignment.TopEnd)
