@@ -5,6 +5,9 @@ import io.github.hoeggi.openshiftdb.api.response.DatabaseEventApi
 import io.github.hoeggi.openshiftdb.api.response.EventApi
 import io.github.hoeggi.openshiftdb.api.response.EventResultApi
 import io.github.hoeggi.openshiftdb.api.response.EventTypeApi
+import io.github.hoeggi.openshiftdb.api.response.LogEvent
+import io.github.hoeggi.openshiftdb.api.response.LogException
+import io.github.hoeggi.openshiftdb.api.response.LogProperty
 import io.github.hoeggi.openshiftdb.api.response.PortForwardEventApi
 import io.github.hoeggi.openshiftdb.api.response.ToolsVersionApi
 import io.github.hoeggi.openshiftdb.eventlog.DatabaseEvent
@@ -16,15 +19,23 @@ import io.github.hoeggi.openshiftdb.postgres.Postgres
 import io.github.hoeggi.openshiftdb.server.Path
 import io.github.hoeggi.openshiftdb.server.database
 import io.github.hoeggi.openshiftdb.server.portForward
+import io.github.hoeggi.openshiftdb.syslog.LoggingEvent
+import io.github.hoeggi.openshiftdb.syslog.SyslogQuerier
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.cio.websocket.Frame
 import io.ktor.request.path
 import io.ktor.request.receiveOrNull
 import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
+import io.ktor.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.encodeToByteArray
 
 internal fun Tools(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
     val awaitAll = awaitAll(
@@ -34,6 +45,41 @@ internal fun Tools(): suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> U
     val psql = awaitAll[0]
     val pgDump = awaitAll[1]
     call.respond(ApiResponse(ToolsVersionApi(psql.first, pgDump.first), psql.second + pgDump.second))
+}
+
+internal object SyslogHandler {
+    private val syslog = SyslogQuerier
+
+    val log: suspend DefaultWebSocketServerSession.() -> Unit = {
+        syslog.events()
+            .map {
+                it.map { it.toLogEvent() }
+            }.collect {
+                outgoing.send(Frame.Binary(true, Cbor.encodeToByteArray(it)))
+            }
+    }
+
+    private fun LoggingEvent.toLogEvent() = LogEvent(
+        timestamp = event.timestmp,
+        message = event.formatted_message,
+        loggerName = event.logger_name,
+        logLevel = event.level_string,
+        thread_name = event.thread_name,
+        eventId = event.event_id,
+        caller = "${event.caller_filename}:${event.caller_line}",
+        properties = properties.map {
+            LogProperty(
+                key = it.mapped_key,
+                value = it.mapped_value
+            )
+        },
+        exception = exception.map {
+            LogException(
+                index = it.i,
+                line = it.trace_line
+            )
+        }
+    )
 }
 
 internal object TransactionLogger {

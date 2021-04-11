@@ -19,10 +19,10 @@ import io.github.hoeggi.openshiftdb.viewmodel.models.PortForwardTarget
 import io.github.hoeggi.openshiftdb.viewmodel.models.Service
 import io.github.hoeggi.openshiftdb.viewmodel.models.toContext
 import io.github.hoeggi.openshiftdb.viewmodel.models.toService
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -199,11 +199,11 @@ class OcViewModel internal constructor(port: Int, errorViewer: ErrorViewer) :
         _portForward.value = listOf()
     }
 
-    private suspend inline fun CoroutineScope.trackPortforwardMessages(
+    private suspend inline fun trackPortforwardMessages(
         message: io.github.hoeggi.openshiftdb.api.response.PortForwardMessage,
         eventTracker: PortForwardEventTracker,
         crossinline action: suspend (value: io.github.hoeggi.openshiftdb.api.response.PortForwardMessage) -> Unit,
-    ) {
+    ) = coroutineScope {
         eventTracker.trackMessage(message)
         if (message is io.github.hoeggi.openshiftdb.api.response.PortForwardMessage.Start) {
             sendPortForwardEvent(eventTracker)

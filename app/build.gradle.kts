@@ -6,11 +6,11 @@ plugins {
 }
 
 dependencies {
-    testImplementation(kotlin("test-junit"))
+//    testImplementation(kotlin("test-junit"))
     implementation(compose.desktop.currentOs)
     implementation(kotlin("stdlib-jdk8"))
-    implementation(project(":server"))
-    implementation(project(":ui"))
+    implementation(projects.server)
+    implementation(projects.ui)
     implementation(Dependencies.logback)
     implementation(Dependencies.flatlaf)
     compileOnly(Dependencies.slf4j_api)

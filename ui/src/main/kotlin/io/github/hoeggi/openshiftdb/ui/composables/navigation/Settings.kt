@@ -33,6 +33,7 @@ import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_DARK
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_LABEL
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.THEME_LIGHT
 import io.github.hoeggi.openshiftdb.settings.ExportFormat
+import io.github.hoeggi.openshiftdb.settings.FileChooser
 import io.github.hoeggi.openshiftdb.settings.LogLevels
 import io.github.hoeggi.openshiftdb.settings.SettingsProvider
 import io.github.hoeggi.openshiftdb.settings.Theme
@@ -163,6 +164,51 @@ internal fun ThemeChooser(coroutineScope: CoroutineScope) {
                 modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically),
                 style = MaterialTheme.typography.body2,
                 text = MessageProvider.message(THEME_LIGHT)
+            )
+        }
+    }
+}
+
+@Composable
+internal fun FileChooser(coroutineScope: CoroutineScope) {
+    val settings = SettingsProvider()
+    val chooser by settings.fileChooser.collectAsState(coroutineScope.coroutineContext)
+
+    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+        Text(
+            modifier = Modifier.padding(4.dp),
+            text = "FileChooser"
+        )
+        Row(
+            modifier = Modifier.clickable {
+                settings.updateFileChooser(FileChooser.Custom)
+            }
+        ) {
+            RadioButton(
+                modifier = Modifier.padding(4.dp),
+                selected = chooser == FileChooser.Custom,
+                onClick = null,
+            )
+            Text(
+                modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically),
+                style = MaterialTheme.typography.body2,
+                text = "Custom"
+            )
+        }
+        Row(
+            modifier = Modifier.clickable {
+                settings.updateFileChooser(FileChooser.System)
+            }
+        ) {
+            RadioButton(
+                modifier = Modifier.padding(4.dp),
+                selected = chooser == FileChooser.System,
+                onClick = null,
+            )
+            Text(
+                modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically),
+                style = MaterialTheme.typography.body2,
+                text = "System"
             )
         }
     }

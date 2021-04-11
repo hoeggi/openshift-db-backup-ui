@@ -1,0 +1,22 @@
+plugins {
+    kotlin("jvm")
+    id("com.squareup.sqldelight") version Versions.sqldelight
+}
+
+sqldelight {
+    database("SyslogDb") {
+        schemaOutputDirectory = file("src/main/sqldelight-log/databases")
+        packageName = "io.github.hoeggi.openshiftdb.syslog"
+    }
+}
+
+dependencies {
+    implementation(kotlin("stdlib-jdk8"))
+    testImplementation(kotlin("test-junit"))
+    implementation(Dependencies.Kotlin.coroutines)
+    implementation(Dependencies.sqldelight_sqlite)
+    implementation(Dependencies.sqldelight_coroutines)
+    implementation(Dependencies.logback)
+    implementation(Dependencies.sqlite)
+
+}

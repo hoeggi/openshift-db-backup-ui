@@ -1,7 +1,6 @@
 package io.github.hoeggi.openshiftdb.settings
 
 import io.github.hoeggi.openshiftdb.BuildConfig
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
@@ -35,11 +34,13 @@ internal fun Setting.update(
     theme: Theme? = null,
     format: ExportFormat? = null,
     logLevel: LogLevel? = null,
+    fileChooser: FileChooser? = null,
 ): Setting {
     return copy(
         theme = theme ?: this.theme,
         format = format ?: this.format,
-        logLevel = logLevel ?: this.logLevel
+        logLevel = logLevel ?: this.logLevel,
+        fileChooser = fileChooser ?: this.fileChooser
     ).also {
         it.save()
     }
@@ -70,19 +71,15 @@ val LogLevels = listOf(
 @Serializable
 sealed class LogLevel(val name: String, val predicate: (CharSequence) -> Boolean) {
     @Serializable
-    @SerialName("Debug")
     object Debug : LogLevel("Debug", { true })
 
     @Serializable
-    @SerialName("Info")
     object Info : LogLevel("Info", { !it.startsWith("DEBUG") && Debug.predicate(it) })
 
     @Serializable
-    @SerialName("Warn")
     object Warn : LogLevel("Warn", { !it.startsWith("INFO") && Info.predicate(it) && Debug.predicate(it) })
 
     @Serializable
-    @SerialName("Error")
     object Error :
         LogLevel("Error", { !it.startsWith("WARN") && Warn.predicate(it) && Info.predicate(it) && Debug.predicate(it) })
 }
@@ -90,23 +87,28 @@ sealed class LogLevel(val name: String, val predicate: (CharSequence) -> Boolean
 @Serializable
 sealed class Theme {
     @Serializable
-    @SerialName("dark")
     object Dark : Theme()
 
     @Serializable
-    @SerialName("light")
     object Light : Theme()
 }
 
 @Serializable
 sealed class ExportFormat(val format: String) {
     @Serializable
-    @SerialName("custom")
     object Custom : ExportFormat("custom")
 
     @Serializable
-    @SerialName("plain")
     object Plain : ExportFormat("plain")
+}
+
+@Serializable
+sealed class FileChooser {
+    @Serializable
+    object Custom : FileChooser()
+
+    @Serializable
+    object System : FileChooser()
 }
 
 @Serializable
@@ -114,4 +116,5 @@ data class Setting(
     val theme: Theme = Theme.Dark,
     val format: ExportFormat = ExportFormat.Custom,
     val logLevel: LogLevel = LogLevel.Debug,
+    val fileChooser: FileChooser = FileChooser.Custom,
 )

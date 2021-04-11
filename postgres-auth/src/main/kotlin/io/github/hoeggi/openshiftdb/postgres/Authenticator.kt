@@ -11,7 +11,7 @@ class Authenticator {
     private fun authenticationCommand(username: String) =
         listOf("psql", "-h", "localhost", "-p", "5432", "-U", username, "-c", "\\q")
 
-    val logger = LoggerFactory.getLogger(Authenticator::class.java)
+    private val logger = LoggerFactory.getLogger(Authenticator::class.java)
 
     fun validateCredentials(): suspend ApplicationCall.(UserPasswordCredential) -> Principal? =
         { credentials ->

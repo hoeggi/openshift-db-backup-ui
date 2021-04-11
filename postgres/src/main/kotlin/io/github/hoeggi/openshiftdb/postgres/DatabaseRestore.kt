@@ -15,7 +15,7 @@ class DatabaseRestore(
     private val onError: suspend (Int, Exception?) -> Unit,
 ) {
 
-    val logger = LoggerFactory.getLogger(DatabaseDownloaderPlain::class.java)
+    private val logger = LoggerFactory.getLogger(DatabaseDownloaderPlain::class.java)
 
     suspend fun restore() = withContext(Dispatchers.IO) {
         try {

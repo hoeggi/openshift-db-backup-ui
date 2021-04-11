@@ -1,6 +1,5 @@
 package io.github.hoeggi.openshiftdb.ui.composables.restore
 
-import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import io.github.hoeggi.openshiftdb.ui.composables.pathchooser.FileChooser
 @Composable
 internal fun BackupPicker() {
     val viewModel = ViewModelProvider.current.postgresViewModel
-    val window = LocalAppWindow.current.window
 
     val path by viewModel.collectAsState(viewModel.restorePath)
     val restoreState by viewModel.collectAsState(viewModel.restoreState)

@@ -24,6 +24,9 @@ interface Settings {
 
     val exportFormat: StateFlow<ExportFormat>
     fun updateExportFormat(exportFormat: ExportFormat)
+
+    val fileChooser: StateFlow<FileChooser>
+    fun updateFileChooser(fileChooser: FileChooser)
 }
 
 private object SettingsHolder : Settings {
@@ -63,6 +66,15 @@ private object SettingsHolder : Settings {
         _exportFormat.value = exportFormat
         coroutineScope.launch {
             settings = settings.update(format = _exportFormat.value)
+        }
+    }
+
+    private val _fileChooser: MutableStateFlow<FileChooser> = MutableStateFlow(settings.fileChooser)
+    override val fileChooser = _fileChooser.asStateFlow()
+    override fun updateFileChooser(fileChooser: FileChooser) {
+        _fileChooser.value = fileChooser
+        coroutineScope.launch {
+            settings = settings.update(fileChooser = _fileChooser.value)
         }
     }
 }

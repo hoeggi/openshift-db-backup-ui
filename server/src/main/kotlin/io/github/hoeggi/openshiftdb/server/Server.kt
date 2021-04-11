@@ -2,7 +2,9 @@ package io.github.hoeggi.openshiftdb.server
 
 import com.codahale.metrics.jmx.JmxReporter
 import io.github.hoeggi.openshiftdb.api.response.SerializersModule
+import io.github.hoeggi.openshiftdb.eventlog.DatabaseLogProvider
 import io.github.hoeggi.openshiftdb.postgres.Authenticator
+import io.github.hoeggi.openshiftdb.server.handler.postgres.SyslogHandler
 import io.github.hoeggi.openshiftdb.server.handler.postgres.TransactionLogger
 import io.github.hoeggi.openshiftdb.server.routes.default
 import io.github.hoeggi.openshiftdb.server.routes.oc
@@ -49,6 +51,7 @@ class Server(private val listeningPort: Int) : Runnable {
     private val logging = LoggerFactory.getLogger(Server::class.java)
 
     override fun run() {
+        DatabaseLogProvider
         logging.info("port used: $listeningPort}")
         embeddedServer(
             Netty,
@@ -86,6 +89,7 @@ class Server(private val listeningPort: Int) : Runnable {
                         post(TransactionLogger.newTransaction)
                     }
                 }
+                webSocket(Path.log(), SyslogHandler.log)
             }
         }
     }

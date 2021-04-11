@@ -61,7 +61,7 @@ internal fun EventLog() {
 }
 
 @Composable
-fun EventItems() {
+internal fun EventItems() {
     val eventsViewModel = ViewModelProvider.current.eventsViewModel
     val events by eventsViewModel.collectAsState(eventsViewModel.events)
     LazyColumn(modifier = Modifier.fillMaxWidth()) {

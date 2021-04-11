@@ -14,7 +14,7 @@ import java.io.IOException
 import java.time.LocalDateTime
 
 object Postgres {
-    val logger = LoggerFactory.getLogger(Postgres::class.java)
+    private val logger = LoggerFactory.getLogger(Postgres::class.java)
     const val DEFAULT_DB = "postgres"
 
     sealed class PostgresResult {

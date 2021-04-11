@@ -1,4 +1,5 @@
 import com.autonomousapps.DependencyAnalysisExtension
+import com.diffplug.gradle.spotless.SpotlessExtension
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 buildscript {
@@ -11,7 +12,6 @@ buildscript {
         classpath(Plugins.gradle_versions)
         classpath(Plugins.dependency_analysis)
         classpath(Plugins.module_dependency_graph)
-        classpath(Plugins.metalava)
         classpath(Plugins.spotless)
         classpath(kotlin("gradle-plugin", version = Versions.kotlin))
     }
@@ -39,7 +39,7 @@ tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
     }
 }
 
-configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+configure<SpotlessExtension> {
     kotlin {
         target("**/src/**/*.kt", "**/src/**/*.kt")
         ktlint("0.38.0").userData(mapOf("indent_size" to "4", "continuation_indent_size" to "2"))
@@ -54,7 +54,7 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     }
 }
 
-extensions.configure<DependencyAnalysisExtension> {
+configure<DependencyAnalysisExtension> {
     issues {
         all {
             onUsedTransitiveDependencies {

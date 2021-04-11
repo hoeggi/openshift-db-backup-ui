@@ -1,14 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-allprojects {
-
-}
-
 subprojects {
     group = "io.github.hoeggi"
     version = "1.0.0"
 
-    apply(plugin = "me.tylerbwong.gradle.metalava")
+//    apply(plugin = "me.tylerbwong.gradle.metalava")
 
     configurations.all {
         resolutionStrategy.eachDependency {
@@ -37,6 +33,12 @@ subprojects {
                         useVersion(Versions.okio)
                     }
                 }
+                requested.name.startsWith("sqlite-jdbc") -> {
+                    if (requested.version != Versions.sqlite) {
+                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.sqlite}")
+                        useVersion(Versions.sqlite)
+                    }
+                }
             }
         }
     }
@@ -46,10 +48,9 @@ subprojects {
         maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
         jcenter {
             content {
-                includeModule("net.rubygrapefruit", "ansi-control-sequence-util")
                 includeModule("org.jetbrains.kotlinx", "kotlinx-collections-immutable")
                 includeModule("org.jetbrains.kotlinx", "kotlinx-collections-immutable-jvm")
-                includeModule("org.jetbrains.trove4j", "trove4j")
+//                includeModule("org.jetbrains.trove4j", "trove4j")
             }
         }
         maven {
@@ -69,6 +70,7 @@ subprojects {
             "-Xuse-experimental=androidx.compose.material.ExperimentalMaterialApi",
             "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi",
             "-Xuse-experimental=androidx.compose.animation.ExperimentalAnimationApi",
+            "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi",
             "-Xinline-classes",
             "-no-reflect",
             "-P",

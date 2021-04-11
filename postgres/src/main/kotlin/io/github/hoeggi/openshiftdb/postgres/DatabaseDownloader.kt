@@ -1,14 +1,3 @@
-@file:Suppress(
-    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
-    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
-    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
-    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
-    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
-    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
-    "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext", "BlockingMethodInNonBlockingContext",
-    "BlockingMethodInNonBlockingContext"
-)
-
 package io.github.hoeggi.openshiftdb.postgres
 
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +13,7 @@ class DatabaseDownloaderPlain(
     private val onError: suspend (Int, Exception?) -> Unit,
 ) {
 
-    val logger = LoggerFactory.getLogger(DatabaseDownloaderPlain::class.java)
+    private val logger = LoggerFactory.getLogger(DatabaseDownloaderPlain::class.java)
 
     suspend fun download() = withContext(Dispatchers.IO) {
         try {
@@ -73,7 +62,7 @@ class DatabaseDownloaderCustom(
     private val onError: suspend (Int, String?, Exception?) -> Unit,
 ) {
 
-    val logger = LoggerFactory.getLogger(DatabaseDownloaderPlain::class.java)
+    private val logger = LoggerFactory.getLogger(DatabaseDownloaderPlain::class.java)
 
     suspend fun download() = withContext(Dispatchers.IO) {
         try {

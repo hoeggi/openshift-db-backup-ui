@@ -76,7 +76,7 @@ internal fun Theme(
 }
 
 @Composable
-fun BaseView(
+internal fun BaseView(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     content: @Composable BoxScope.() -> Unit,
 ) {

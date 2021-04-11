@@ -31,5 +31,6 @@ fun Routes.info() = copy(path = "$path/info")
 fun Routes.command() = copy(path = "$path/command")
 
 fun Routes.events() = copy(path = "$path/events")
+fun Routes.log() = copy(path = "$path/log")
 
 fun Routes.asPathSegment() = if (path.startsWith("/")) path.substring(1) else path

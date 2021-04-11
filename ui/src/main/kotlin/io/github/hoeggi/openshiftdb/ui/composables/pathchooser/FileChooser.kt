@@ -61,7 +61,7 @@ internal class FileChooser(
     private val selectedPath = mutableStateOf<File?>(null)
     private val showHiddenFiles = mutableStateOf(false)
 
-    fun show(onFileChoosen: (File) -> Unit) = Window(
+    fun show(onFileChosen: (File) -> Unit) = Window(
         title = "Choose a File",
         size = IntSize(600, 400),
         undecorated = false
@@ -77,12 +77,12 @@ internal class FileChooser(
         }
 
         val list: List<File> = (
-            openedDir.listFiles()?.filter { file ->
-                filter.all { it(file) }
-            }?.toMutableList() ?: mutableListOf()
-            ).apply {
-            sortWith(fileSorter)
-        }
+            openedDir.listFiles()
+                ?.filter { file ->
+                    filter.all { it(file) }
+                }?.toMutableList() ?: mutableListOf()
+            )
+            .apply { sortWith(fileSorter) }
 
         val tree = mutableListOf<File>().apply {
             var current: File? = openedDir
@@ -94,7 +94,7 @@ internal class FileChooser(
 
         val window = LocalAppWindow.current
         val fileChosen = { file: File ->
-            onFileChoosen(file)
+            onFileChosen(file)
             window.close()
         }
         Theme {
@@ -143,7 +143,7 @@ internal class FileChooser(
                     }
                     LazyVerticalGrid(
                         cells = GridCells.Fixed(3),
-                        modifier = Modifier.weight(2f, true).padding(4.dp)
+                        modifier = Modifier.weight(1f, true).padding(4.dp)
                     ) {
                         items(list) {
                             val icon = when (it.isDirectory) {
@@ -159,7 +159,6 @@ internal class FileChooser(
                                     .combinedClickable(
                                         onDoubleClick = {
                                             if (it.isDirectory) {
-                                                println("${it.absolutePath}")
                                                 setCurrent(it)
                                             } else {
                                                 fileChosen(it)

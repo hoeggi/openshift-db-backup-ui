@@ -106,7 +106,7 @@ internal fun SecretsChooser(modifier: Modifier = Modifier) {
                                                 style = MaterialTheme.typography.body2
                                             )
                                             Text(
-                                                text = "${it.value}",
+                                                text = it.value,
                                                 style = MaterialTheme.typography.caption
                                             )
                                         }

@@ -1,0 +1,60 @@
+import java.time.LocalDateTime;
+import ch.qos.logback.classic.Level;
+
+CREATE TABLE logging_event (
+    timestmp            INTEGER NOT NULL,
+    formatted_message   TEXT NOT NULL,
+    logger_name         TEXT NOT NULL,
+    level_string        TEXT NOT NULL,
+    thread_name         TEXT,
+    reference_flag      INTEGER,
+    arg0                TEXT,
+    arg1                TEXT,
+    arg2                TEXT,
+    arg3                TEXT,
+    caller_filename     TEXT NOT NULL,
+    caller_class        TEXT NOT NULL,
+    caller_method       TEXT NOT NULL,
+    caller_line         TEXT NOT NULL,
+    event_id            INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
+);
+
+CREATE TABLE logging_event_property (
+    event_id	      INTEGER NOT NULL,
+    mapped_key        TEXT NOT NULL,
+    mapped_value      TEXT,
+    PRIMARY KEY(event_id, mapped_key),
+    FOREIGN KEY (event_id) REFERENCES logging_event(event_id)
+);
+
+CREATE TABLE logging_event_exception (
+    event_id         INTEGER NOT NULL,
+    i                INTEGER NOT NULL,
+    trace_line       TEXT NOT NULL,
+    PRIMARY KEY(event_id, i),
+    FOREIGN KEY (event_id) REFERENCES logging_event(event_id)
+);
+
+insertEvent:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line)
+VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+insertProperty:
+INSERT INTO logging_event_property (event_id, mapped_key, mapped_value)
+VALUES (?, ?, ?);
+
+insertException:
+INSERT INTO logging_event_exception (event_id, i, trace_line)
+VALUES (?, ?, ?);
+
+selectLastInserted:
+SELECT last_insert_rowid();
+
+logEvents:
+SELECT * FROM logging_event;
+
+logProperties:
+SELECT * FROM logging_event_property WHERE event_id = ?;
+
+logException:
+SELECT * FROM logging_event_exception WHERE event_id = ?;

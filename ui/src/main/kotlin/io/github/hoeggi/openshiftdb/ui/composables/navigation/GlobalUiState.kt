@@ -1,8 +1,6 @@
 package io.github.hoeggi.openshiftdb.ui.composables.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -65,33 +63,19 @@ internal object NavigationProvider : Provider<Navigator>() {
     override val instance: Navigator by lazy { GlobalUiState }
 }
 
-internal object LogLinesProvider : Provider<LogLines>() {
-    override val instance: LogLines by lazy { GlobalUiState }
-}
-
 internal interface MenuControl : Navigator {
     val refreshTrigger: SharedFlow<Unit>
     fun refresh(): Job
 }
 
-internal interface LogLines {
-    val syslog: StateFlow<List<AnnotatedString>>
-    fun updateSyslog(log: List<AnnotatedString>)
-}
-
-private object GlobalUiState : CustomErrorViewer, MenuControl, LogLines {
+private object GlobalUiState : CustomErrorViewer, MenuControl {
 
     private val coroutineScope = MainScope()
-    private val _refreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow()
+
+    val _refreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow()
     override val refreshTrigger = _refreshTrigger.asSharedFlow()
     override fun refresh() = coroutineScope.launch {
         _refreshTrigger.emit(Unit)
-    }
-
-    private val _syslog = MutableStateFlow(listOf(AnnotatedString("", SpanStyle())))
-    override val syslog = _syslog.asStateFlow()
-    override fun updateSyslog(log: List<AnnotatedString>) {
-        _syslog.value = log
     }
 
     private val _screen: MutableStateFlow<Screen> =

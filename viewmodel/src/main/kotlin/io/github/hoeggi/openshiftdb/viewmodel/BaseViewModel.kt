@@ -2,6 +2,7 @@ package io.github.hoeggi.openshiftdb.viewmodel
 
 import io.github.hoeggi.openshiftdb.api.Api
 import io.github.hoeggi.openshiftdb.api.EventsApi
+import io.github.hoeggi.openshiftdb.api.LoggingApi
 import io.github.hoeggi.openshiftdb.api.OcApi
 import io.github.hoeggi.openshiftdb.api.PostgresApi
 import io.github.hoeggi.openshiftdb.errorhandler.CoroutineExceptionHandler
@@ -16,10 +17,12 @@ data class ViewModelFactory(
     private val _ocViewModel: Lazy<OcViewModel>,
     private val _postgresViewModel: Lazy<PostgresViewModel>,
     private val _eventsViewModel: Lazy<EventsViewModel>,
+    private val _syslogViewModel: Lazy<SyslogViewModel>,
 ) {
     val ocViewModel by _ocViewModel
     val postgresViewModel by _postgresViewModel
     val eventsViewModel by _eventsViewModel
+    val syslogViewModel by _syslogViewModel
 }
 
 fun viewModels(
@@ -29,6 +32,7 @@ fun viewModels(
     _ocViewModel = lazy { OcViewModel(port, errorViewer) },
     _postgresViewModel = lazy { PostgresViewModel(port, errorViewer) },
     _eventsViewModel = lazy { EventsViewModel(port, errorViewer) },
+    _syslogViewModel = lazy { SyslogViewModel(port, errorViewer) },
 )
 
 abstract class BaseViewModel(port: Int, private val errorViewer: ErrorViewer) {
@@ -40,6 +44,9 @@ abstract class BaseViewModel(port: Int, private val errorViewer: ErrorViewer) {
     internal val postgresApi: PostgresApi
         get() = api
     internal val eventsApi: EventsApi
+        get() = api
+
+    internal val loggingApi: LoggingApi
         get() = api
 
     private val scope = CoroutineScope(Dispatchers.IO + CoroutineExceptionHandler(errorViewer))

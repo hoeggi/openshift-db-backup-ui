@@ -16,9 +16,9 @@ private fun port(): Int {
 
 private val logger = LoggerFactory.getLogger(UI::class.java)
 fun main() {
+
     logger.info("initializing")
     val port = port()
-    Logger.start()
     Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler())
     UIManager.setLookAndFeel(FlatDarculaLaf())
     logger.info("starting server")
@@ -30,7 +30,6 @@ fun main() {
             .forEach {
                 it.destroy()
             }
-        Logger.stop()
     }
 }
 

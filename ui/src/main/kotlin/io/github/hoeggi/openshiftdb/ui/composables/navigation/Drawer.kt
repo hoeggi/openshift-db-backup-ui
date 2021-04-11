@@ -79,6 +79,10 @@ internal fun BoxScope.Drawer(
                     Divider(
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
+                    FileChooser(coroutineScope)
+                    Divider(
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
                     LogLevelChooser(coroutineScope)
                     Divider(
                         modifier = Modifier.padding(vertical = 8.dp)

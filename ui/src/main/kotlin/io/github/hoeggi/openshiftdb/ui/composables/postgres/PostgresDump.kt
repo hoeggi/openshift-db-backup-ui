@@ -64,7 +64,7 @@ internal fun PostgresDump() {
             }
             is DatabaseDownloadMessage.ErrorMessage -> {
                 Text(
-                    text = "${resultState.message}",
+                    text = resultState.message,
                     style = MaterialTheme.typography.body2,
                     modifier = Modifier.padding(10.dp)
                 )

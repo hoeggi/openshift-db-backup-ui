@@ -35,7 +35,7 @@ class EventsViewModel(port: Int, errorViewer: ErrorViewer) :
             .getOrDefault(listOf())
             .map { forward ->
                 val portForwardUiEvent = forward.toUiEvent()
-                if (forward.port == Companion.forwardablePort) {
+                if (forward.port == forwardablePort) {
                     val map = databaseEvents
                         .getOrDefault(listOf())
                         .filter {

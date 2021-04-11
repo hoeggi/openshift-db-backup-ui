@@ -7,10 +7,11 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
     implementation(project(":oc"))
-    implementation(project(":api-models"))
+    implementation(projects.api.apiModels)
     implementation(project(":postgres"))
     implementation(project(":postgres-auth"))
-    implementation(project(":transaction-log"))
+    implementation(projects.log.transactionLog)
+    implementation(projects.log.sysLog)
     implementation(project(":routes"))
 
     implementation(Dependencies.metrics_jmx)
@@ -23,6 +24,6 @@ dependencies {
     implementation(Dependencies.ktor.serialization)
     implementation(Dependencies.ktor.metrics)
     implementation(Dependencies.ktor.metrics_micrometer)
-
+    implementation(Dependencies.Kotlin.serialization_cbor)
     compileOnly(Dependencies.slf4j_api)
 }

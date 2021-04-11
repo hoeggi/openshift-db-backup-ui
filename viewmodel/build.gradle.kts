@@ -5,9 +5,9 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
-    api(project(":errorhandler"))
-    implementation(project(":api"))
-    api(project(":api-models"))
+    api(projects.errorhandler)
+    api(projects.api.apiModels)
+    implementation(projects.api.api)
     implementation(Dependencies.Kotlin.coroutines)
     implementation(Dependencies.guava)
     compileOnly(Dependencies.slf4j_api)

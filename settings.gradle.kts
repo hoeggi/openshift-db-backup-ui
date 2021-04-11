@@ -1,3 +1,5 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -14,14 +16,15 @@ include(
     ":server",
     ":postgres",
     "postgres-auth",
-    ":api",
+    ":api:api",
+    ":api:api-models",
     ":viewmodel",
-    ":api-models",
     ":ui",
     ":i18n",
     ":errorhandler",
     ":settings",
-    ":transaction-log",
-    ":build-config"
+    ":log:transaction-log",
+    ":log:sys-log",
+    ":build-config",
+    ":routes"
 )
-include("routes")
