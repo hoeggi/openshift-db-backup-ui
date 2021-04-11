@@ -16,9 +16,9 @@
     <appender name="jdbcAppender" class="io.github.hoeggi.openshiftdb.syslog.SqlDelightAppender" />
 
     <Logger name="ktor" level="info"/>
-    <Logger name="ktor.application" level="info"/>
+<!--    <Logger name="ktor.application" level="info"/>-->
     <Logger name="io.netty" level="info"/>
-    <Logger name="ktor.calls" level="debug"/>
+<!--    <Logger name="ktor.calls" level="debug"/>-->
 
 
     <root level="debug">

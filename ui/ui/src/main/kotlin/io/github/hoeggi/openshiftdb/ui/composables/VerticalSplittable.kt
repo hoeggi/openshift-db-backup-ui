@@ -138,6 +138,5 @@ internal fun VerticalSplitter(
             .width(1.dp)
             .fillMaxHeight()
             .background(color.copy(alpha = alpha))
-//            .graphicsLayer(alpha = alpha)
     )
 }

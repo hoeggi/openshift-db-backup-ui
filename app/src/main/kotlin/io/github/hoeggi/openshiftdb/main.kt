@@ -14,7 +14,7 @@ private fun port(): Int {
     ServerSocket(0).use { socket -> return socket.localPort }
 }
 
-private val logger = LoggerFactory.getLogger(UI::class.java)
+private val logger = LoggerFactory.getLogger(Main::class.java)
 fun main() {
 
     logger.info("initializing")

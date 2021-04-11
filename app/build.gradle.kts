@@ -10,7 +10,7 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(kotlin("stdlib-jdk8"))
     implementation(projects.server)
-    implementation(projects.ui)
+    implementation(projects.ui.ui)
     implementation(Dependencies.logback)
     implementation(Dependencies.flatlaf)
     compileOnly(Dependencies.slf4j_api)

@@ -12,7 +12,6 @@ sqldelight {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    testImplementation(kotlin("test-junit"))
     implementation(projects.buildConfig)
     implementation(Dependencies.Kotlin.coroutines)
     implementation(Dependencies.sqldelight_sqlite)

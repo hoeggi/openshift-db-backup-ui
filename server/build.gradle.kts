@@ -6,13 +6,13 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test-junit"))
-    implementation(project(":oc"))
+    implementation(projects.process.oc)
     implementation(projects.api.apiModels)
-    implementation(project(":postgres"))
-    implementation(project(":postgres-auth"))
+    implementation(projects.process.postgres)
+    implementation(projects.postgresAuth)
     implementation(projects.log.transactionLog)
     implementation(projects.log.sysLog)
-    implementation(project(":routes"))
+    implementation(projects.routes)
 
     implementation(Dependencies.metrics_jmx)
     implementation(Dependencies.micrometer_registry_prometheus)

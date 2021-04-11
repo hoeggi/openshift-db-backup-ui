@@ -11,7 +11,6 @@ object Versions {
     const val guava = "30.1.1-jre"
     const val logback = "1.2.3"
     const val compose = "0.4.0-build180"
-    const val ansi_sequence = "0.2"
     const val flatlaf = "1.1.2"
     const val sqldelight = "1.4.4"
     const val buildconfig = "3.0.0"
@@ -47,7 +46,6 @@ object Dependencies {
         const val metrics_micrometer = "io.ktor:ktor-metrics-micrometer:${Versions.ktor}"
     }
 
-    const val ansi_sequence = "net.rubygrapefruit:ansi-control-sequence-util:${Versions.ansi_sequence}"
     const val logback = "ch.qos.logback:logback-classic:${Versions.logback}"
     const val guava = "com.google.guava:guava:${Versions.guava}"
     const val slf4j_api = "org.slf4j:slf4j-api:${Versions.slf4j}"

@@ -23,6 +23,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -120,8 +121,8 @@ internal fun BaseView(
         Box {
             when (loginState) {
                 LoginState.LOGGEDIN -> {
-                    ocViewModel.update()
-                    postgresViewModel.update()
+                    remember { ocViewModel.update() }
+                    remember { postgresViewModel.update() }
                     Box(modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 48.dp)) {
                         content()
                     }

@@ -115,7 +115,6 @@ class Server(private val listeningPort: Int) : Runnable {
         }
 
         install(CallLogging) {
-            logger = LoggerFactory.getLogger("ktor.calls")
             level = Level.INFO
             callIdMdc(HttpHeaders.XRequestId)
             mdc("request") { call ->

@@ -12,11 +12,9 @@ sqldelight {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    testImplementation(kotlin("test-junit"))
     implementation(Dependencies.Kotlin.coroutines)
     implementation(Dependencies.sqldelight_sqlite)
     implementation(Dependencies.sqldelight_coroutines)
     implementation(Dependencies.logback)
     implementation(Dependencies.sqlite)
-
 }
