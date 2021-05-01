@@ -1,16 +1,16 @@
 object Versions {
     const val kotlin = "1.4.32"
     const val okio = "2.10.0"
-    const val ktor = "1.5.3"
+    const val ktor = "1.5.4"
     const val kotlinx_coroutines = "1.4.3"
     const val kotlinx_serialization = "1.1.0"
-    const val metrics_jmx = "4.1.19"
-    const val micrometer_registry_prometheus = "1.6.5"
+    const val metrics_jmx = "4.1.21"
+    const val micrometer_registry_prometheus = "1.6.6"
     const val okhttp = "4.9.1"
     const val slf4j = "1.7.30"
     const val guava = "30.1.1-jre"
     const val logback = "1.2.3"
-    const val compose = "0.4.0-build180"
+    const val compose = "0.4.0-build185"
     const val flatlaf = "1.1.2"
     const val sqldelight = "1.4.4"
     const val buildconfig = "3.0.0"
@@ -20,11 +20,11 @@ object Versions {
 object Plugins {
     const val compose = "org.jetbrains.compose:compose-gradle-plugin:${Versions.compose}"
     const val gradle_versions = "com.github.ben-manes:gradle-versions-plugin:0.38.0"
-    const val dependency_analysis = "com.autonomousapps:dependency-analysis-gradle-plugin:0.71.0"
+    const val dependency_analysis = "com.autonomousapps:dependency-analysis-gradle-plugin:0.72.0"
     const val module_dependency_graph = "com.savvasdalkitsis:module-dependency-graph:0.9"
 //    const val metalava = "me.tylerbwong.gradle:metalava-gradle:0.1.6"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
-    const val spotless = "com.diffplug.spotless:spotless-plugin-gradle:5.12.0"
+    const val spotless = "com.diffplug.spotless:spotless-plugin-gradle:5.12.4"
 }
 
 object Dependencies {
@@ -78,7 +78,7 @@ object TransitivDependencies {
         "org.jetbrains.compose.animation:animation-core-desktop",
         "org.jetbrains.compose.animation:animation-desktop",
         "org.jetbrains.compose.foundation:foundation-desktop",
-//        "org.jetbrains.compose.foundation:foundation-layout-desktop",
+        "org.jetbrains.compose.foundation:foundation-layout-desktop",
         "org.jetbrains.compose.ui:ui-desktop",
         "org.jetbrains.compose.ui:ui-geometry-desktop",
         "org.jetbrains.compose.ui:ui-graphics-desktop",
@@ -87,8 +87,8 @@ object TransitivDependencies {
         "org.jetbrains.compose.desktop:desktop-jvm",
         "org.jetbrains.compose.material:material-desktop",
         "org.jetbrains.compose.material:material-icons-core-desktop",
-        "org.jetbrains.compose.material:material-icons-extended-desktop"
-//        "org.jetbrains.compose.runtime:runtime-desktop"
+        "org.jetbrains.compose.material:material-icons-extended-desktop",
+        "org.jetbrains.compose.runtime:runtime-desktop"
     )
     val dependencies = arrayOf(
         *kotlinx,

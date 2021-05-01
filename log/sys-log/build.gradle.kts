@@ -5,7 +5,6 @@ plugins {
 
 sqldelight {
     database("SyslogDb") {
-        schemaOutputDirectory = file("src/main/sqldelight-log/databases")
         packageName = "io.github.hoeggi.openshiftdb.syslog"
     }
 }

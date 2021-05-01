@@ -4,7 +4,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
@@ -16,13 +15,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.errorhandler.ErrorViewer
-import io.github.hoeggi.openshiftdb.errorhandler.ExceptionHandler
 import io.github.hoeggi.openshiftdb.ui.MenuBar
+import io.github.hoeggi.openshiftdb.ui.composables.BaseView
 import io.github.hoeggi.openshiftdb.ui.composables.PanelState
 import io.github.hoeggi.openshiftdb.ui.composables.SecretsChooser
 import io.github.hoeggi.openshiftdb.ui.composables.VerticalSplittable
@@ -34,19 +32,13 @@ import io.github.hoeggi.openshiftdb.ui.composables.navigation.Screen
 import io.github.hoeggi.openshiftdb.ui.composables.oc.OcPane
 import io.github.hoeggi.openshiftdb.ui.composables.postgres.PostgresPane
 import io.github.hoeggi.openshiftdb.ui.composables.restore.RestoreView
-import io.github.hoeggi.openshiftdb.ui.theme.BaseView
 import io.github.hoeggi.openshiftdb.ui.theme.Theme
-import io.github.hoeggi.openshiftdb.viewmodel.ViewModelFactory
 import io.github.hoeggi.openshiftdb.viewmodel.viewModels
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 const val APP_NAME = "Openshift DB Backup GUI"
-
-internal val ViewModelProvider = staticCompositionLocalOf<ViewModelFactory> {
-    error("unexpected call to ViewModelProvider")
-}
 
 class UI {
     private val logger = LoggerFactory.getLogger(UI::class.java)
@@ -60,14 +52,12 @@ class UI {
             port,
             errorViewer
         )
-//        var window
         Window(
             title = APP_NAME,
             undecorated = false,
             size = IntSize(1280, 1024),
             events = WindowEvents(
                 onClose = {
-                    AppManager.windows.drop(1).forEach { it.close() }
                     onClose()
                 }
             ),
@@ -96,7 +86,8 @@ class UI {
 
     private fun setExceptionHandler(errorViewer: ErrorViewer) {
         val defaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(errorViewer, defaultUncaughtExceptionHandler))
+        val exceptionHandler = UIExceptionHandler(errorViewer, defaultUncaughtExceptionHandler)
+        Thread.setDefaultUncaughtExceptionHandler(exceptionHandler)
     }
 }
 
@@ -132,4 +123,14 @@ private fun MainScreen() {
         PostgresPane()
     }
     SecretsChooser()
+}
+
+private class UIExceptionHandler(
+    private val errorViewer: ErrorViewer,
+    private val defaultExceptionHander: Thread.UncaughtExceptionHandler,
+) : Thread.UncaughtExceptionHandler {
+    override fun uncaughtException(t: Thread?, e: Throwable?) {
+        errorViewer.showError(errorViewer.error(t, e))
+        defaultExceptionHander.uncaughtException(t, e)
+    }
 }

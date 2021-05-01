@@ -21,10 +21,11 @@ apply(plugin = "com.diffplug.spotless")
 apply(plugin = "com.savvasdalkitsis.module-dependency-graph")
 apply(plugin = "com.autonomousapps.dependency-analysis")
 apply(plugin = "com.github.ben-manes.versions")
+
 // apply(plugin = "all-projects")
-// apply {
+//apply {
 //    from("https://raw.githubusercontent.com/JakeWharton/SdkSearch/master/gradle/projectDependencyGraph.gradle")
-// }
+//}
 
 fun isNonStable(version: String): Boolean {
     val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }

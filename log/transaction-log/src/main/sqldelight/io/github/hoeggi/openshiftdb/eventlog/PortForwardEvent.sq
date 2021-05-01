@@ -26,7 +26,7 @@ selectAll:
 SELECT * FROM PortForwardEvent ORDER BY startTime ASC;
 
 selectOpen:
-SELECT * FROM PortForwardEvent WHERE endTime = <> ORDER BY startTime ASC;
+SELECT * FROM PortForwardEvent WHERE endTime IS NULL OR endTime = '' ORDER BY startTime ASC;
 
 closeAllOpen:
-UPDATE PortForwardEvent SET endTime = :now, result = "Error" WHERE endTime IS NULL;
+UPDATE PortForwardEvent SET endTime = :now, result = "Error" WHERE endTime IS NULL OR endTime = '';

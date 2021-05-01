@@ -14,6 +14,7 @@ dependencies {
     implementation(Dependencies.logback)
     implementation(Dependencies.flatlaf)
     compileOnly(Dependencies.slf4j_api)
+    implementation("io.fabric8:openshift-client:5.3.1")
 }
 
 

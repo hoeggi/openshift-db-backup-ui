@@ -129,13 +129,8 @@ internal class SqlDelightAppender : UnsynchronizedAppenderBase<ILoggingEvent>() 
 
     private fun mergePropertyMaps(event: ILoggingEvent): Map<String, String> =
         mutableMapOf<String, String>().apply {
-            val map = this
-            event.loggerContextVO.propertyMap?.run {
-                map.putAll(this)
-            }
-            event.mdcPropertyMap?.run {
-                map.putAll(this)
-            }
+            putAll(event.loggerContextVO.propertyMap ?: emptyMap())
+            putAll(event.mdcPropertyMap ?: emptyMap())
         }
 
     private fun extractFirstCaller(callerDataArray: Array<StackTraceElement?>?) =

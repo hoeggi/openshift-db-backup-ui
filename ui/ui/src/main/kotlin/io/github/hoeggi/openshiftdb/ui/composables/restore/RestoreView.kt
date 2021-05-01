@@ -35,11 +35,11 @@ import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.api.response.DatabaseRestoreMessage
 import io.github.hoeggi.openshiftdb.collectAsState
-import io.github.hoeggi.openshiftdb.outsideClickable
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.AppErrorViewer
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.MenuControlProvider
 import io.github.hoeggi.openshiftdb.ui.composables.oc.CurrentProject
 import io.github.hoeggi.openshiftdb.ui.composables.oc.PortForward
+import io.github.hoeggi.openshiftdb.ui.composables.outsideClickable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 

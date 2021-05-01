@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_EXIT
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.GLOBAL_OK
-import io.github.hoeggi.openshiftdb.outsideClickable
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.AppErrorViewer
 
 @Composable

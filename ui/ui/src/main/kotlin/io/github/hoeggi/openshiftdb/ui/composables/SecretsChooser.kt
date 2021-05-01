@@ -32,7 +32,6 @@ import io.github.hoeggi.openshiftdb.ViewModelProvider
 import io.github.hoeggi.openshiftdb.collectAsState
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider
 import io.github.hoeggi.openshiftdb.i18n.MessageProvider.SECRETS_LABEL
-import io.github.hoeggi.openshiftdb.outsideClickable
 
 @Composable
 internal fun SecretsChooser(modifier: Modifier = Modifier) {

@@ -15,6 +15,8 @@ object SettingsProvider {
 }
 
 interface Settings {
+    fun init() {}
+
     val theme: StateFlow<Theme>
     fun themeDark()
     fun themeLight()
