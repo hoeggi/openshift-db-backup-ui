@@ -1,4 +1,6 @@
 object Versions {
+
+    // const val kotlin = "1.5.0"
     const val kotlin = "1.4.32"
     const val okio = "2.10.0"
     const val ktor = "1.5.4"
@@ -12,7 +14,7 @@ object Versions {
     const val logback = "1.2.3"
     const val compose = "0.4.0-build185"
     const val flatlaf = "1.1.2"
-    const val sqldelight = "1.4.4"
+    const val sqldelight = "1.5.0"
     const val buildconfig = "3.0.0"
     const val sqlite = "3.34.0"
 }
@@ -22,7 +24,8 @@ object Plugins {
     const val gradle_versions = "com.github.ben-manes:gradle-versions-plugin:0.38.0"
     const val dependency_analysis = "com.autonomousapps:dependency-analysis-gradle-plugin:0.72.0"
     const val module_dependency_graph = "com.savvasdalkitsis:module-dependency-graph:0.9"
-//    const val metalava = "me.tylerbwong.gradle:metalava-gradle:0.1.6"
+
+    //    const val metalava = "me.tylerbwong.gradle:metalava-gradle:0.1.6"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
     const val spotless = "com.diffplug.spotless:spotless-plugin-gradle:5.12.4"
 }
@@ -32,7 +35,8 @@ object Dependencies {
         const val version = Versions.kotlin
         const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinx_coroutines}"
         const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinx_serialization}"
-        const val serialization_cbor = "org.jetbrains.kotlinx:kotlinx-serialization-cbor:${Versions.kotlinx_serialization}"
+        const val serialization_cbor =
+            "org.jetbrains.kotlinx:kotlinx-serialization-cbor:${Versions.kotlinx_serialization}"
     }
 
     object ktor {

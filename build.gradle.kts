@@ -34,7 +34,7 @@ fun isNonStable(version: String): Boolean {
     return isStable.not()
 }
 
-tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
+tasks.withType<DependencyUpdatesTask> {
     rejectVersionIf {
         isNonStable(candidate.version) && !isNonStable(currentVersion)
     }
