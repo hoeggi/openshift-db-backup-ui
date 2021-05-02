@@ -14,7 +14,6 @@ dependencies {
     implementation(Dependencies.logback)
     implementation(Dependencies.flatlaf)
     compileOnly(Dependencies.slf4j_api)
-    implementation("io.fabric8:openshift-client:5.3.1")
 }
 
 
@@ -25,7 +24,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Deb, TargetFormat.Rpm)
             packageName = rootProject.name
-            modules("java.logging", "java.naming", "java.management")
+            modules("java.logging", "java.naming", "java.management", "java.sql")
         }
     }
 }

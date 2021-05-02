@@ -1,11 +1,6 @@
 package io.github.hoeggi.openshiftdb
 
 import com.formdev.flatlaf.FlatDarculaLaf
-import io.fabric8.kubernetes.api.model.Secret
-import io.fabric8.kubernetes.api.model.SecretList
-import io.fabric8.kubernetes.client.dsl.MixedOperation
-import io.fabric8.kubernetes.client.dsl.Resource
-import io.fabric8.openshift.client.DefaultOpenShiftClient
 import io.github.hoeggi.openshiftdb.server.Server
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -29,10 +24,6 @@ fun main() {
     logger.info("starting server")
     Server(port).run()
     logger.info("starting ui")
-
-    val defaultOpenShiftClient = DefaultOpenShiftClient()
-    val secrets=defaultOpenShiftClient.services().withName("")
-        .portForward(80, 8080)
 
     UI().show(port) {
         ProcessHandle.current()

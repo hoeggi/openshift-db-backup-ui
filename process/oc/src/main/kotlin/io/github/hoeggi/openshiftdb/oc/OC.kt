@@ -97,7 +97,6 @@ object OC {
 
     suspend fun currentContext() = withContext(Dispatchers.IO) {
         val process = process(Commands.CurrentContext)
-
         val text = process.readStdout()
         val error = process.readError()
         logger.debug(error)
@@ -107,7 +106,11 @@ object OC {
     }
 
     suspend fun listContext() = withContext(Dispatchers.IO) {
-        val process = process(Commands.Config)
+        val process = ProcessBuilder(Commands.Config.commands).start().also {
+            it.onExit().thenAcceptAsync {
+                logger.debug("process onExit: ${it.exitValue()} - ${Thread.currentThread().name}")
+            }
+        }
 
         val text = process.readStdout()
         val error = process.readError()
