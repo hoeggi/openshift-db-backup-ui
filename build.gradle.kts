@@ -110,7 +110,7 @@ subprojects {
                     }
                 }
                 requested.name.startsWith("kotlinx-collections-immutable") -> {
-                    if (requested.version != Versions.slf4j) {
+                    if (requested.version != "0.3.4") {
                         println("overriding ${requested.group}:${requested.name} version from ${requested.version} to 0.3.4")
                         useVersion("0.3.4")
                     }
@@ -125,20 +125,23 @@ subprojects {
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.useIR = true
-        kotlinOptions.jvmTarget = "15"
-        kotlinOptions.freeCompilerArgs += listOf(
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi",
-            "-Xuse-experimental=androidx.compose.material.ExperimentalMaterialApi",
-            "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi",
-            "-Xuse-experimental=androidx.compose.animation.ExperimentalAnimationApi",
-            "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi",
-            "-Xinline-classes",
-            "-no-reflect",
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+        kotlinOptions {
+//            allWarningsAsErrors = true
+            useIR = true
+            jvmTarget = "15"
+            freeCompilerArgs += listOf(
+                "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi",
+                "-Xuse-experimental=androidx.compose.material.ExperimentalMaterialApi",
+                "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi",
+                "-Xuse-experimental=androidx.compose.animation.ExperimentalAnimationApi",
+                "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi",
+                "-Xinline-classes",
+                "-no-reflect",
+//                "-P",
+//                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
 //            "-Xexplicit-api=strict"
-        )
+            )
+        }
     }
 }

@@ -154,9 +154,13 @@ object OC {
     }
 
     suspend fun services(): OcResult.Services = withContext(Dispatchers.IO) {
-        val process = process(Commands.Services)
+        val process = ProcessBuilder(Commands.Services.commands).start()
+
+        val text = process.readStdout()
+        val error = process.readError()
+        logger.debug(error)
         process.let {
-            OcResult.Services(parseServices(it.text()), it.result())
+            OcResult.Services(parseServices(text), it.result())
         }
     }
 
