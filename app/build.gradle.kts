@@ -16,14 +16,14 @@ dependencies {
     compileOnly(Dependencies.slf4j_api)
 
     //https://github.com/JetBrains/compose-jb/issues/273
-    val os = System.getProperty("os.name")
-    val currentTarget = when {
-        os.equals("Mac OS X", ignoreCase = true) -> "macos"
-        os.startsWith("Win", ignoreCase = true) -> "windows"
-        os.startsWith("Linux", ignoreCase = true) -> "linux"
-        else -> error("Unknown OS name: $os")
-    }
-    runtimeOnly("org.jetbrains.skiko:skiko-jvm-runtime-${currentTarget}-x64:0.2.33")
+//    val os = System.getProperty("os.name")
+//    val currentTarget = when {
+//        os.equals("Mac OS X", ignoreCase = true) -> "macos"
+//        os.startsWith("Win", ignoreCase = true) -> "windows"
+//        os.startsWith("Linux", ignoreCase = true) -> "linux"
+//        else -> error("Unknown OS name: $os")
+//    }
+//    runtimeOnly("org.jetbrains.skiko:skiko-jvm-runtime-${currentTarget}-x64:0.2.33")
 }
 
 

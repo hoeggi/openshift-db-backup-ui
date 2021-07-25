@@ -43,13 +43,13 @@ tasks.withType<DependencyUpdatesTask> {
 configure<SpotlessExtension> {
     kotlin {
         target("**/src/**/*.kt", "**/src/**/*.kt")
-        ktlint("0.38.0").userData(mapOf("indent_size" to "4", "continuation_indent_size" to "2"))
+        ktlint("0.41.0").userData(mapOf("indent_size" to "4", "continuation_indent_size" to "2"))
         trimTrailingWhitespace()
         endWithNewline()
     }
     kotlinGradle {
         target("*.gradle.kts")
-        ktlint("0.38.0").userData(mapOf("indent_size" to "4", "continuation_indent_size" to "2"))
+        ktlint("0.41.0").userData(mapOf("indent_size" to "4", "continuation_indent_size" to "2"))
         trimTrailingWhitespace()
         endWithNewline()
     }
@@ -78,12 +78,12 @@ subprojects {
                         useVersion(Versions.kotlinx_serialization)
                     }
                 }
-                requested.name.startsWith("kotlinx-coroutines") -> {
-                    if (requested.version != Versions.kotlinx_coroutines) {
-                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.kotlinx_coroutines}")
-                        useVersion(Versions.kotlinx_coroutines)
-                    }
-                }
+//                requested.name.startsWith("kotlinx-coroutines") -> {
+//                    if (requested.version != Versions.kotlinx_coroutines) {
+//                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.kotlinx_coroutines}")
+//                        useVersion(Versions.kotlinx_coroutines)
+//                    }
+//                }
                 requested.name.startsWith("kotlin-") -> {
                     if (requested.group == "org.jetbrains.kotlin" && requested.version != Versions.kotlin) {
                         println("overriding ${requested.group}:${requested.name} version from ${requested.version} to ${Versions.kotlin}")
@@ -109,12 +109,12 @@ subprojects {
                         useVersion(Versions.slf4j)
                     }
                 }
-                requested.name.startsWith("kotlinx-collections-immutable") -> {
-                    if (requested.version != "0.3.4") {
-                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to 0.3.4")
-                        useVersion("0.3.4")
-                    }
-                }
+//                requested.name.startsWith("kotlinx-collections-immutable") -> {
+//                    if (requested.version != "0.3.4") {
+//                        println("overriding ${requested.group}:${requested.name} version from ${requested.version} to 0.3.4")
+//                        useVersion("0.3.4")
+//                    }
+//                }
             }
         }
     }
@@ -136,6 +136,7 @@ subprojects {
                 "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi",
                 "-Xuse-experimental=androidx.compose.animation.ExperimentalAnimationApi",
                 "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi",
+                "-Xuse-experimental=androidx.compose.ui.ExperimentalComposeUiApi",
                 "-Xinline-classes",
                 "-no-reflect",
 //                "-P",

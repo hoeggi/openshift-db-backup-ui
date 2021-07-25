@@ -21,7 +21,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -112,7 +111,7 @@ private suspend fun restore(
     val incomingMessages = session.async(Dispatchers.IO) {
         logger.debug("start receiver")
         while (true) {
-            val receive = incoming.receiveOrNull() ?: run {
+            val receive = incoming.receiveCatching().getOrNull() ?: run {
                 logger.debug("received null, shutting down")
                 restore.close()
                 return@async

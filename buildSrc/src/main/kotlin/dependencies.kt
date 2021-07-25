@@ -1,18 +1,18 @@
 object Versions {
 
-//    const val kotlin = "1.5.0"
-    const val kotlin = "1.4.32"
-    const val okio = "2.10.0"
-    const val ktor = "1.5.4"
+    const val compose = "0.5.0-build229"
+    const val kotlin = "1.5.10"
+    const val ktor = "1.6.1"
     const val kotlinx_coroutines = "1.4.3"
     const val kotlinx_serialization = "1.1.0"
+    const val okio = "2.10.0"
     const val metrics_jmx = "4.2.2"
     const val micrometer_registry_prometheus = "1.7.1"
     const val okhttp = "4.9.1"
     const val slf4j = "1.7.30"
     const val guava = "30.1.1-jre"
     const val logback = "1.2.3"
-    const val compose = "0.4.0-build198"
+
     const val flatlaf = "1.3"
     const val sqldelight = "1.5.0"
     const val buildconfig = "3.0.1"

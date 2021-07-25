@@ -15,7 +15,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.serialization.encodeToString
 import org.slf4j.LoggerFactory
 
@@ -64,7 +63,7 @@ internal fun PortForward(): suspend DefaultWebSocketServerSession.() -> Unit = {
             val incoming = async(Dispatchers.IO) {
                 logger.debug("start receiver")
                 while (true) {
-                    val receive = incoming.receiveOrNull() ?: run {
+                    val receive = incoming.receiveCatching().getOrNull() ?: run {
                         logger.debug("received null, shutting down")
                         portForward.stop()
                         return@async

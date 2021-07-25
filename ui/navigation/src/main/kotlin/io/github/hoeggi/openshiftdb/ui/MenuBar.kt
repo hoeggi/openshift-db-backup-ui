@@ -2,12 +2,12 @@ package io.github.hoeggi.openshiftdb.ui
 
 import androidx.compose.desktop.AppManager
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.window.KeyStroke
-import androidx.compose.ui.window.Menu
-import androidx.compose.ui.window.MenuItem
+import androidx.compose.ui.window.v1.KeyStroke
+import androidx.compose.ui.window.v1.Menu
+import androidx.compose.ui.window.v1.MenuItem
 import io.github.hoeggi.openshiftdb.ui.composables.navigation.MenuControl
 
-fun MenuBar(menuControl: MenuControl) = androidx.compose.ui.window.MenuBar(
+fun MenuBar(menuControl: MenuControl) = androidx.compose.ui.window.v1.MenuBar(
     Menu(
         "File",
         MenuItem(

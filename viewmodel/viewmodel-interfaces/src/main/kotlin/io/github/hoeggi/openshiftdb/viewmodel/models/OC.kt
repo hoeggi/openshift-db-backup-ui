@@ -39,10 +39,14 @@ class OpenPortForward(val target: PortForwardTarget, val messages: List<PortForw
 interface PortForwardMessage {
     val message: String
 
-    inline class Start(override val message: String) : PortForwardMessage
-    inline class Message(override val message: String) : PortForwardMessage
-    inline class Close(override val message: String) : PortForwardMessage
-    inline class Error(override val message: String) : PortForwardMessage
+    @JvmInline
+    value class Start(override val message: String) : PortForwardMessage
+    @JvmInline
+    value class Message(override val message: String) : PortForwardMessage
+    @JvmInline
+    value class Close(override val message: String) : PortForwardMessage
+    @JvmInline
+    value class Error(override val message: String) : PortForwardMessage
 
     companion object {
         fun portForwardMessage(from: io.github.hoeggi.openshiftdb.api.response.PortForwardMessage): PortForwardMessage =

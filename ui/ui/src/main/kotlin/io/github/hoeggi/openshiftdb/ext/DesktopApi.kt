@@ -5,6 +5,7 @@ import java.io.File
 import java.io.IOException
 import java.net.URI
 import java.util.ArrayList
+import java.util.Locale
 
 object DesktopApi {
     fun browse(uri: URI): Boolean {
@@ -149,7 +150,7 @@ object DesktopApi {
 
     val os: EnumOS
         get() {
-            val s = System.getProperty("os.name").toLowerCase()
+            val s = System.getProperty("os.name").lowercase(Locale.getDefault())
             if (s.contains("win")) {
                 return EnumOS.WINDOWS
             }
